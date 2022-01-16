@@ -1,7 +1,7 @@
 
 # chess
 
-Simple chess application to play against a very smart computer and with very bad piece.
+Simple chess application to play against a very smart computer and with very bad graphics (that's a trend and something to be proud of).
 
 # Installation
 

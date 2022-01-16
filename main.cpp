@@ -1,8 +1,7 @@
 
 /**
- * @brief - Canonical application allowing to instantiate
- *          a working PGE process with configurable hooks
- *          to customize the behavior.
+ * @brief - Experiment around creating a board game (in this
+ *          case for chess) and a limited AI.
  */
 
 # include <core_utils/StdLogger.hh>
