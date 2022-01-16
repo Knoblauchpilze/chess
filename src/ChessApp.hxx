@@ -8,12 +8,6 @@ namespace pge {
 
   inline
   void
-  ChessApp::loadData() {
-    log("Load app data as needed", utils::Level::Info);
-  }
-
-  inline
-  void
   ChessApp::loadResources() {
     // Assign a specific tint to the regular
     // drawing layer so that we have a built
@@ -38,7 +32,9 @@ namespace pge {
   inline
   void
   ChessApp::cleanResources() {
-    log("Clean app data as needed", utils::Level::Info);
+    if (m_packs != nullptr) {
+      m_packs.reset();
+    }
   }
 
   inline

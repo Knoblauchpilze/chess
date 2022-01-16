@@ -10,8 +10,21 @@ namespace pge {
     m_game(nullptr),
     m_menus(),
 
-    m_packs(std::make_shared<TexturePack>())
+    m_packs(std::make_shared<TexturePack>()),
+    m_piecesPackID(),
+    m_currentPiece(0u)
   {}
+
+  void
+  ChessApp::loadData() {
+    // Create the texture pack.
+    sprites::Pack pack;
+    pack.file = "data/img/pieces.png";
+    pack.sSize = olc::vi2d(170, 170);
+    pack.layout = olc::vi2d(6, 2);
+
+    m_piecesPackID = m_packs->registerPack(pack);
+  }
 
   bool
   ChessApp::onFrame(float fElapsed) {
@@ -31,6 +44,10 @@ namespace pge {
   ChessApp::onInputs(const controls::State& c,
                      const CoordinateFrame& cf)
   {
+    if (c.keys[controls::keys::N]) {
+      m_currentPiece = (m_currentPiece + 1u) % 12u;
+    }
+
     // Handle case where no game is defined.
     if (m_game == nullptr) {
       return;
@@ -64,10 +81,24 @@ namespace pge {
   }
 
   void
-  ChessApp::drawDecal(const RenderDesc& /*res*/) {
+  ChessApp::drawDecal(const RenderDesc& res) {
     // Clear rendering target.
     SetPixelMode(olc::Pixel::ALPHA);
-    Clear(olc::VERY_DARK_GREY);
+    Clear(olc::Pixel(125, 154, 255));
+
+
+    SpriteDesc sd;
+    sd.radius = 1.0f;
+    sd.x = 0.0f;
+    sd.y = 0.0f;
+    sd.loc = RelativePosition::Center;
+
+    sd.sprite.pack = m_piecesPackID;
+    sd.sprite.sprite = m_currentPiece;
+    sd.sprite.id = 0;
+    sd.sprite.tint = olc::WHITE;
+
+    drawSprite(sd, res.cf);
 
     SetPixelMode(olc::Pixel::NORMAL);
   }

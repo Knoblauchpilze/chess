@@ -126,6 +126,13 @@ namespace pge {
        *          the elements of the game.
        */
       TexturePackShPtr m_packs;
+
+      /**
+       * @brief - The identifier of the pack containing the pieces.
+       */
+      unsigned m_piecesPackID;
+
+      unsigned m_currentPiece;
   };
 
 }

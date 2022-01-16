@@ -191,6 +191,9 @@ namespace pge {
     b = GetKey(olc::SPACE);
     m_controls.keys[controls::keys::Space] = b.bPressed || b.bHeld;
 
+    b = GetKey(olc::N);
+    m_controls.keys[controls::keys::N] = b.bReleased;
+
     b = GetKey(olc::P);
     m_controls.keys[controls::keys::P] = b.bReleased;
 
