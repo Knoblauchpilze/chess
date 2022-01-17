@@ -6,9 +6,9 @@
 # include "Menu.hh"
 # include "Game.hh"
 
-namespace pge {
+namespace chess {
 
-  class ChessApp: public PGEApp {
+  class App: public pge::App {
     public:
 
       /**
@@ -17,12 +17,12 @@ namespace pge {
        *               create the canvas needed by the app and
        *               set up base properties.
        */
-      ChessApp(const AppDesc& desc);
+      App(const pge::AppDesc& desc);
 
       /**
        * @brief - Desctruction of the object.
        */
-      ~ChessApp() = default;
+      ~App() = default;
 
     protected:
 
@@ -57,8 +57,8 @@ namespace pge {
       onFrame(float fElapsed) override;
 
       void
-      onInputs(const controls::State& c,
-               const CoordinateFrame& cf) override;
+      onInputs(const pge::controls::State& c,
+               const pge::CoordinateFrame& cf) override;
 
     private:
 
@@ -71,9 +71,9 @@ namespace pge {
         float y;
 
         float radius;
-        RelativePosition loc;
+        pge::RelativePosition loc;
 
-        sprites::Sprite sprite;
+        pge::sprites::Sprite sprite;
       };
 
       /**
@@ -94,7 +94,7 @@ namespace pge {
        *             conversion from tile position to pixels.
        */
       void
-      drawSprite(const SpriteDesc& t, const CoordinateFrame& cf);
+      drawSprite(const SpriteDesc& t, const pge::CoordinateFrame& cf);
 
       /**
        * @brief - Used to draw a simple rect at the specified
@@ -106,26 +106,26 @@ namespace pge {
        */
       void
       drawRect(const SpriteDesc& t,
-               const CoordinateFrame& cf);
+               const pge::CoordinateFrame& cf);
 
     private:
 
       /**
        * @brief - The game managed by this application.
        */
-      GameShPtr m_game;
+      pge::GameShPtr m_game;
 
       /**
        * @brief - Defines the list of menus available for
        *          this app.
        */
-      std::vector<MenuShPtr> m_menus;
+      std::vector<pge::MenuShPtr> m_menus;
 
       /**
        * @brief - A description of the textures used to represent
        *          the elements of the game.
        */
-      TexturePackShPtr m_packs;
+      pge::TexturePackShPtr m_packs;
 
       /**
        * @brief - The identifier of the pack containing the pieces.
@@ -137,6 +137,6 @@ namespace pge {
 
 }
 
-# include "ChessApp.hxx"
+# include "App.hxx"
 
 #endif    /* CHESS_APP_HH */

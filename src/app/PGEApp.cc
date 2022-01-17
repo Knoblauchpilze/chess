@@ -3,7 +3,7 @@
 
 namespace pge {
 
-  PGEApp::PGEApp(const AppDesc& desc):
+  App::App(const AppDesc& desc):
     utils::CoreObject(desc.name),
     olc::PixelGameEngine(),
 
@@ -37,7 +37,7 @@ namespace pge {
   }
 
   bool
-  PGEApp::OnUserCreate() {
+  App::OnUserCreate() {
     // The debug layer is the default layer: it is always
     // provided by the pixel game engine.
     m_dLayer = 0u;
@@ -67,7 +67,7 @@ namespace pge {
   }
 
   bool
-  PGEApp::OnUserUpdate(float fElapsedTime) {
+  App::OnUserUpdate(float fElapsedTime) {
     // Handle inputs.
     InputChanges ic = handleInputs();
 
@@ -138,8 +138,8 @@ namespace pge {
     return !ic.quit && !quit;
   }
 
-  PGEApp::InputChanges
-  PGEApp::handleInputs() {
+  App::InputChanges
+  App::handleInputs() {
     InputChanges ic{false, false};
 
     // Detect press on `Escape` key to shutdown the app.

@@ -18,6 +18,10 @@ add_subdirectory (
 	)
 
 add_subdirectory (
+	${CMAKE_CURRENT_SOURCE_DIR}/chess
+	)
+
+add_subdirectory (
 	${CMAKE_CURRENT_SOURCE_DIR}/game
 	)
 
@@ -26,7 +30,7 @@ add_subdirectory (
 	)
 
 target_sources (chess_lib PRIVATE
-	${CMAKE_CURRENT_SOURCE_DIR}/ChessApp.cc
+	${CMAKE_CURRENT_SOURCE_DIR}/App.cc
 	)
 
 set (TDEF_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" PARENT_SCOPE)

@@ -9,7 +9,7 @@
 
 namespace pge {
 
-  class PGEApp: public utils::CoreObject, public olc::PixelGameEngine {
+  class App: public utils::CoreObject, public olc::PixelGameEngine {
     public:
 
       /**
@@ -18,12 +18,12 @@ namespace pge {
        *               create the canvas needed by the app and
        *               set up base properties.
        */
-      PGEApp(const AppDesc& desc);
+      App(const AppDesc& desc);
 
       /**
        * @brief - Desctruction of the object.
        */
-      ~PGEApp() = default;
+      ~App() = default;
 
       /**
        * @brief - Implementation of the interface method called

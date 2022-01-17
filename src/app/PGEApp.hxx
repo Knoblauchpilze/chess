@@ -7,7 +7,7 @@ namespace pge {
 
   inline
   bool
-  PGEApp::OnUserDestroy() {
+  App::OnUserDestroy() {
     cleanResources();
     cleanMenuResources();
 
@@ -16,37 +16,37 @@ namespace pge {
 
   inline
   void
-  PGEApp::loadResources() {}
+  App::loadResources() {}
 
   inline
   void
-  PGEApp::loadMenuResources() {}
+  App::loadMenuResources() {}
 
   inline
   void
-  PGEApp::cleanResources() {}
+  App::cleanResources() {}
 
   inline
   bool
-  PGEApp::isFirstFrame() const noexcept {
+  App::isFirstFrame() const noexcept {
     return m_first;
   }
 
   inline
   bool
-  PGEApp::hasDebug() const noexcept {
+  App::hasDebug() const noexcept {
     return m_debugOn;
   }
 
   inline
   bool
-  PGEApp::hasUI() const noexcept {
+  App::hasUI() const noexcept {
     return m_uiOn;
   }
 
   inline
   void
-  PGEApp::setLayerTint(const Layer& layer, const olc::Pixel& tint) {
+  App::setLayerTint(const Layer& layer, const olc::Pixel& tint) {
     switch (layer) {
       case Layer::Draw:
         SetLayerTint(m_mLayer, tint);
@@ -66,7 +66,7 @@ namespace pge {
 
   inline
   void
-  PGEApp::clearLayer() {
+  App::clearLayer() {
     // Clear the canvas with a neutral fully transparent color.
     SetPixelMode(olc::Pixel::ALPHA);
     Clear(olc::Pixel(255, 255, 255, alpha::Transparent));
@@ -75,7 +75,7 @@ namespace pge {
 
   inline
   void
-  PGEApp::initialize(const olc::vi2d& dims, const olc::vi2d& pixRatio) {
+  App::initialize(const olc::vi2d& dims, const olc::vi2d& pixRatio) {
     // Construct the window. Note that we use a pixel size
     // to screen size ratio of `1` (meaning that each pixel
     // of the viewport will be represented by a pixel on

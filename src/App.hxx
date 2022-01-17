@@ -1,14 +1,14 @@
 #ifndef    CHESS_APP_HXX
 # define   CHESS_APP_HXX
 
-# include "ChessApp.hh"
+# include "App.hh"
 # include "Action.hh"
 
-namespace pge {
+namespace chess {
 
   inline
   void
-  ChessApp::loadResources() {
+  App::loadResources() {
     // Assign a specific tint to the regular
     // drawing layer so that we have a built
     // in transparency.
@@ -20,18 +20,18 @@ namespace pge {
     // This means that everything is indeed
     // transparent but that's the only way
     // for now to achieve it.
-    setLayerTint(Layer::Draw, olc::Pixel(255, 255, 255, alpha::SemiOpaque));
+    setLayerTint(Layer::Draw, olc::Pixel(255, 255, 255, pge::alpha::SemiOpaque));
   }
 
   inline
   void
-  ChessApp::loadMenuResources() {
+  App::loadMenuResources() {
     log("Generate menus and register them in the 'm_menus' attribute", utils::Level::Info);
   }
 
   inline
   void
-  ChessApp::cleanResources() {
+  App::cleanResources() {
     if (m_packs != nullptr) {
       m_packs.reset();
     }
@@ -39,13 +39,13 @@ namespace pge {
 
   inline
   void
-  ChessApp::cleanMenuResources() {
+  App::cleanMenuResources() {
     m_menus.clear();
   }
 
   inline
   void
-  ChessApp::drawSprite(const SpriteDesc& t, const CoordinateFrame& cf) {
+  App::drawSprite(const SpriteDesc& t, const pge::CoordinateFrame& cf) {
     olc::vf2d p = cf.tileCoordsToPixels(t.x, t.y, t.loc, t.radius);
 
     m_packs->draw(this, t.sprite, p, t.radius * cf.tileScale());
@@ -53,8 +53,8 @@ namespace pge {
 
   inline
   void
-  ChessApp::drawRect(const SpriteDesc& t,
-                     const CoordinateFrame& cf)
+  App::drawRect(const SpriteDesc& t,
+                const pge::CoordinateFrame& cf)
   {
     olc::vf2d p = cf.tileCoordsToPixels(t.x, t.y, t.loc, t.radius);
     FillRectDecal(p, t.radius * cf.tileSize(), t.sprite.tint);

@@ -10,7 +10,7 @@
 # include <core_utils/CoreException.hh>
 # include "AppDesc.hh"
 # include "TopViewFrame.hh"
-# include "ChessApp.hh"
+# include "App.hh"
 
 int
 main(int /*argc*/, char** /*argv*/) {
@@ -32,7 +32,7 @@ main(int /*argc*/, char** /*argv*/) {
       olc::vi2d(64, 64)
     );
     pge::AppDesc ad = pge::newDesc(olc::vi2d(800, 600), cf, "chess-app");
-    pge::ChessApp demo(ad);
+    chess::App demo(ad);
 
     demo.Start();
   }
