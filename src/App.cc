@@ -5,6 +5,31 @@
 /// @brief - Size of the tiles.
 # define TILE_SIZE 170
 
+namespace {
+
+  int
+  spriteIDFromPiece(const chess::pieces::Type& p) noexcept {
+    switch (p) {
+      case chess::pieces::Knight:
+        return 3;
+      case chess::pieces::Bishop:
+        return 2;
+      case chess::pieces::Rook:
+        return 4;
+      case chess::pieces::Queen:
+        return 1;
+      case chess::pieces::King:
+        return 0;
+      case chess::pieces::Pawn:
+      case chess::pieces::None:
+      default:
+        // Assume pawn.
+        return 5;
+    }
+  }
+
+}
+
 namespace chess {
 
   App::App(const pge::AppDesc& desc):
@@ -90,10 +115,6 @@ namespace chess {
     olc::Pixel bright(238, 238, 213);
     olc::Pixel dark(128, 148, 93);
 
-    // Colors for the pieces.
-    olc::Pixel white = olc::Pixel(128, 0, 0, pge::alpha::SemiOpaque);
-    olc::Pixel black = olc::Pixel(0, 0, 128, pge::alpha::SemiOpaque);
-
     // Draw the board.
     for (unsigned y = 0u ; y < 8u ; ++y) {
       for (unsigned x = 0u ; x < 8u ; ++x) {
@@ -132,17 +153,11 @@ namespace chess {
 
         sd.sprite.pack = m_piecesPackID;
         sd.sprite.id = 0;
-        sd.sprite.tint = (p.color == pieces::White ? white : black);
-        sd.sprite.sprite = 0u;
-
-        // if (x == 0 && y == 0) {
-        //   log(
-        //     "Sprite at " + std::to_string(x) + "x" + std::to_string(y) +
-        //     " is at " + std::to_string(sd.x) + "x" + std::to_string(sd.y) +
-        //     " tile: " + std::to_string(res.cf.tileSize().x) + "x" + std::to_string(res.cf.tileSize().y) +
-        //     " scale: " + std::to_string(res.cf.tileScale().x) + "x" + std::to_string(res.cf.tileScale().y)
-        //   );
-        // }
+        sd.sprite.tint = olc::WHITE;
+        sd.sprite.sprite = olc::vi2d(
+          spriteIDFromPiece(p.type),
+          p.color == pieces::White ? 0 : 1
+        );
 
         drawSprite(sd, res.cf);
       }

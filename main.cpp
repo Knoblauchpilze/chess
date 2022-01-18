@@ -12,6 +12,9 @@
 # include "TopViewFrame.hh"
 # include "App.hh"
 
+/// @brief - Size of the tiles.
+# define TILE_SIZE 170
+
 int
 main(int /*argc*/, char** /*argv*/) {
   // Create the logger.
@@ -29,7 +32,7 @@ main(int /*argc*/, char** /*argv*/) {
     pge::CoordinateFrameShPtr cf = std::make_shared<pge::TopViewFrame>(
       tViewport,
       pViewport,
-      olc::vi2d(64, 64)
+      olc::vi2d(TILE_SIZE, TILE_SIZE)
     );
     pge::AppDesc ad = pge::newDesc(olc::vi2d(800, 600), cf, "chess-app");
     chess::App demo(ad);
