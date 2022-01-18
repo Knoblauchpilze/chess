@@ -2,6 +2,9 @@
 # include "App.hh"
 # include <maths_utils/ComparisonUtils.hh>
 
+/// @brief - Size of the tiles.
+# define TILE_SIZE 170
+
 namespace chess {
 
   App::App(const pge::AppDesc& desc):
@@ -12,7 +15,8 @@ namespace chess {
 
     m_packs(std::make_shared<pge::TexturePack>()),
     m_piecesPackID(),
-    m_currentPiece(0u)
+
+    m_board()
   {}
 
   void
@@ -20,7 +24,7 @@ namespace chess {
     // Create the texture pack.
     pge::sprites::Pack pack;
     pack.file = "data/img/pieces.png";
-    pack.sSize = olc::vi2d(170, 170);
+    pack.sSize = olc::vi2d(TILE_SIZE, TILE_SIZE);
     pack.layout = olc::vi2d(6, 2);
 
     m_piecesPackID = m_packs->registerPack(pack);
@@ -44,10 +48,6 @@ namespace chess {
   App::onInputs(const pge::controls::State& c,
                 const pge::CoordinateFrame& cf)
   {
-    if (c.keys[pge::controls::keys::N]) {
-      m_currentPiece = (m_currentPiece + 1u) % 12u;
-    }
-
     // Handle case where no game is defined.
     if (m_game == nullptr) {
       return;
@@ -86,19 +86,67 @@ namespace chess {
     SetPixelMode(olc::Pixel::ALPHA);
     Clear(olc::Pixel(125, 154, 255));
 
+    // Colors for the board.
+    olc::Pixel bright(238, 238, 213);
+    olc::Pixel dark(128, 148, 93);
 
-    SpriteDesc sd;
-    sd.radius = 1.0f;
-    sd.x = 0.0f;
-    sd.y = 0.0f;
-    sd.loc = pge::RelativePosition::Center;
+    // Colors for the pieces.
+    olc::Pixel white = olc::Pixel(128, 0, 0, pge::alpha::SemiOpaque);
+    olc::Pixel black = olc::Pixel(0, 0, 128, pge::alpha::SemiOpaque);
 
-    sd.sprite.pack = m_piecesPackID;
-    sd.sprite.sprite = m_currentPiece;
-    sd.sprite.id = 0;
-    sd.sprite.tint = olc::WHITE;
+    // Draw the board.
+    for (unsigned y = 0u ; y < 8u ; ++y) {
+      for (unsigned x = 0u ; x < 8u ; ++x) {
+        unsigned det = (y % 2u + x) % 2u;
 
-    drawSprite(sd, res.cf);
+        SpriteDesc sd = {};
+        sd.loc = pge::RelativePosition::Center;
+        // Assume that the tile size is a square and scale
+        // the tiles so that they occupy one tile.
+        sd.radius = 1.0f;
+
+        sd.x = x;
+        sd.y = y;
+
+        sd.sprite.tint = (det == 0u ? dark : bright);
+
+        drawRect(sd, res.cf);
+      }
+    }
+
+    // Draw the pieces.
+    for (unsigned y = 0u ; y < 8u ; ++y) {
+      for (unsigned x = 0u ; x < 8u ; ++x) {
+        // Check if something is at this position.
+        pieces::Cell p = m_board.at(x, y);
+        if (p.type == pieces::None) {
+          continue;
+        }
+
+        SpriteDesc sd = {};
+        sd.loc = pge::RelativePosition::Center;
+        sd.radius = 0.9f;
+
+        sd.x = x;
+        sd.y = y;
+
+        sd.sprite.pack = m_piecesPackID;
+        sd.sprite.id = 0;
+        sd.sprite.tint = (p.color == pieces::White ? white : black);
+        sd.sprite.sprite = 0u;
+
+        // if (x == 0 && y == 0) {
+        //   log(
+        //     "Sprite at " + std::to_string(x) + "x" + std::to_string(y) +
+        //     " is at " + std::to_string(sd.x) + "x" + std::to_string(sd.y) +
+        //     " tile: " + std::to_string(res.cf.tileSize().x) + "x" + std::to_string(res.cf.tileSize().y) +
+        //     " scale: " + std::to_string(res.cf.tileScale().x) + "x" + std::to_string(res.cf.tileScale().y)
+        //   );
+        // }
+
+        drawSprite(sd, res.cf);
+      }
+    }
 
     SetPixelMode(olc::Pixel::NORMAL);
   }

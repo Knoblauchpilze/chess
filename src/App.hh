@@ -5,6 +5,7 @@
 # include "TexturePack.hh"
 # include "Menu.hh"
 # include "Game.hh"
+# include "Board.hh"
 
 namespace chess {
 
@@ -132,7 +133,10 @@ namespace chess {
        */
       unsigned m_piecesPackID;
 
-      unsigned m_currentPiece;
+      /**
+       * @brief - The chess board.
+       */
+      Board m_board;
   };
 
 }

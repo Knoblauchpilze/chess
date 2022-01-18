@@ -10,7 +10,20 @@ namespace chess {
       Bishop,
       Rook,
       Queen,
-      King
+      King,
+      None
+    };
+
+    /// @brief - The possible colors.
+    enum Color {
+      White,
+      Black
+    };
+
+    /// @brief - A convenience structure to represent a piece.
+    struct Cell {
+      Color color;
+      Type type;
     };
   }
 
