@@ -335,6 +335,12 @@ namespace pge {
       bool m_first;
 
       /**
+       * @brief - Whether or not panning and zooming is allowed
+       *          in this app.
+       */
+      bool m_fixedFrame;
+
+      /**
        * @brief - Holds an object allowing to convert between the
        *          various coordinate frames handled by the app. It
        *          handles conversion between cells coordinate and

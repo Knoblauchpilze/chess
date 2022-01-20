@@ -109,19 +109,29 @@ namespace chess {
   App::drawDecal(const RenderDesc& res) {
     // Clear rendering target.
     SetPixelMode(olc::Pixel::ALPHA);
-    Clear(olc::Pixel(125, 154, 255));
+    Clear(olc::Pixel(0, 100, 0));
+
+    SpriteDesc sd = {};
+    sd.loc = pge::RelativePosition::Center;
+    sd.radius = 8.4f;
+
+    sd.x = 3.5f;
+    sd.y = 3.5f;
+
+    sd.sprite.tint = olc::Pixel(123, 63, 0);
+
+    // The wooden layer.
+    drawRect(sd, res.cf);
 
     // Colors for the board.
     olc::Pixel bright(238, 238, 213);
-    olc::Pixel dark(128, 148, 93);
+    olc::Pixel dark(149, 69, 53);
 
     // Draw the board.
     for (unsigned y = 0u ; y < 8u ; ++y) {
       for (unsigned x = 0u ; x < 8u ; ++x) {
         unsigned det = (y % 2u + x) % 2u;
 
-        SpriteDesc sd = {};
-        sd.loc = pge::RelativePosition::Center;
         // Assume that the tile size is a square and scale
         // the tiles so that they occupy one tile.
         sd.radius = 1.0f;
@@ -144,8 +154,6 @@ namespace chess {
           continue;
         }
 
-        SpriteDesc sd = {};
-        sd.loc = pge::RelativePosition::Center;
         sd.radius = 0.9f;
 
         sd.x = x;

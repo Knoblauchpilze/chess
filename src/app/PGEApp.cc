@@ -18,6 +18,7 @@ namespace pge {
     m_controls(controls::newState()),
     m_first(true),
 
+    m_fixedFrame(desc.fixedFrame),
     m_frame(desc.frame)
   {
     // Initialize the application settings.
@@ -149,28 +150,32 @@ namespace pge {
       return ic;
     }
 
-    // In case we're dragging the right mouse button we
-    // will update the world's position (panning). What
-    // we want is to remember the position at the moment
-    // of the click and then continuously move the world
-    // to match the current displacement.
-    if (GetMouse(1).bPressed) {
-      m_frame->beginTranslation(GetMousePos());
-    }
-    if (GetMouse(1).bHeld) {
-      m_frame->translate(GetMousePos());
+    if (!m_fixedFrame) {
+      // In case we're dragging the right mouse button we
+      // will update the world's position (panning). What
+      // we want is to remember the position at the moment
+      // of the click and then continuously move the world
+      // to match the current displacement.
+      if (GetMouse(1).bPressed) {
+        m_frame->beginTranslation(GetMousePos());
+      }
+      if (GetMouse(1).bHeld) {
+        m_frame->translate(GetMousePos());
+      }
     }
 
     olc::vi2d mPos = GetMousePos();
     m_controls.mPosX = mPos.x;
     m_controls.mPosY = mPos.y;
 
-    int scroll = GetMouseWheel();
-    if (scroll > 0) {
-      m_frame->zoomIn(GetMousePos());
-    }
-    if (scroll < 0) {
-      m_frame->zoomOut(GetMousePos());
+    if (!m_fixedFrame) {
+      int scroll = GetMouseWheel();
+      if (scroll > 0) {
+        m_frame->zoomIn(GetMousePos());
+      }
+      if (scroll < 0) {
+        m_frame->zoomOut(GetMousePos());
+      }
     }
 
     // Handle inputs. Note that for keys apart for the

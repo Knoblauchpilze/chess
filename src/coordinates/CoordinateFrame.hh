@@ -257,6 +257,4 @@ namespace pge {
   using CoordinateFrameShPtr = std::shared_ptr<CoordinateFrame>;
 }
 
-# include "CoordinateFrame.hxx"
-
 #endif    /* COORDINATE_FRAME_HH */

@@ -13,12 +13,23 @@ namespace pge {
    *          concise and easily add info if needed.
    */
   struct AppDesc {
+    // The dimension of the window for this app in pixels.
     olc::vi2d dims;
+
+    // A ratio defining how many 'logical' pixels will be
+    // mapped to 'screen' pixels.
     olc::vi2d pixRatio;
 
+    // The name of the window.
     std::string name;
 
+    // The coordinate frame to use to convert dimensions in
+    // tiles to screen and pixels coordinates.
     CoordinateFrameShPtr frame;
+
+    // Whether or not the coordinate frame is fixed (meaning
+    // that panning and zooming is disabled) or not.
+    bool fixedFrame;
   };
 
   /**

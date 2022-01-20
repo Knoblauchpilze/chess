@@ -20,6 +20,8 @@ namespace pge {
 
     ad.frame = cf;
 
+    ad.fixedFrame = false;
+
     return ad;
   }
 
