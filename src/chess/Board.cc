@@ -3,8 +3,8 @@
 
 namespace chess {
 
-  Board::Board(unsigned  width,
-               unsigned  height) noexcept:
+  Board::Board(int  width,
+               int  height) noexcept:
     utils::CoreObject("board"),
 
     m_width(width),
@@ -18,8 +18,18 @@ namespace chess {
     initialize();
   }
 
+  int
+  Board::w() const noexcept {
+    return m_width;
+  }
+
+  int
+  Board::h() const noexcept {
+    return m_height;
+  }
+
   pieces::Cell
-  Board::at(unsigned x, unsigned y) const {
+  Board::at(int x, int y) const {
     if (x >= m_width || y >= m_height) {
       error(
         "Failed to fetch board piece",

@@ -10,8 +10,22 @@ namespace chess {
   class Board: public utils::CoreObject {
     public:
 
-      Board(unsigned  width = 8u,
-            unsigned  height = 8u) noexcept;
+      Board(int  width = 8u,
+            int  height = 8u) noexcept;
+
+      /**
+       * @brief - The width of the board.
+       * @return - the width of the board.
+       */
+      int
+      w() const noexcept;
+
+      /**
+       * @brief - The height of the board.
+       * @return - the height of the board.
+       */
+      int
+      h() const noexcept;
 
       /**
        * @brief - Returns the piece at the specified position or none in
@@ -21,7 +35,7 @@ namespace chess {
        * @return - the piece at this place.
        */
       pieces::Cell
-      at(unsigned x, unsigned y) const;
+      at(int x, int y) const;
 
     private:
 
@@ -33,12 +47,12 @@ namespace chess {
       /**
        * @brief - The width of the board.
        */
-      unsigned m_width;
+      int m_width;
 
       /**
        * @brief - The height of the board.
        */
-      unsigned m_height;
+      int m_height;
 
       /**
        * @brief - The current state of the board.

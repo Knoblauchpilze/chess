@@ -1,5 +1,6 @@
 
 # include "App.hh"
+# include <algorithm>
 # include <maths_utils/ComparisonUtils.hh>
 
 /// @brief - Size of the tiles.
@@ -169,6 +170,25 @@ namespace chess {
 
         drawSprite(sd, res.cf);
       }
+    }
+
+    // Draw the overlay in case the mouse is over
+    // a cell with a piece.
+    olc::vi2d mp = GetMousePos();
+    olc::vi2d mtp = res.cf.pixelCoordsToTiles(mp, nullptr);
+    if (mtp.x >= 0 && mtp.x < m_board.w() && mtp.y >= 0 && mtp.y < m_board.h()) {
+      unsigned x = std::clamp(mtp.x, 0, static_cast<int>(m_board.w()));
+      unsigned y = std::clamp(mtp.y, 0, static_cast<int>(m_board.h()));
+
+      log("m: " + std::to_string(mp.x) + "x" + std::to_string(mp.y) + " / " + std::to_string(x) + "x" + std::to_string(y) + " -> " + std::to_string(isFirstFrame()));
+
+      sd.radius = 1.0f;
+
+      sd.x = 1.0f * x;
+      sd.y = 1.0f * y;
+
+      sd.sprite.tint = olc::Pixel(0, 255, 0, pge::alpha::AlmostTransparent);
+      drawRect(sd, res.cf);
     }
 
     SetPixelMode(olc::Pixel::NORMAL);
