@@ -14,15 +14,11 @@ add_subdirectory (
 	)
 
 add_subdirectory (
-	${CMAKE_CURRENT_SOURCE_DIR}/app
-	)
-
-add_subdirectory (
-	${CMAKE_CURRENT_SOURCE_DIR}/chess
-	)
-
-add_subdirectory (
 	${CMAKE_CURRENT_SOURCE_DIR}/game
+	)
+
+add_subdirectory (
+	${CMAKE_CURRENT_SOURCE_DIR}/app
 	)
 
 add_subdirectory (

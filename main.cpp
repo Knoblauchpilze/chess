@@ -20,7 +20,7 @@ main(int /*argc*/, char** /*argv*/) {
   // Create the logger.
   utils::StdLogger raw;
   raw.setLevel(utils::Level::Debug);
-  utils::PrefixedLogger logger("pge", "main");
+  utils::PrefixedLogger logger("chess", "main");
   utils::LoggerLocator::provide(&raw);
 
   try {

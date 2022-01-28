@@ -4,6 +4,7 @@
 # include <vector>
 # include <memory>
 # include <core_utils/CoreObject.hh>
+# include "Board.hh"
 
 namespace pge {
 
@@ -17,8 +18,9 @@ namespace pge {
 
       /**
        * @brief - Create a new game with default parameters.
+       * @param board - the board managed by this game.
        */
-      Game();
+      Game(chess::BoardShPtr board);
 
       ~Game();
 
@@ -158,6 +160,11 @@ namespace pge {
        * @brief - The definition of the game state.
        */
       State m_state;
+
+      /**
+       * @brief - The board managed by this game.
+       */
+      chess::BoardShPtr m_board;
   };
 
   using GameShPtr = std::shared_ptr<Game>;

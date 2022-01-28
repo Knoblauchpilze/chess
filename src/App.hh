@@ -136,7 +136,7 @@ namespace chess {
       /**
        * @brief - The chess board.
        */
-      Board m_board;
+      BoardShPtr m_board;
   };
 
 }

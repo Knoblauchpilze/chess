@@ -2,6 +2,7 @@
 # define   BOARD_HH
 
 # include <vector>
+# include <memory>
 # include <core_utils/CoreObject.hh>
 # include "Pieces.hh"
 
@@ -60,6 +61,7 @@ namespace chess {
       std::vector<pieces::Cell> m_board;
   };
 
+  using BoardShPtr = std::shared_ptr<Board>;
 }
 
 #endif    /* BOARD_HH */

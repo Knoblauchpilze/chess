@@ -5,7 +5,7 @@
 
 namespace pge {
 
-  Game::Game():
+  Game::Game(chess::BoardShPtr board):
     utils::CoreObject("game"),
 
     m_state(
@@ -14,7 +14,9 @@ namespace pge {
         true,  // disabled
         false, // terminated
       }
-    )
+    ),
+
+    m_board(board)
   {
     setService("game");
   }
@@ -30,12 +32,14 @@ namespace pge {
   }
 
   void
-  Game::performAction(float /*x*/, float /*y*/) {
+  Game::performAction(float x, float y) {
     // Only handle actions when the game is not disabled.
     if (m_state.disabled) {
       log("Ignoring action while menu is disabled");
       return;
     }
+
+    log("Click " + std::to_string(x) + "x" + std::to_string(y));
   }
 
   bool
@@ -45,7 +49,8 @@ namespace pge {
       return true;
     }
 
-    log("Perform step method of the game", utils::Level::Info);
+    /// TODO: Handle this.
+    log("Perform step method of the game", utils::Level::Verbose);
 
     updateUI();
 
@@ -78,7 +83,8 @@ namespace pge {
 
   void
   Game::updateUI() {
-    log("Perform update of UI menus", utils::Level::Info);
+    /// TODO: Handle this.
+    log("Perform update of UI menus", utils::Level::Verbose);
   }
 
 }

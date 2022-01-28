@@ -42,7 +42,7 @@ namespace chess {
     m_packs(std::make_shared<pge::TexturePack>()),
     m_piecesPackID(),
 
-    m_board()
+    m_board(std::make_shared<Board>())
   {}
 
   void
@@ -54,6 +54,25 @@ namespace chess {
     pack.layout = olc::vi2d(6, 2);
 
     m_piecesPackID = m_packs->registerPack(pack);
+  }
+
+  void
+  App::loadResources() {
+    // Assign a specific tint to the regular
+    // drawing layer so that we have a built
+    // in transparency.
+    // We can't do it directly when drawing
+    // in the rendering function because as
+    // the whole layer will be drawn as one
+    // quad in opengl with an opaque alpha,
+    // we will lose this info.
+    // This means that everything is indeed
+    // transparent but that's the only way
+    // for now to achieve it.
+    setLayerTint(Layer::Draw, olc::Pixel(255, 255, 255, pge::alpha::SemiOpaque));
+
+    // Create the game.
+    m_game = std::make_shared<pge::Game>(m_board);
   }
 
   bool
@@ -150,7 +169,7 @@ namespace chess {
     for (unsigned y = 0u ; y < 8u ; ++y) {
       for (unsigned x = 0u ; x < 8u ; ++x) {
         // Check if something is at this position.
-        pieces::Cell p = m_board.at(x, y);
+        pieces::Cell p = m_board->at(x, y);
         if (p.type == pieces::None) {
           continue;
         }
@@ -176,9 +195,9 @@ namespace chess {
     // a cell with a piece.
     olc::vi2d mp = GetMousePos();
     olc::vi2d mtp = res.cf.pixelCoordsToTiles(mp, nullptr);
-    if (mtp.x >= 0 && mtp.x < m_board.w() && mtp.y >= 0 && mtp.y < m_board.h()) {
-      unsigned x = std::clamp(mtp.x, 0, static_cast<int>(m_board.w()));
-      unsigned y = std::clamp(mtp.y, 0, static_cast<int>(m_board.h()));
+    if (mtp.x >= 0 && mtp.x < m_board->w() && mtp.y >= 0 && mtp.y < m_board->h()) {
+      unsigned x = std::clamp(mtp.x, 0, static_cast<int>(m_board->w()));
+      unsigned y = std::clamp(mtp.y, 0, static_cast<int>(m_board->h()));
 
       sd.radius = 1.0f;
 
