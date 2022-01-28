@@ -79,16 +79,19 @@ namespace pge {
     float pox = pixels.x - m_pViewport.p.x;
     float poy = pixels.y - m_pViewport.p.y;
 
-    int tx = static_cast<int>(std::floor(pox / m_tScaled.x));
-    int ty = static_cast<int>(std::floor(poy / m_tScaled.y));
-
-    olc::vi2d rt(tx, ty);
+    float ftx = pox / m_tScaled.x;
+    float fty = poy / m_tScaled.y;
 
     // The viewport should be handled after we first
     // computed coordinates in the world's frame: it
     // is what is meant by the cells' offset.
-    rt.x += m_cViewport.p.x;
-    rt.y += m_cViewport.p.y;
+    // Note that as we allow decimal coordinates, we
+    // need to handle the rounding.
+    olc::vf2d frt(ftx + m_cViewport.p.x, fty + m_cViewport.p.y);
+    olc::vi2d rt(
+      static_cast<int>(std::round(frt.x)),
+      static_cast<int>(std::round(frt.y))
+    );
 
     // Compute the intra-tile offset by converting
     // the tile position to pixels and comparing the

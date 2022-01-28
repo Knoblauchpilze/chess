@@ -180,8 +180,6 @@ namespace chess {
       unsigned x = std::clamp(mtp.x, 0, static_cast<int>(m_board.w()));
       unsigned y = std::clamp(mtp.y, 0, static_cast<int>(m_board.h()));
 
-      log("m: " + std::to_string(mp.x) + "x" + std::to_string(mp.y) + " / " + std::to_string(x) + "x" + std::to_string(y) + " -> " + std::to_string(isFirstFrame()));
-
       sd.radius = 1.0f;
 
       sd.x = 1.0f * x;
