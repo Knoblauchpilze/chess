@@ -63,6 +63,12 @@ namespace chess {
       void
       initialize() noexcept;
 
+      unsigned
+      linear(unsigned x, unsigned y) const noexcept;
+
+      unsigned
+      linear(const Coordinates& c) const noexcept;
+
     private:
 
       /**

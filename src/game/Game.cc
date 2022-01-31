@@ -75,7 +75,7 @@ namespace pge {
     // starting location, or we don't.
     if (!m_start) {
       chess::pieces::Cell c = m_board->at(*coords);
-      if (c.type == chess::pieces::Type::None) {
+      if (c.type == chess::pieces::None) {
         return;
       }
 
@@ -87,15 +87,12 @@ namespace pge {
     // Attempt to move this piece: this can fail if the piece
     // is not allowed to move there (for any reason).
     if (!m_board->move(*m_start, *coords)) {
-      log(
-        "Failed to move piece from " + m_start->toString() +
-        " to " + coords->toString(),
-        utils::Level::Warning
-      );
-
       // Keep the initial position, the user can try again.
       return;
     }
+
+    // Reset starting location after the move.
+    m_start.reset();
   }
 
   bool

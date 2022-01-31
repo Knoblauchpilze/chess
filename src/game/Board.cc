@@ -37,7 +37,7 @@ namespace chess {
       );
     }
 
-    return m_board[y * m_width + x];
+    return m_board[linear(x, y)];
   }
 
   pieces::Cell
@@ -46,8 +46,27 @@ namespace chess {
   }
 
   bool
-  Board::move(const Coordinates& /*start*/, const Coordinates& /*end*/) {
-    return false;
+  Board::move(const Coordinates& start, const Coordinates& end) {
+    // Check piece at the start and end location.
+    pieces::Cell s = at(start);
+    pieces::Cell e = at(end);
+
+    if (s.type == pieces::None) {
+      warn("Failed to move from " + start.toString(), "Empty location");
+      return false;
+    }
+    if (e.type != pieces::None && s.color == e.color) {
+      warn("Move from " + start.toString() + " would conflict with " + end.toString());
+      return false;
+    }
+
+    // Swap pieces.
+    /// TODO: Handle real moves.
+    pieces::Cell c = m_board[linear(start)];
+    m_board[linear(start)] = m_board[linear(end)];
+    m_board[linear(end)] = c;
+
+    return true;
   }
 
   void
@@ -89,6 +108,18 @@ namespace chess {
     m_board[cells::F8] = { pieces::Black, pieces::Bishop };
     m_board[cells::G8] = { pieces::Black, pieces::Knight };
     m_board[cells::H8] = { pieces::Black, pieces::Rook };
+  }
+
+  inline
+  unsigned
+  Board::linear(unsigned x, unsigned y) const noexcept {
+    return y * m_width + x;
+  }
+
+  inline
+  unsigned
+  Board::linear(const Coordinates& c) const noexcept {
+    return linear(c.x(), c.y());
   }
 
 }
