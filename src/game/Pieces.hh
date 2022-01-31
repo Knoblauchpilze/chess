@@ -1,9 +1,12 @@
 #ifndef    PIECES_HH
 # define   PIECES_HH
 
-# include <iostream>
+# include <string>
 
 namespace chess {
+  /// Forward declaration of the coordinates class.
+  class Coordinates;
+
   namespace pieces {
     /// @brief - The possible pieces.
     enum Type {
@@ -16,11 +19,17 @@ namespace chess {
       None
     };
 
+    std::string
+    toString(const Type& t) noexcept;
+
     /// @brief - The possible colors.
     enum Color {
       White,
       Black
     };
+
+    std::string
+    toString(const Color& c) noexcept;
 
     /// @brief - A convenience structure to represent a piece.
     struct Cell {
@@ -129,6 +138,7 @@ namespace chess {
       unsigned m_x;
       unsigned m_y;
   };
+
 }
 
 #endif    /* PIECES_HH */

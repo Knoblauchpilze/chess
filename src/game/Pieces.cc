@@ -4,6 +4,41 @@
 # include <core_utils/CoreException.hh>
 
 namespace chess {
+  namespace pieces {
+
+    std::string
+    toString(const Type& t) noexcept {
+      switch (t) {
+        case Pawn:
+          return "pawn";
+        case Knight:
+          return "knight";
+        case Bishop:
+          return "bishop";
+        case Rook:
+          return "rook";
+        case Queen:
+          return "queen";
+        case King:
+          return "king";
+        case None:
+        default:
+          return "none";
+      }
+    }
+
+    std::string
+    toString(const Color& c) noexcept {
+      switch (c) {
+        case Black:
+          return "black";
+        default:
+        case White:
+          return "white";
+      }
+    }
+  }
+
   namespace cells {
 
     std::string

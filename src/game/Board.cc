@@ -1,5 +1,6 @@
 
 # include "Board.hh"
+# include "Move.hh"
 
 namespace chess {
 
@@ -60,11 +61,18 @@ namespace chess {
       return false;
     }
 
+    // Make sure the move is valid.
+    pieces::Cell sp = m_board[linear(start)];
+    if (!pieces::valid(sp.type, start, end)) {
+      warn("Move from " + start.toString() + " to " + end.toString() + " for " + pieces::toString(sp.type) + " is invalid");
+      return false;
+    }
+
     // Swap pieces.
-    /// TODO: Handle real moves.
-    pieces::Cell c = m_board[linear(start)];
     m_board[linear(start)] = m_board[linear(end)];
-    m_board[linear(end)] = c;
+    m_board[linear(end)] = sp;
+
+    /// TODO: Handle capture.
 
     return true;
   }
