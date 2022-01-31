@@ -156,6 +156,9 @@ namespace pge {
         bool terminated;
       };
 
+      /// @brief - Convenience define for a pointer on coordinates.
+      using CoordinatesShPtr = std::shared_ptr<chess::Coordinates>;
+
       /**
        * @brief - The definition of the game state.
        */
@@ -165,6 +168,14 @@ namespace pge {
        * @brief - The board managed by this game.
        */
       chess::BoardShPtr m_board;
+
+      /**
+       * @brief - The first coordinate that was clicked on
+       *          by the user. Defines the starting point of
+       *          a potential motion.
+       *          No location selected if null.
+       */
+      CoordinatesShPtr m_start;
   };
 
   using GameShPtr = std::shared_ptr<Game>;

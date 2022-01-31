@@ -3,6 +3,30 @@
 # include <cxxabi.h>
 # include "Menu.hh"
 
+namespace {
+
+  std::shared_ptr<chess::Coordinates>
+  convertCoords(float x, float y, float w, float h) {
+    // Account for center of tile.
+    x += 0.5f;
+    y += 0.5f;
+
+    if (x < 0.0f || y < 0.0f || x > w || y > h) {
+      // Outside of the board.
+      return nullptr;
+    }
+
+    unsigned ux = static_cast<unsigned>(x);
+    unsigned uy = static_cast<unsigned>(y);
+
+    // Note that the board is actually displayed upside down.
+    uy = h - 1u - uy;
+
+    return std::make_shared<chess::Coordinates>(ux, uy);
+  }
+
+}
+
 namespace pge {
 
   Game::Game(chess::BoardShPtr board):
@@ -39,7 +63,39 @@ namespace pge {
       return;
     }
 
-    log("Click " + std::to_string(x) + "x" + std::to_string(y));
+    CoordinatesShPtr coords = convertCoords(x, y, 1.0f * m_board->w(), 1.0f * m_board->h());
+    if (coords == nullptr) {
+      // Reset the current selected starting position for
+      // a piece move.
+      m_start.reset();
+      return;
+    }
+
+    // Two main possbilities: either we already have a valid
+    // starting location, or we don't.
+    if (!m_start) {
+      chess::pieces::Cell c = m_board->at(*coords);
+      if (c.type == chess::pieces::Type::None) {
+        return;
+      }
+
+      m_start = coords;
+      log("Click at " + m_start->toString());
+      return;
+    }
+
+    // Attempt to move this piece: this can fail if the piece
+    // is not allowed to move there (for any reason).
+    if (!m_board->move(*m_start, *coords)) {
+      log(
+        "Failed to move piece from " + m_start->toString() +
+        " to " + coords->toString(),
+        utils::Level::Warning
+      );
+
+      // Keep the initial position, the user can try again.
+      return;
+    }
   }
 
   bool

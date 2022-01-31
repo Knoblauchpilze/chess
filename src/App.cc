@@ -73,6 +73,12 @@ namespace chess {
 
     // Create the game.
     m_game = std::make_shared<pge::Game>(m_board);
+    m_game->togglePause();
+  }
+
+  void
+  App::loadMenuResources() {
+    m_menus = m_game->generateMenus(ScreenWidth(), ScreenHeight());
   }
 
   bool
@@ -118,6 +124,9 @@ namespace chess {
       olc::vi2d tp = cf.pixelCoordsToTiles(olc::vi2d(c.mPosX, c.mPosY), &it);
 
       m_game->performAction(tp.x + it.x, tp.y + it.y);
+    }
+    if (c.buttons[pge::controls::mouse::Left] == pge::controls::ButtonState::Held) {
+      /// TODO: Add drag and drop.
     }
 
     if (c.keys[pge::controls::keys::P]) {
@@ -165,7 +174,9 @@ namespace chess {
       }
     }
 
-    // Draw the pieces.
+    // Draw the pieces. Note that the board is upside
+    // down when drawn on screen.
+    /// TODO: Change in case the player is playing blacks.
     for (unsigned y = 0u ; y < 8u ; ++y) {
       for (unsigned x = 0u ; x < 8u ; ++x) {
         // Check if something is at this position.
@@ -177,7 +188,7 @@ namespace chess {
         sd.radius = 0.9f;
 
         sd.x = x;
-        sd.y = y;
+        sd.y = 7.0f - y;
 
         sd.sprite.pack = m_piecesPackID;
         sd.sprite.id = 0;

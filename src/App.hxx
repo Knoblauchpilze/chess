@@ -8,12 +8,6 @@ namespace chess {
 
   inline
   void
-  App::loadMenuResources() {
-    log("Generate menus and register them in the 'm_menus' attribute", utils::Level::Info);
-  }
-
-  inline
-  void
   App::cleanResources() {
     if (m_packs != nullptr) {
       m_packs.reset();

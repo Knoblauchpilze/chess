@@ -61,8 +61,8 @@ namespace pge {
 
     // Load elements.
     loadData();
-    loadMenuResources();
     loadResources();
+    loadMenuResources();
 
     return true;
   }

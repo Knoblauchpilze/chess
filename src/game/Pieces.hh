@@ -1,6 +1,8 @@
 #ifndef    PIECES_HH
 # define   PIECES_HH
 
+# include <iostream>
+
 namespace chess {
   namespace pieces {
     /// @brief - The possible pieces.
@@ -95,7 +97,38 @@ namespace chess {
       G8,
       H8
     };
+
+    std::string
+    toString(const Value& v) noexcept;
+
+    Value
+    fromString(const std::string& s);
   }
+
+  class Coordinates {
+    public:
+
+      Coordinates(unsigned x, unsigned y) noexcept;
+
+      Coordinates(const cells::Value& v) noexcept;
+
+      cells::Value
+      asValue() const;
+
+      unsigned
+      x() const noexcept;
+
+      unsigned
+      y() const noexcept;
+
+      std::string
+      toString() const noexcept;
+
+    private:
+
+      unsigned m_x;
+      unsigned m_y;
+  };
 }
 
 #endif    /* PIECES_HH */

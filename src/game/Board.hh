@@ -38,6 +38,26 @@ namespace chess {
       pieces::Cell
       at(int x, int y) const;
 
+      /**
+       * @brief - Returns the piece at the specified position or none in
+       *          case the cell is empty.
+       * @param c - the coordinates to check.
+       * @return - the piece at this place.
+       */
+      pieces::Cell
+      at(const Coordinates& c) const;
+
+      /**
+       * @brief - Attempts to move whatever piece might be located at the
+       *          starting position to the end location.
+       *          Also updates the board state based on this move.
+       * @param start - the start location to move from.
+       * @param end - the end location to move to.
+       * @return - `true` if the move could be performed.
+       */
+      bool
+      move(const Coordinates& start, const Coordinates& end);
+
     private:
 
       void

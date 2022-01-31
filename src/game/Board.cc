@@ -40,6 +40,16 @@ namespace chess {
     return m_board[y * m_width + x];
   }
 
+  pieces::Cell
+  Board::at(const Coordinates& c) const {
+    return at(c.x(), c.y());
+  }
+
+  bool
+  Board::move(const Coordinates& /*start*/, const Coordinates& /*end*/) {
+    return false;
+  }
+
   void
   Board::initialize() noexcept {
     // Whites.
