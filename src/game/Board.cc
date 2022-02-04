@@ -94,10 +94,11 @@ namespace chess {
 
     m_current = (m_current == pieces::White ? pieces::Black : pieces::White);
 
-    /// TODO: Handle capture.
-    // Swap pieces.
-    m_board[linear(start)] = m_board[linear(end)];
+    // Swap the piece at the starting position with the
+    // one at the end position. We also need to erase
+    // the data at the starting position.
     m_board[linear(end)] = sp;
+    m_board[linear(start)].type = pieces::None;
 
     return true;
   }
