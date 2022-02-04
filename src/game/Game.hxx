@@ -42,6 +42,12 @@ namespace pge {
     m_state.paused = false;
   }
 
+  inline
+  chess::CoordinatesShPtr
+  Game::getSelectedPosition() const noexcept {
+    return m_start;
+  }
+
 }
 
 #endif    /* GAME_HXX */

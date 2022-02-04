@@ -271,22 +271,22 @@ namespace chess {
     }
   }
 
-  Coordinates::Coordinates(unsigned x, unsigned y) noexcept:
+  Coordinates::Coordinates(int x, int y) noexcept:
     m_x(x),
     m_y(y)
   {}
 
   Coordinates::Coordinates(const cells::Value& v) noexcept:
-    m_x(0u),
-    m_y(0u)
+    m_x(0),
+    m_y(0)
   {
-    m_x = static_cast<unsigned>(v) % 8u;
-    m_y = static_cast<unsigned>(v) / 8u;
+    m_x = static_cast<int>(v) % 8;
+    m_y = static_cast<int>(v) / 8;
   }
 
   cells::Value
   Coordinates::asValue() const {
-    if (m_x > 7u || m_y > 7u) {
+    if (m_x > 7 || m_y > 7) {
       throw utils::CoreException(
         "Unable to convert coordinates to cell",
         "coordinates",
@@ -295,15 +295,15 @@ namespace chess {
       );
     }
 
-    return static_cast<cells::Value>(m_y * 8u + m_x);
+    return static_cast<cells::Value>(m_y * 8 + m_x);
   }
 
-  unsigned
+  int
   Coordinates::x() const noexcept {
     return m_x;
   }
 
-  unsigned
+  int
   Coordinates::y() const noexcept {
     return m_y;
   }
@@ -317,7 +317,7 @@ namespace chess {
     out += "x";
     out += std::to_string(m_y);
     out += ", ";
-    if (m_x > 8u || m_y > 8u) {
+    if (m_x > 8 || m_y > 8) {
       out += "N/A";
     }
     else {

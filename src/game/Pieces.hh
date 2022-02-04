@@ -2,10 +2,14 @@
 # define   PIECES_HH
 
 # include <string>
+# include <memory>
 
 namespace chess {
-  /// Forward declaration of the coordinates class.
+  /// @brief - Forward declaration of the coordinates class.
   class Coordinates;
+
+  /// @brief - Convenience define for a pointer on coordinates.
+  using CoordinatesShPtr = std::shared_ptr<chess::Coordinates>;
 
   namespace pieces {
     /// @brief - The possible pieces.
@@ -117,17 +121,17 @@ namespace chess {
   class Coordinates {
     public:
 
-      Coordinates(unsigned x, unsigned y) noexcept;
+      Coordinates(int x, int y) noexcept;
 
       Coordinates(const cells::Value& v) noexcept;
 
       cells::Value
       asValue() const;
 
-      unsigned
+      int
       x() const noexcept;
 
-      unsigned
+      int
       y() const noexcept;
 
       std::string
@@ -135,8 +139,8 @@ namespace chess {
 
     private:
 
-      unsigned m_x;
-      unsigned m_y;
+      int m_x;
+      int m_y;
   };
 
 }

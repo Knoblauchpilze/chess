@@ -174,8 +174,7 @@ namespace chess {
       }
     }
 
-    // Draw the pieces. Note that the board is upside
-    // down when drawn on screen.
+    // Draw the pieces.
     /// TODO: Change in case the player is playing blacks.
     for (unsigned y = 0u ; y < 8u ; ++y) {
       for (unsigned x = 0u ; x < 8u ; ++x) {
@@ -188,6 +187,8 @@ namespace chess {
         sd.radius = 0.9f;
 
         sd.x = x;
+        // Note that the board is upside down when drawn
+        // on screen.
         sd.y = 7.0f - y;
 
         sd.sprite.pack = m_piecesPackID;
@@ -216,6 +217,20 @@ namespace chess {
       sd.y = 1.0f * y;
 
       sd.sprite.tint = olc::Pixel(0, 255, 0, pge::alpha::AlmostTransparent);
+      drawRect(sd, res.cf);
+    }
+
+    // Draw the overlay for the selected piece.
+    CoordinatesShPtr c = m_game->getSelectedPosition();
+    if (c != nullptr) {
+      sd.radius = 1.0f;
+
+      sd.x = 1.0f * c->x();
+        // Note that the board is upside down when drawn
+        // on screen.
+      sd.y = 7.0f - c->y();
+
+      sd.sprite.tint = olc::Pixel(0, 0, 255, pge::alpha::AlmostTransparent);
       drawRect(sd, res.cf);
     }
 

@@ -63,7 +63,7 @@ namespace pge {
       return;
     }
 
-    CoordinatesShPtr coords = convertCoords(x, y, 1.0f * m_board->w(), 1.0f * m_board->h());
+    chess::CoordinatesShPtr coords = convertCoords(x, y, 1.0f * m_board->w(), 1.0f * m_board->h());
     if (coords == nullptr) {
       // Reset the current selected starting position for
       // a piece move.

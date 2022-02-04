@@ -110,6 +110,14 @@ namespace pge {
       void
       resume();
 
+      /**
+       * @brief - Returns the selected position (may be `null`
+       *          in case nothing is selected).
+       * @return - the selected coordinate if any.
+       */
+      chess::CoordinatesShPtr
+      getSelectedPosition() const noexcept;
+
     private:
 
       /**
@@ -156,9 +164,6 @@ namespace pge {
         bool terminated;
       };
 
-      /// @brief - Convenience define for a pointer on coordinates.
-      using CoordinatesShPtr = std::shared_ptr<chess::Coordinates>;
-
       /**
        * @brief - The definition of the game state.
        */
@@ -175,7 +180,7 @@ namespace pge {
        *          a potential motion.
        *          No location selected if null.
        */
-      CoordinatesShPtr m_start;
+      chess::CoordinatesShPtr m_start;
   };
 
   using GameShPtr = std::shared_ptr<Game>;
