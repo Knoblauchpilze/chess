@@ -2,6 +2,9 @@
 # include "Move.hh"
 # include "Board.hh"
 
+/// TODO: Prevent pieces to move in a way where it would
+/// put the kind in check.
+
 namespace chess {
 
   void
@@ -46,13 +49,99 @@ namespace chess {
 
       inline
       bool
-      valid(const Color& /*c*/,
-            const Coordinates& /*start*/,
-            const Coordinates& /*end*/,
-            const Board& /*b*/) noexcept
+      valid(const Color& c,
+            const Coordinates& start,
+            const Coordinates& end,
+            const Board& b) noexcept
       {
-        /// TODO: Handle pawn moves
-        return true;
+        // Pawn can move only vertically and diagonally
+        // when capturing or doing _en passant_.
+        int dx, dy;
+        differentials(start, end, dx, dy);
+
+        // Backward moves are prevented.
+        if (c == White && dy <= 0) {
+          return false;
+        }
+        if (c == Black && dy >= 0) {
+          return false;
+        }
+
+        if (dx == 0) {
+          // Depending on the color we want to allow the
+          // move to the top or to the bottom of the board.
+          if (c == White && dy < 0) {
+            return false;
+          }
+
+          if (c == Black && dy > 0) {
+            return false;
+          }
+
+          // We only allow two cells move in case the pawn
+          // is on its initial line.
+          if (c == White && start.y() != 1 && dy > 1) {
+            return false;
+          }
+          if (c == White && dy > 2) {
+            return false;
+          }
+
+          if (c == Black && start.y() != 6 && dy < -1) {
+            return false;
+          }
+          if (c == Black && dy < -2) {
+            return false;
+          }
+
+          // Prevent move to an obstructed cell.
+          Cell ce = b.at(end.x(), end.y());
+          if (ce.type != None) {
+            return false;
+          }
+
+          return true;
+        }
+
+        if (std::abs(dy) > 1) {
+          return false;
+        }
+
+        Cell ce = b.at(end.x(), end.y());
+        if (ce.type != None) {
+          // In case there's something, we have to make
+          // sure that the piece is of opposite color.
+          return ce.color != c;
+        }
+
+        // Otherwise, handle the en passant case. According
+        // to this page: https://en.wikipedia.org/wiki/En_passant
+        // The pawns should be in their fifth row.
+        if (c == White && start.y() != 4) {
+          return false;
+        }
+        if (c == Black && start.y() != 3) {
+          return false;
+        }
+
+        if (dx > 0 && start.x() >= b.w() - 2) {
+          return false;
+        }
+        if (dx < 0 && start.x() < 1) {
+          return false;
+        }
+
+        // There must be an adjacent pawn in the direction
+        // of the move.
+        Cell toCapture = b.at(end.x(), start.y());
+        if (toCapture.color == c || toCapture.type != Pawn) {
+          return false;
+        }
+
+        // The last move must have been the double-step move
+        // from the opposite pawn.
+        /// TODO: Handle last move.
+        return false;
       }
     }
 
@@ -62,12 +151,29 @@ namespace chess {
       inline
       bool
       valid(const Color& /*c*/,
-            const Coordinates& /*start*/,
-            const Coordinates& /*end*/,
+            const Coordinates& start,
+            const Coordinates& end,
             const Board& /*b*/) noexcept
       {
-        /// TODO: Handle knight moves.
-        return true;
+        // Pawn can move in a weird way and also jump over
+        // pieces of the same color (so ignoring any form
+        // of obstruction).
+        int dx, dy;
+        differentials(start, end, dx, dy);
+
+        // Combination of `(dx, dy)` can be:
+        // (1, 2) (1, -2)
+        // (-1, 2) (-1, -2)
+        // (2, 1) (-2, 1)
+        // (2, -1), (-2, -1)
+        if (std::abs(dx) == 1 && std::abs(dy) == 2) {
+          return true;
+        }
+        if (std::abs(dx) == 2 && std::abs(dy) == 1) {
+          return true;
+        }
+
+        return false;
       }
     }
 
