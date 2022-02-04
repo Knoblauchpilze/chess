@@ -84,6 +84,13 @@ namespace pge {
       return;
     }
 
+    // In case the end location is the same as the starting
+    // one, consider that we unselect the starting location.
+    if (*m_start == *coords) {
+      m_start.reset();
+      return;
+    }
+
     // Attempt to move this piece: this can fail if the piece
     // is not allowed to move there (for any reason).
     if (!m_board->move(*m_start, *coords)) {

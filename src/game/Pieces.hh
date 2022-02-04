@@ -125,6 +125,12 @@ namespace chess {
 
       Coordinates(const cells::Value& v) noexcept;
 
+      bool
+      operator==(const Coordinates& rhs) const noexcept;
+
+      bool
+      operator!=(const Coordinates& rhs) const noexcept;
+
       cells::Value
       asValue() const;
 

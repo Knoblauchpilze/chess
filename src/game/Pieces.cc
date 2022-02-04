@@ -284,6 +284,16 @@ namespace chess {
     m_y = static_cast<int>(v) / 8;
   }
 
+  bool
+  Coordinates::operator==(const Coordinates& rhs) const noexcept {
+    return m_x == rhs.m_x && m_y == rhs.m_y;
+  }
+
+  bool
+  Coordinates::operator!=(const Coordinates& rhs) const noexcept {
+    return !operator==(rhs);
+  }
+
   cells::Value
   Coordinates::asValue() const {
     if (m_x > 7 || m_y > 7) {
