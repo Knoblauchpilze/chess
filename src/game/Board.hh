@@ -64,7 +64,7 @@ namespace chess {
       initialize() noexcept;
 
       unsigned
-      linear(unsigned x, unsigned y) const noexcept;
+      linear(int x, int y) const noexcept;
 
       unsigned
       linear(const Coordinates& c) const noexcept;

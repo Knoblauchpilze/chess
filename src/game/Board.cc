@@ -63,7 +63,7 @@ namespace chess {
 
     // Make sure the move is valid.
     pieces::Cell sp = m_board[linear(start)];
-    if (!pieces::valid(sp.type, start, end)) {
+    if (!pieces::valid(sp.type, s.color, start, end, *this)) {
       warn("Move from " + start.toString() + " to " + end.toString() + " for " + pieces::toString(sp.type) + " is invalid");
       return false;
     }
@@ -120,7 +120,7 @@ namespace chess {
 
   inline
   unsigned
-  Board::linear(unsigned x, unsigned y) const noexcept {
+  Board::linear(int x, int y) const noexcept {
     return y * m_width + x;
   }
 
