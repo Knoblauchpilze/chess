@@ -77,12 +77,23 @@ namespace chess {
       inline
       bool
       valid(const Color& /*c*/,
-            const Coordinates& /*start*/,
-            const Coordinates& /*end*/,
-            const Board& /*b*/) noexcept
+            const Coordinates& start,
+            const Coordinates& end,
+            const Board& b) noexcept
       {
-        // TODO: Handle bishop moves.
-        return true;
+        // Rooks can only move diagonally.
+        int dx, dy;
+        differentials(start, end, dx, dy);
+
+        if (dx == 0 || dy == 0) {
+          return false;
+        }
+
+        if (std::abs(dx) != std::abs(dy)) {
+          return false;
+        }
+
+        return obstructed(b, start, (dx > 0 ? 1 : -1), (dy > 0 ? 1 : -1), std::abs(dx));
       }
     }
 
