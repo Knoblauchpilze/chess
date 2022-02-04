@@ -1,6 +1,7 @@
 #ifndef    MOVE_HH
 # define   MOVE_HH
 
+# include <string>
 # include "Pieces.hh"
 
 namespace chess {
@@ -8,6 +9,110 @@ namespace chess {
   /// @brief - Forward declaration of the Board to allow its
   /// use as parameter in the functions.
   class Board;
+
+  class Move {
+    public:
+
+      /**
+       * @brief - Create a move with the specified ID and
+       *          no data.
+       * @param id - the index of the move.
+       */
+      Move(unsigned id);
+
+      /**
+       * @brief - Used to register the part of the move related
+       *          to the input color's actions.
+       * @param
+       */
+      void
+      registerMove(const pieces::Color& c,
+                   const pieces::Type& t,
+                   const Coordinates& start,
+                   const Coordinates& end,
+                   const pieces::Type& captured,
+                   bool check,
+                   bool checkmate) noexcept;
+
+      /**
+       * @brief - Whether or not this move is valid.
+       * @return - `true` in case the move is valid.
+       */
+      bool
+      valid() const noexcept;
+
+      /**
+       * @brief - Prints the move as a standard string to
+       *          make it more readable. Note that in case
+       *          the move is not complete an error string
+       *          will be generated.
+       * @return - the generated string.
+       */
+      std::string
+      toString() const noexcept;
+
+    private:
+
+      void
+      generateName() noexcept;
+
+    private:
+
+      /// @brief - Convenience structure recording half of
+      /// a move with the information about a single move
+      /// of either white or black.
+      struct Part {
+        /// @brief - The piece that was moved.
+        pieces::Type piece;
+
+        /// @brief - The starting position of the piece that
+        /// was moved.
+        Coordinates start;
+
+        /// @brief - The end position of the piece that was
+        /// moved.
+        Coordinates end;
+
+        /// @brief - The type of the piece that was captured.
+        /// Set to `None` in case no piece was captured.
+        pieces::Type captured;
+
+        /// @brief - Whether this move put the enemy king in
+        /// check.
+        bool check;
+
+        /// @brief - Whether this move put the enemy kind in
+        /// checkmate.
+        bool checkmate;
+      };
+
+      /**
+       * @brief - The index of the move.
+       */
+      unsigned m_id;
+
+      /**
+       * @brief - Whether or not this move is valid.
+       */
+      bool m_valid;
+
+      /**
+       * @brief - The move performed by white.
+       */
+      Part m_white;
+
+      /**
+       * @brief - The move performed by black.
+       */
+      Part m_black;
+
+      /**
+       * @brief - The string representing this move. We do
+       *          compute it once and then save it for cache
+       *          purposes.
+       */
+      std::string m_name;
+  };
 
   namespace pieces {
 

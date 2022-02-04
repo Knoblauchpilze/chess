@@ -28,6 +28,28 @@ namespace chess {
     }
 
     std::string
+    algebraic(const Type& t) noexcept {
+      switch (t) {
+        case Pawn:
+          // Empty string for a pawn.
+          return "";
+        case Knight:
+          return "N";
+        case Bishop:
+          return "B";
+        case Rook:
+          return "R";
+        case Queen:
+          return "Q";
+        case King:
+          return "K";
+        case None:
+        default:
+          return "?";
+      }
+    }
+
+    std::string
     toString(const Color& c) noexcept {
       switch (c) {
         case Black:
@@ -172,6 +194,87 @@ namespace chess {
           return "g8";
         case Value::H8:
           return "h8";
+      }
+
+      // Shouldn't happen.
+      return "unknown";
+    }
+
+    std::string
+    file(const Value& v) noexcept {
+      switch (v) {
+        case Value::A1:
+        case Value::A2:
+        case Value::A3:
+        case Value::A4:
+        case Value::A5:
+        case Value::A6:
+        case Value::A7:
+        case Value::A8:
+          return "a";
+        case Value::B1:
+        case Value::B2:
+        case Value::B3:
+        case Value::B4:
+        case Value::B5:
+        case Value::B6:
+        case Value::B7:
+        case Value::B8:
+          return "b";
+        case Value::C1:
+        case Value::C2:
+        case Value::C3:
+        case Value::C4:
+        case Value::C5:
+        case Value::C6:
+        case Value::C7:
+        case Value::C8:
+          return "c";
+        case Value::D1:
+        case Value::D2:
+        case Value::D3:
+        case Value::D4:
+        case Value::D5:
+        case Value::D6:
+        case Value::D7:
+        case Value::D8:
+          return "d";
+        case Value::E1:
+        case Value::E2:
+        case Value::E3:
+        case Value::E4:
+        case Value::E5:
+        case Value::E6:
+        case Value::E7:
+        case Value::E8:
+          return "e";
+        case Value::F1:
+        case Value::F2:
+        case Value::F3:
+        case Value::F4:
+        case Value::F5:
+        case Value::F6:
+        case Value::F7:
+        case Value::F8:
+          return "f";
+        case Value::G1:
+        case Value::G2:
+        case Value::G3:
+        case Value::G4:
+        case Value::G5:
+        case Value::G6:
+        case Value::G7:
+        case Value::G8:
+          return "g";
+        case Value::H1:
+        case Value::H2:
+        case Value::H3:
+        case Value::H4:
+        case Value::H5:
+        case Value::H6:
+        case Value::H7:
+        case Value::H8:
+          return "h";
       }
 
       // Shouldn't happen.

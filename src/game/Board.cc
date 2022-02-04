@@ -12,7 +12,12 @@ namespace chess {
     m_height(height),
 
     // White by default.
-    m_board(width * height, {pieces::White, pieces::None})
+    m_board(width * height, {pieces::White, pieces::None}),
+
+    m_index(1u),
+    m_current(pieces::White),
+    m_move(m_index),
+    m_moves()
   {
     setService("chess");
 
@@ -61,6 +66,12 @@ namespace chess {
       return false;
     }
 
+    // Prevent wrong pieces to move.
+    if (s.color != m_current) {
+      warn("Trying to move " + pieces::toString(s.color) + " when " + pieces::toString(m_current) + " should play");
+      return false;
+    }
+
     // Make sure the move is valid.
     pieces::Cell sp = m_board[linear(start)];
     if (!pieces::valid(sp.type, s.color, start, end, *this)) {
@@ -68,11 +79,25 @@ namespace chess {
       return false;
     }
 
+
+    // Register the move.
+    m_move.registerMove(s.color, s.type, start, end, e.type, false, false);
+
+    if (m_move.valid()) {
+      m_moves.push_back(m_move);
+      m_move = Move(m_index);
+
+      ++m_index;
+
+      log("Adding move " + m_moves.back().toString());
+    }
+
+    m_current = (m_current == pieces::White ? pieces::Black : pieces::White);
+
+    /// TODO: Handle capture.
     // Swap pieces.
     m_board[linear(start)] = m_board[linear(end)];
     m_board[linear(end)] = sp;
-
-    /// TODO: Handle capture.
 
     return true;
   }

@@ -26,6 +26,9 @@ namespace chess {
     std::string
     toString(const Type& t) noexcept;
 
+    std::string
+    algebraic(const Type& t) noexcept;
+
     /// @brief - The possible colors.
     enum Color {
       White,
@@ -113,6 +116,9 @@ namespace chess {
 
     std::string
     toString(const Value& v) noexcept;
+
+    std::string
+    file(const Value& v) noexcept;
 
     Value
     fromString(const std::string& s);

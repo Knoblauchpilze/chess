@@ -5,6 +5,7 @@
 # include <memory>
 # include <core_utils/CoreObject.hh>
 # include "Pieces.hh"
+# include "Move.hh"
 
 namespace chess {
 
@@ -85,6 +86,27 @@ namespace chess {
        * @brief - The current state of the board.
        */
       std::vector<pieces::Cell> m_board;
+
+      /**
+       * @brief - The current move index.
+       */
+      unsigned m_index;
+
+      /**
+       * @brief - The color of pieces currently allowed to
+       *          move. Gets updated after each round.
+       */
+      pieces::Color m_current;
+
+      /**
+       * @brief - The current move.
+       */
+      Move m_move;
+
+      /**
+       * @brief - The stack of moves.
+       */
+      std::vector<Move> m_moves;
   };
 
   using BoardShPtr = std::shared_ptr<Board>;
