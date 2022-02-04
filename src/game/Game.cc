@@ -79,6 +79,12 @@ namespace pge {
         return;
       }
 
+      // Prevent selection of pieces that are not meant to
+      // play at the moment.
+      if (c.color != m_board->getPlayer()) {
+        return;
+      }
+
       m_start = coords;
       log("Click at " + m_start->toString());
       return;

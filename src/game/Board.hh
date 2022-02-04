@@ -30,6 +30,14 @@ namespace chess {
       h() const noexcept;
 
       /**
+       * @brief - Returns the current color playing the next
+       *          round.
+       * @return - the next color to play.
+       */
+      chess::pieces::Color
+      getPlayer() const noexcept;
+
+      /**
        * @brief - Returns the piece at the specified position or none in
        *          case the cell is empty.
        * @param x - the x coordinate.

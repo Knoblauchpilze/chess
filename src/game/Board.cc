@@ -34,6 +34,11 @@ namespace chess {
     return m_height;
   }
 
+  chess::pieces::Color
+  Board::getPlayer() const noexcept {
+    return m_current;
+  }
+
   pieces::Cell
   Board::at(int x, int y) const {
     if (x >= m_width || y >= m_height) {
