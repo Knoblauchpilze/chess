@@ -92,12 +92,24 @@ namespace chess {
       inline
       bool
       valid(const Color& /*c*/,
-            const Coordinates& /*start*/,
-            const Coordinates& /*end*/,
-            const Board& /*b*/) noexcept
+            const Coordinates& start,
+            const Coordinates& end,
+            const Board& b) noexcept
       {
-        /// TODO: Handle rook moves.
-        return true;
+        // Rooks can only move horizontally or vertically.
+        int dx, dy;
+        differentials(start, end, dx, dy);
+
+        if (dx != 0 && dy != 0) {
+          return false;
+        }
+
+        if (dx != 0) {
+          return obstructed(b, start, (dx > 0 ? 1 : -1), 0, std::abs(dx));
+        }
+
+        // Assume vertical move.
+        return obstructed(b, start, 0, (dy > 0 ? 1 : -1), std::abs(dy));
       }
     }
 
@@ -111,7 +123,7 @@ namespace chess {
             const Coordinates& end,
             const Board& b) noexcept
       {
-        // Queens can do move any direction as long as it
+        // Queens can move any direction as long as it
         // is a horizontal, vertical or diagonal move.
         int dx, dy;
         differentials(start, end, dx, dy);
