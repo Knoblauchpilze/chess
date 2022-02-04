@@ -38,6 +38,39 @@ namespace chess {
       getPlayer() const noexcept;
 
       /**
+       * @brief - Returns the current round index.
+       * @return - the index of the current round.
+       */
+      unsigned
+      getCurrentRound() const noexcept;
+
+      /**
+       * @brief - Returns the last move player.
+       * @return - the last move played.
+       */
+      chess::Move
+      getLastMove() const noexcept;
+
+      /**
+       * @brief - Determines whether the king of the input color is
+       *          currently in check.
+       * @param color - the color to check.
+       * @return - `true` if the king of the input color is in check.
+       */
+      bool
+      isInCheck(const pieces::Color& color) const noexcept;
+
+      /**
+       * @brief - Determines whether the king of the input color is
+       *          currently in checkmate.
+       * @param color - the color to check.
+       * @return - `true` if the king of the input color is in a
+       *           checkmate position.
+       */
+      bool
+      isInCheckmate(const pieces::Color& color) const noexcept;
+
+      /**
        * @brief - Returns the piece at the specified position or none in
        *          case the cell is empty.
        * @param x - the x coordinate.

@@ -5,6 +5,7 @@
 # include <memory>
 # include <core_utils/CoreObject.hh>
 # include "Board.hh"
+# include "AI.hh"
 
 namespace pge {
 
@@ -139,12 +140,10 @@ namespace pge {
 
     private:
 
-      /**
-       * @brief - Convenience information defining the state of the
-       *          game. It includes information about whether the
-       *          menus should be displayed and if the user actions
-       *          should be interpreted or not.
-       */
+      /// @brief - Convenience information defining the state of the
+      /// game. It includes information about whether the
+      /// menus should be displayed and if the user actions
+      /// should be interpreted or not.
       struct State {
         // Defines whether this world is paused (i.e.
         // internal attributes of the mobs/blocks/etc
@@ -164,6 +163,25 @@ namespace pge {
         bool terminated;
       };
 
+      /// @brief - Convenience structure allowing to display the info
+      /// about the current game.
+      struct Menus {
+        /// The current round.
+        MenuShPtr round;
+
+        /// Who is next to play.
+        MenuShPtr player;
+
+        /// The check mate status.
+        MenuShPtr status;
+
+        /// The last moves.
+        std::vector<MenuShPtr> moves;
+
+        /// The current menu to update for the next move.
+        unsigned move;
+      };
+
       /**
        * @brief - The definition of the game state.
        */
@@ -181,6 +199,18 @@ namespace pge {
        *          No location selected if null.
        */
       chess::CoordinatesShPtr m_start;
+
+      /**
+       * @brief - The AI used to play the other color compared
+       *          to what the user chose.
+       */
+      chess::AIShPtr m_ai;
+
+      /**
+       * @brief - The menus registered to display information to
+       *          the user about the current state of the game.
+       */
+      Menus m_menus;
   };
 
   using GameShPtr = std::shared_ptr<Game>;

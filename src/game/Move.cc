@@ -41,8 +41,6 @@ namespace {
     return true;
   }
 
-
-
 }
 
 namespace chess {
@@ -91,6 +89,11 @@ namespace chess {
   bool
   Move::valid() const noexcept {
     return m_white.piece != pieces::None && m_black.piece != pieces::None;
+  }
+
+  unsigned
+  Move::id() const noexcept {
+    return m_id;
   }
 
   std::string

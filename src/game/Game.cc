@@ -25,6 +25,26 @@ namespace {
     return std::make_shared<chess::Coordinates>(ux, uy);
   }
 
+  pge::MenuShPtr
+  generateMenu(const olc::vi2d& size,
+               const std::string& text,
+               const std::string& name)
+  {
+    pge::menu::MenuContentDesc fd = pge::menu::newMenuContent(text, "", size);
+    fd.color = olc::WHITE;
+
+    return std::make_shared<pge::Menu>(
+      olc::vi2d(),
+      size,
+      name,
+      pge::menu::newColoredBackground(olc::VERY_DARK_GREEN),
+      fd,
+      pge::menu::Layout::Horizontal,
+      false,
+      false
+    );
+  }
+
 }
 
 namespace pge {
@@ -40,7 +60,10 @@ namespace pge {
       }
     ),
 
-    m_board(board)
+    m_board(board),
+    m_start(nullptr),
+    m_ai(std::make_shared<chess::AI>(chess::pieces::Black)),
+    m_menus()
   {
     setService("game");
   }
@@ -48,11 +71,48 @@ namespace pge {
   Game::~Game() {}
 
   std::vector<MenuShPtr>
-  Game::generateMenus(float /*width*/,
+  Game::generateMenus(float width,
                       float /*height*/)
   {
-    log("Generate UI menus here", utils::Level::Info);
-    return std::vector<MenuShPtr>();
+    // Generate the main menu.
+    pge::MenuShPtr status = generateMenu(olc::vi2d(width, 50), "", "root");
+
+    static const unsigned sk_lastMoves = 5u;
+    // And additional menus: we will display 3 menus
+    // and the number of moves. The percentage are
+    // arbitrary.
+    int wRound = static_cast<int>(width * 0.1f);
+    int wPlayer = static_cast<int>(width * 0.2f);
+    int wStatus = static_cast<int>(width * 0.2f);
+    int wMove = static_cast<int>(width * 0.5f / sk_lastMoves);
+
+    int mHeight = 30;
+
+    m_menus.round = generateMenu(olc::vi2d(wRound, mHeight), "Round: N/A", "round");
+    m_menus.player = generateMenu(olc::vi2d(wPlayer, mHeight), "White", "player");
+    m_menus.status = generateMenu(olc::vi2d(wStatus, mHeight), "All good", "status");
+
+    for (unsigned id = 0u ; id < sk_lastMoves ; ++id) {
+      m_menus.moves.push_back(
+        generateMenu(olc::vi2d(wMove, mHeight), "", "move_" + std::to_string(id))
+      );
+    }
+
+    // Register the menu in the parent one.
+    status->addMenu(m_menus.round);
+    status->addMenu(m_menus.player);
+    status->addMenu(m_menus.status);
+
+    for (unsigned id = 0u ; id < sk_lastMoves ; ++id) {
+      status->addMenu(m_menus.moves[id]);
+    }
+
+    // Initialize the current move at one minus the
+    // maximum number of move so that the first move
+    // can actually be registered.
+    m_menus.move = sk_lastMoves - 1u;
+
+    return std::vector<MenuShPtr>(1u, status);
   }
 
   void
@@ -104,6 +164,11 @@ namespace pge {
       return;
     }
 
+    // Make the AI play as the move was valid if we reach this
+    // point: this will make sure that the user can play again
+    // immediately.
+    m_ai->play(*m_board);
+
     // Reset starting location after the move.
     m_start.reset();
   }
@@ -149,6 +214,30 @@ namespace pge {
 
   void
   Game::updateUI() {
+    // Fetch properties to update.
+    chess::pieces::Color p = m_board->getPlayer();
+    unsigned id = m_board->getCurrentRound();
+    chess::Move m = m_board->getLastMove();
+
+    m_menus.round->setText("Round: " + std::to_string(id + 1u));
+    m_menus.player->setText(chess::pieces::toString(p));
+
+    std::string st = "All good";
+    if (m_board->isInCheck(p)) {
+      st = "Check";
+    }
+    if (m_board->isInCheckmate(p)) {
+      st = "Checkmate";
+    }
+    m_menus.status->setText(st);
+
+    if (m.id() != m_menus.move && m.valid()) {
+      unsigned pos = m.id() % m_menus.moves.size();
+      log("Setting move " + std::to_string(m.id()) + " at " + std::to_string(pos) + " to " + m.toString());
+      m_menus.moves[pos]->setText(m.toString());
+      m_menus.move = m.id();
+    }
+
     /// TODO: Handle this.
     log("Perform update of UI menus", utils::Level::Verbose);
   }

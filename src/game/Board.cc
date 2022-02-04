@@ -14,7 +14,7 @@ namespace chess {
     // White by default.
     m_board(width * height, {pieces::White, pieces::None}),
 
-    m_index(1u),
+    m_index(0u),
     m_current(pieces::White),
     m_move(m_index),
     m_moves()
@@ -37,6 +37,32 @@ namespace chess {
   chess::pieces::Color
   Board::getPlayer() const noexcept {
     return m_current;
+  }
+
+  unsigned
+  Board::getCurrentRound() const noexcept {
+    return m_index;
+  }
+
+  chess::Move
+  Board::getLastMove() const noexcept {
+    if (m_moves.empty()) {
+      return m_move;
+    }
+
+    return m_moves.back();
+  }
+
+  bool
+  Board::isInCheck(const pieces::Color& /*color*/) const noexcept {
+    /// TODO: Compute if check exists.
+    return false;
+  }
+
+  bool
+  Board::isInCheckmate(const pieces::Color& /*color*/) const noexcept {
+    /// TODO: Compute if checkmate exists.
+    return false;
   }
 
   pieces::Cell
@@ -90,9 +116,8 @@ namespace chess {
 
     if (m_move.valid()) {
       m_moves.push_back(m_move);
-      m_move = Move(m_index);
-
       ++m_index;
+      m_move = Move(m_index);
 
       log("Adding move " + m_moves.back().toString());
     }

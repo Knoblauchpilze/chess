@@ -23,7 +23,13 @@ namespace chess {
       /**
        * @brief - Used to register the part of the move related
        *          to the input color's actions.
-       * @param
+       * @param c - the color for which the move should be set.
+       * @param t - the type of piece executing the move.
+       * @param start - the starting position of the move.
+       * @param end - the end position of the move.
+       * @param captured - the piece that was captured (if any).
+       * @param check - whether the move creates a check.
+       * @param checkmate - whether the move creates a checkmate.
        */
       void
       registerMove(const pieces::Color& c,
@@ -40,6 +46,13 @@ namespace chess {
        */
       bool
       valid() const noexcept;
+
+      /**
+       * @brief - Returns the index of this move.
+       * @return - the index of the move.
+       */
+      unsigned
+      id() const noexcept;
 
       /**
        * @brief - Prints the move as a standard string to
