@@ -143,7 +143,7 @@ namespace chess {
      * @param start - the starting position.
      * @param end - the end position.
      * @param b - the current state of the board used to get some
-     *            additional position about the position of the
+     *            additional information about the position of the
      *            pieces.
      * @return - `true` if the motion is valid.
      */
