@@ -168,7 +168,7 @@ namespace chess {
         sd.x = x;
         sd.y = y;
 
-        sd.sprite.tint = (det == 0u ? dark : bright);
+        sd.sprite.tint = (det == 1u ? dark : bright);
 
         drawRect(sd, res.cf);
       }
