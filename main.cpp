@@ -16,9 +16,6 @@
 /// piece. This helps picking something.
 /// TODO: Display a timed message when the user is in check
 /// or checkmate.
-/// TODO: Create a menu indicating the last N moves.
-/// TODO: Create a menu indicating the current situation of
-/// the game.
 
 /// @brief - Size of the tiles.
 # define TILE_SIZE 170

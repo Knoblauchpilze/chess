@@ -13,6 +13,7 @@ namespace chess {
 
   void
   AI::play(Board& /*b*/) noexcept {
+    /// TODO: Handle the AI play.
     warn("Should play for \"" + pieces::toString(m_color) + "\"");
   }
 
