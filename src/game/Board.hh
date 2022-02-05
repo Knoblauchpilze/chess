@@ -111,7 +111,35 @@ namespace chess {
       unsigned
       linear(const Coordinates& c) const noexcept;
 
+      /**
+       * @brief - Used to update the internal state and perform the
+       *          computation about checks, checkmates, etc.
+       */
+      void
+      updateState() const noexcept;
+
     private:
+
+      /// @brief - Convenience structure allowing to keep track
+      /// of the state of the board to speed-up some computations.
+      /// This information is used as a sort of cache and needs
+      /// to be recomputed when needed.
+      struct State {
+        // Whether or not the information here is up to date.
+        bool dirty;
+
+        // Whether the white kind is in check.
+        bool whiteInCheck;
+
+        // Whether the black kind is in check.
+        bool blackInCheck;
+
+        // Whether the white kind is in checkmate.
+        bool whiteInCheckmate;
+
+        // Whether the black kind is in checkmate.
+        bool blackInCheckmate;
+      };
 
       /**
        * @brief - The width of the board.
@@ -138,6 +166,11 @@ namespace chess {
        *          move. Gets updated after each round.
        */
       pieces::Color m_current;
+
+      /**
+       * @brief - The current state of the board.
+       */
+      mutable State m_state;
 
       /**
        * @brief - The current move.

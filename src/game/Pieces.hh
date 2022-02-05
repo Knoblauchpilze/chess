@@ -157,4 +157,6 @@ namespace chess {
 
 }
 
+# include "Pieces_std_specialization.hh"
+
 #endif    /* PIECES_HH */
