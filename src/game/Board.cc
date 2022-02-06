@@ -81,6 +81,17 @@ namespace chess {
     return isInCheckmate(color);
   }
 
+  std::vector<Coordinates>
+  Board::availablePositions(const Coordinates& coords) noexcept {
+    pieces::Cell c = at(coords);
+    // Case of an empty piece: no available position.
+    if (c.type == pieces::None) {
+      return std::vector<Coordinates>();
+    }
+
+    return pieces::move(c.type, c.color, coords, *this);
+  }
+
   pieces::Cell
   Board::at(int x, int y) const {
     if (x >= m_width || y >= m_height) {

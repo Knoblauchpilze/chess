@@ -71,6 +71,17 @@ namespace chess {
       isInCheckmate(const pieces::Color& color) const noexcept;
 
       /**
+       * @brief - Used to generate the possible positions that can
+       *          be reached by the piece at the input coordinates.
+       *          In case the cell is empty, the returned list will
+       *          be empty.
+       * @param coords - the coordinates of the piece to generate.
+       * @return - the list of coordinates reachable by the piece.
+       */
+      std::vector<Coordinates>
+      availablePositions(const Coordinates& coords) noexcept;
+
+      /**
        * @brief - Returns the piece at the specified position or none in
        *          case the cell is empty.
        * @param x - the x coordinate.

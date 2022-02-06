@@ -109,6 +109,15 @@ namespace chess {
       drawRect(const SpriteDesc& t,
                const pge::CoordinateFrame& cf);
 
+      void
+      drawBoard(const RenderDesc& res) noexcept;
+
+      void
+      drawPieces(const RenderDesc& res) noexcept;
+
+      void
+      drawOverlays(const RenderDesc& res) noexcept;
+
     private:
 
       /**

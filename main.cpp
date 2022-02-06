@@ -12,8 +12,6 @@
 # include "TopViewFrame.hh"
 # include "App.hh"
 
-/// TODO: Display the possible positions when selecting a
-/// piece. This helps picking something.
 /// TODO: Display a timed message when the user is in check
 /// or checkmate.
 

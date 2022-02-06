@@ -4,6 +4,7 @@
 
 /// TODO: Prevent pieces to move in a way where it would
 /// put the kind in check.
+
 namespace {
 
   void
@@ -258,6 +259,87 @@ namespace chess {
         /// TODO: Handle last move.
         return false;
       }
+
+      inline
+      std::vector<Coordinates>
+      move(const Color& c,
+           const Coordinates& p,
+           const Board& b) noexcept
+      {
+        // A pawn can move ony forward, one or two cells in case
+        // it's its first move. It can also handle the en passant
+        // cell if needed.
+        std::vector<Coordinates> out;
+
+        std::vector<Coordinates> cells;
+        if (c == White) {
+          cells = {
+            Coordinates(p.x(), p.y() + 1),
+            Coordinates(p.x(), p.y() + 2),
+            Coordinates(p.x() + 1, p.y() + 1),
+            Coordinates(p.x() - 1, p.y() + 1),
+          };
+        }
+        else {
+          cells = {
+            Coordinates(p.x(), p.y() - 1),
+            Coordinates(p.x(), p.y() - 2),
+            Coordinates(p.x() + 1, p.y() - 1),
+            Coordinates(p.x() - 1, p.y() - 1),
+          };
+        }
+
+        for (unsigned id = 0u ; id < cells.size() ; ++id) {
+          const Coordinates& co = cells[id];
+
+          if (co.x() < 0 || co.x() >= b.w() || co.y() < 0 || co.y() >= b.h()) {
+            continue;
+          }
+
+          // Unable to move to cells that are occupied by
+          // pieces of the same color.
+          Cell ce = b.at(co);
+          if (ce.type != None && ce.color == c) {
+            continue;
+          }
+
+          int dx, dy;
+          differentials(p, co, dx, dy);
+
+          // Prevent cells that are two rows in advance if
+          // the pawn is not on its started row.
+          bool firstRow = (c == White && p.y() == 1) || (c == Black && p.y() == 6);
+          if (std::abs(dy) > 1 && !firstRow) {
+            continue;
+          }
+
+          // Handle cases where there's nothing to capture.
+          if (dx != 0 && ce.type == None) {
+            // En passant might still make that valid.
+            Cell tc;
+            if (dx > 0) {
+              tc = b.at(p.x() + 1, p.y());
+            }
+            if (dx < 0) {
+              tc = b.at(p.x() - 1, p.y());
+            }
+
+            if (c == White && p.y() == 4 && tc.type == Pawn && tc.color != c) {
+              out.push_back(co);
+            }
+            if (c == Black && p.y() == 3 && tc.type == Pawn && tc.color != c) {
+              out.push_back(co);
+            }
+
+            continue;
+          }
+
+          /// TODO: Handle en passant.
+          out.push_back(co);
+        }
+
+        return out;
+      }
     }
 
     /// @brief - Knight related functions.
@@ -290,6 +372,56 @@ namespace chess {
 
         return false;
       }
+
+      inline
+      std::vector<Coordinates>
+      move(const Color& c,
+           const Coordinates& p,
+           const Board& b) noexcept
+      {
+        // A knight can move in a certain set of coordinates with
+        // the corresponding deltas:
+        // (1, 2) (1, -2)
+        // (-1, 2) (-1, -2)
+        // (2, 1) (-2, 1)
+        // (2, -1), (-2, -1)
+        std::vector<Coordinates> out;
+
+        std::vector<Coordinates> coords = {
+          Coordinates(p.x() + 1, p.y() + 2),
+          Coordinates(p.x() + 2, p.y() + 1),
+
+          Coordinates(p.x() + 2, p.y() - 1),
+          Coordinates(p.x() + 1, p.y() - 2),
+
+          Coordinates(p.x() - 1, p.y() - 2),
+          Coordinates(p.x() - 2, p.y() - 1),
+
+          Coordinates(p.x() - 2, p.y() + 1),
+          Coordinates(p.x() - 1, p.y() + 2),
+        };
+
+        for (unsigned id = 0u ; id < coords.size() ; ++id) {
+          // Ignore invalid coordinates.
+          if (coords[id].x() < 0 || coords[id].x() >= b.w()) {
+            continue;
+          }
+          if (coords[id].y() < 0 || coords[id].y() >= b.h()) {
+            continue;
+          }
+
+          // Ignore coordinates where there's a piece of
+          // the same color.
+          Cell ce = b.at(coords[id]);
+          if (ce.type != None && ce.color == c) {
+            continue;
+          }
+
+          out.push_back(coords[id]);
+        }
+
+        return out;
+      }
     }
 
     /// @brief - Bishop related functions.
@@ -315,6 +447,95 @@ namespace chess {
         }
 
         return obstructed(b, start, (dx > 0 ? 1 : -1), (dy > 0 ? 1 : -1), std::abs(dx));
+      }
+
+      inline
+      std::vector<Coordinates>
+      move(const Color& c,
+           const Coordinates& p,
+           const Board& b) noexcept
+      {
+        // A bishop can move diagonally for as long as the
+        // cells are not obstructed.
+        std::vector<Coordinates> out;
+
+        // Top right diagonal.
+        int x = p.x() + 1;
+        int y = p.y() + 1;
+        bool blocked = false;
+
+        while (x < b.w() && y < b.h() && !blocked) {
+          Coordinates co(x, y);
+          Cell ce = b.at(co);
+
+          blocked = (ce.type != None);
+
+          if (!blocked || ce.color != c) {
+            out.push_back(co);
+          }
+
+          ++x;
+          ++y;
+        }
+
+        // Top left diagonal.
+        x = p.x() - 1;
+        y = p.y() + 1;
+        blocked = false;
+
+        while (x >= 0 && y < b.h() && !blocked) {
+          Coordinates co(x, y);
+          Cell ce = b.at(co);
+
+          blocked = (ce.type != None);
+
+          if (!blocked || ce.color != c) {
+            out.push_back(co);
+          }
+
+          --x;
+          ++y;
+        }
+
+        // Bottom left diagonal.
+        x = p.x() - 1;
+        y = p.y() - 1;
+        blocked = false;
+
+        while (x >= 0 && y >= 0 && !blocked) {
+          Coordinates co(x, y);
+          Cell ce = b.at(co);
+
+          blocked = (ce.type != None);
+
+          if (!blocked || ce.color != c) {
+            out.push_back(co);
+          }
+
+          --x;
+          --y;
+        }
+
+        // Bottom right diagonal.
+        x = p.x() + 1;
+        y = p.y() - 1;
+        blocked = false;
+
+        while (x < b.w() && y >= 0 && !blocked) {
+          Coordinates co(x, y);
+          Cell ce = b.at(co);
+
+          blocked = (ce.type != None);
+
+          if (!blocked || ce.color != c) {
+            out.push_back(co);
+          }
+
+          ++x;
+          --y;
+        }
+
+        return out;
       }
     }
 
@@ -342,6 +563,87 @@ namespace chess {
 
         // Assume vertical move.
         return obstructed(b, start, 0, (dy > 0 ? 1 : -1), std::abs(dy));
+      }
+
+      inline
+      std::vector<Coordinates>
+      move(const Color& c,
+           const Coordinates& p,
+           const Board& b) noexcept
+      {
+        // A rook can move horizontally and diagonally for
+        // as long as the cell is not obstructed.
+        std::vector<Coordinates> out;
+
+        // Positive horizontal.
+        int delta = p.x() + 1;
+        bool blocked = false;
+
+        while (delta < b.w() && !blocked) {
+          Coordinates co(delta, p.y());
+          Cell ce = b.at(co);
+
+          blocked = (ce.type != None);
+
+          if (!blocked || ce.color != c) {
+            out.push_back(co);
+          }
+
+          ++delta;
+        }
+
+        // Negative horizontal.
+        delta = p.x() - 1;
+        blocked = false;
+
+        while (delta >= 0 && !blocked) {
+          Coordinates co(delta, p.y());
+          Cell ce = b.at(co);
+
+          blocked = (ce.type != None);
+
+          if (!blocked || ce.color != c) {
+            out.push_back(co);
+          }
+
+          --delta;
+        }
+
+        // Positive vertical.
+        delta  = p.y() + 1;
+        blocked = false;
+
+        while (delta < b.h() && !blocked) {
+          Coordinates co(p.x(), delta);
+          Cell ce = b.at(co);
+
+          blocked = (ce.type != None);
+
+          if (!blocked || ce.color != c) {
+            out.push_back(co);
+          }
+
+          ++delta;
+        }
+
+        // Negative vertical.
+        delta = p.y() - 1;
+        blocked = false;
+
+        while (delta >= 0 && !blocked) {
+          Coordinates co(p.x(), delta);
+          Cell ce = b.at(co);
+
+          blocked = (ce.type != None);
+
+          if (!blocked || ce.color != c) {
+            out.push_back(co);
+          }
+
+          --delta;
+        }
+
+        return out;
       }
     }
 
@@ -378,6 +680,165 @@ namespace chess {
 
         return obstructed(b, start, (dx > 0 ? 1 : -1), (dy > 0 ? 1 : -1), std::abs(dx));
       }
+
+      inline
+      std::vector<Coordinates>
+      move(const Color& c,
+           const Coordinates& p,
+           const Board& b) noexcept
+      {
+        // A queen threatens all the cells horizontally but
+        // also vertically and diagonally from its position,
+        // as long but up to the blocked cell or the edge of
+        // the board.
+        std::vector<Coordinates> out;
+
+        // Positive horizontal.
+        int delta = p.x() + 1;
+        bool blocked = false;
+
+        while (delta < b.w() && !blocked) {
+          Coordinates co(delta, p.y());
+          Cell ce = b.at(co);
+
+          blocked = (ce.type != None);
+
+          if (!blocked || ce.color != c) {
+            out.push_back(co);
+          }
+
+          ++delta;
+        }
+
+        // Negative horizontal.
+        delta = p.x() - 1;
+        blocked = false;
+
+        while (delta >= 0 && !blocked) {
+          Coordinates co(delta, p.y());
+          Cell ce = b.at(co);
+
+          blocked = (ce.type != None);
+
+          if (!blocked || ce.color != c) {
+            out.push_back(co);
+          }
+
+          --delta;
+        }
+
+        // Positive vertical.
+        delta  = p.y() + 1;
+        blocked = false;
+
+        while (delta < b.h() && !blocked) {
+          Coordinates co(p.x(), delta);
+          Cell ce = b.at(co);
+
+          blocked = (ce.type != None);
+
+          if (!blocked || ce.color != c) {
+            out.push_back(co);
+          }
+
+          ++delta;
+        }
+
+        // Negative vertical.
+        delta = p.y() - 1;
+        blocked = false;
+
+        while (delta >= 0 && !blocked) {
+          Coordinates co(p.x(), delta);
+          Cell ce = b.at(co);
+
+          blocked = (ce.type != None);
+
+          if (!blocked || ce.color != c) {
+            out.push_back(co);
+          }
+
+          --delta;
+        }
+
+        // Top right diagonal.
+        int x = p.x() + 1;
+        int y = p.y() + 1;
+        blocked = false;
+
+        while (x < b.w() && y < b.h() && !blocked) {
+          Coordinates co(x, y);
+          Cell ce = b.at(co);
+
+          blocked = (ce.type != None);
+
+          if (!blocked || ce.color != c) {
+            out.push_back(co);
+          }
+
+          ++x;
+          ++y;
+        }
+
+        // Top left diagonal.
+        x = p.x() - 1;
+        y = p.y() + 1;
+        blocked = false;
+
+        while (x >= 0 && y < b.h() && !blocked) {
+          Coordinates co(x, y);
+          Cell ce = b.at(co);
+
+          blocked = (ce.type != None);
+
+          if (!blocked || ce.color != c) {
+            out.push_back(co);
+          }
+
+          --x;
+          ++y;
+        }
+
+        // Bottom left diagonal.
+        x = p.x() - 1;
+        y = p.y() - 1;
+        blocked = false;
+
+        while (x >= 0 && y >= 0 && !blocked) {
+          Coordinates co(x, y);
+          Cell ce = b.at(co);
+
+          blocked = (ce.type != None);
+
+          if (!blocked || ce.color != c) {
+            out.push_back(co);
+          }
+
+          --x;
+          --y;
+        }
+
+        // Bottom right diagonal.
+        x = p.x() + 1;
+        y = p.y() - 1;
+        blocked = false;
+
+        while (x < b.w() && y >= 0 && !blocked) {
+          Coordinates co(x, y);
+          Cell ce = b.at(co);
+
+          blocked = (ce.type != None);
+
+          if (!blocked || ce.color != c) {
+            out.push_back(co);
+          }
+
+          ++x;
+          --y;
+        }
+
+        return out;
+      }
     }
 
     /// @brief - King related functions.
@@ -398,9 +859,51 @@ namespace chess {
           return false;
         }
 
-        /// TODO: Prevent king from moving in chess.
+        /// TODO: Prevent king from moving in check: this can be
+        /// done by refining the list of threats and persisiting
+        /// it in the state and then making that accessible with
+        /// a dedicated method.
         /// TODO: Allow king to castle.
         return true;
+      }
+
+      inline
+      std::vector<Coordinates>
+      move(const Color& c,
+           const Coordinates& p,
+           const Board& b) noexcept
+      {
+        // A king can reach all cells around it as long as
+        // they are occupied by an enemy piece or nothing.
+        std::vector<Coordinates> out;
+
+        for (int y = p.y() - 1 ; y <= p.y() + 1 ; ++y) {
+          if (y < 0 || y >= b.h()) {
+            continue;
+          }
+
+          for (int x = p.x() - 1 ; x <= p.x() + 1 ; ++x) {
+            if (x < 0 || x >= b.w()) {
+              continue;
+            }
+
+            // Ignore own cell.
+            if (x == p.x() && y == p.y()) {
+              continue;
+            }
+
+            // Prevent cells occupied by pieces of the same color
+            // to be considered.
+            Cell ce = b.at(x, y);
+            if (ce.type != None && ce.color == c) {
+              continue;
+            }
+
+            out.push_back(Coordinates(x, y));
+          }
+        }
+
+        return out;
       }
     }
 
@@ -415,6 +918,15 @@ namespace chess {
             const Board& /*b*/) noexcept
       {
         return false;
+      }
+
+      inline
+      std::vector<Coordinates>
+      move(const Color& /*c*/,
+           const Coordinates& /*p*/,
+           const Board& /*b*/) noexcept
+      {
+        return std::vector<Coordinates>();
       }
     }
 
@@ -441,6 +953,31 @@ namespace chess {
         case None:
         default:
           return none::valid(c, start, end, b);
+      }
+    }
+
+    std::vector<Coordinates>
+    move(const Type& t,
+         const Color& c,
+         const Coordinates& p,
+         const Board& b) noexcept
+    {
+      switch (t) {
+        case Pawn:
+          return pawn::move(c, p, b);
+        case Knight:
+          return knight::move(c, p, b);
+        case Bishop:
+          return bishop::move(c, p, b);
+        case Rook:
+          return rook::move(c, p, b);
+        case Queen:
+          return queen::move(c, p, b);
+        case King:
+          return king::move(c, p, b);
+        case None:
+        default:
+          return none::move(c, p, b);
       }
     }
 

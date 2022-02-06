@@ -152,87 +152,9 @@ namespace chess {
     // The wooden layer.
     drawRect(sd, res.cf);
 
-    // Colors for the board.
-    olc::Pixel bright(238, 238, 213);
-    olc::Pixel dark(149, 69, 53);
-
-    // Draw the board.
-    for (unsigned y = 0u ; y < 8u ; ++y) {
-      for (unsigned x = 0u ; x < 8u ; ++x) {
-        unsigned det = (y % 2u + x) % 2u;
-
-        // Assume that the tile size is a square and scale
-        // the tiles so that they occupy one tile.
-        sd.radius = 1.0f;
-
-        sd.x = x;
-        sd.y = y;
-
-        sd.sprite.tint = (det == 1u ? dark : bright);
-
-        drawRect(sd, res.cf);
-      }
-    }
-
-    // Draw the pieces.
-    /// TODO: Change in case the player is playing blacks.
-    for (unsigned y = 0u ; y < 8u ; ++y) {
-      for (unsigned x = 0u ; x < 8u ; ++x) {
-        // Check if something is at this position.
-        pieces::Cell p = m_board->at(x, y);
-        if (p.type == pieces::None) {
-          continue;
-        }
-
-        sd.radius = 0.9f;
-
-        sd.x = x;
-        // Note that the board is upside down when drawn
-        // on screen.
-        sd.y = 7.0f - y;
-
-        sd.sprite.pack = m_piecesPackID;
-        sd.sprite.id = 0;
-        sd.sprite.tint = olc::WHITE;
-        sd.sprite.sprite = olc::vi2d(
-          spriteIDFromPiece(p.type),
-          p.color == pieces::White ? 0 : 1
-        );
-
-        drawSprite(sd, res.cf);
-      }
-    }
-
-    // Draw the overlay in case the mouse is over
-    // a cell with a piece.
-    olc::vi2d mp = GetMousePos();
-    olc::vi2d mtp = res.cf.pixelCoordsToTiles(mp, nullptr);
-    if (mtp.x >= 0 && mtp.x < m_board->w() && mtp.y >= 0 && mtp.y < m_board->h()) {
-      unsigned x = std::clamp(mtp.x, 0, static_cast<int>(m_board->w()));
-      unsigned y = std::clamp(mtp.y, 0, static_cast<int>(m_board->h()));
-
-      sd.radius = 1.0f;
-
-      sd.x = 1.0f * x;
-      sd.y = 1.0f * y;
-
-      sd.sprite.tint = olc::Pixel(0, 255, 0, pge::alpha::AlmostTransparent);
-      drawRect(sd, res.cf);
-    }
-
-    // Draw the overlay for the selected piece.
-    CoordinatesShPtr c = m_game->getSelectedPosition();
-    if (c != nullptr) {
-      sd.radius = 1.0f;
-
-      sd.x = 1.0f * c->x();
-        // Note that the board is upside down when drawn
-        // on screen.
-      sd.y = 7.0f - c->y();
-
-      sd.sprite.tint = olc::Pixel(0, 0, 255, pge::alpha::AlmostTransparent);
-      drawRect(sd, res.cf);
-    }
+    drawBoard(res);
+    drawPieces(res);
+    drawOverlays(res);
 
     SetPixelMode(olc::Pixel::NORMAL);
   }
@@ -278,6 +200,118 @@ namespace chess {
     DrawString(olc::vi2d(0, h / 2 + 2 * dOffset), "Intra cell        : " + toString(it), olc::CYAN);
 
     SetPixelMode(olc::Pixel::NORMAL);
+  }
+
+  void
+  App::drawBoard(const RenderDesc& res) noexcept {
+    // Colors for the board.
+    olc::Pixel bright(238, 238, 213);
+    olc::Pixel dark(149, 69, 53);
+
+    SpriteDesc sd = {};
+    sd.loc = pge::RelativePosition::Center;
+
+    // Draw the board.
+    for (unsigned y = 0u ; y < 8u ; ++y) {
+      for (unsigned x = 0u ; x < 8u ; ++x) {
+        unsigned det = (y % 2u + x) % 2u;
+
+        // Assume that the tile size is a square and scale
+        // the tiles so that they occupy one tile.
+        sd.radius = 1.0f;
+
+        sd.x = x;
+        sd.y = y;
+
+        sd.sprite.tint = (det == 1u ? dark : bright);
+
+        drawRect(sd, res.cf);
+      }
+    }
+  }
+
+  void
+  App::drawPieces(const RenderDesc& res) noexcept {
+    SpriteDesc sd = {};
+    sd.loc = pge::RelativePosition::Center;
+
+    /// TODO: Change in case the player is playing blacks.
+    for (unsigned y = 0u ; y < 8u ; ++y) {
+      for (unsigned x = 0u ; x < 8u ; ++x) {
+        // Check if something is at this position.
+        pieces::Cell p = m_board->at(x, y);
+        if (p.type == pieces::None) {
+          continue;
+        }
+
+        sd.radius = 0.9f;
+
+        sd.x = x;
+        // Note that the board is upside down when drawn
+        // on screen.
+        sd.y = 7.0f - y;
+
+        sd.sprite.pack = m_piecesPackID;
+        sd.sprite.id = 0;
+        sd.sprite.tint = olc::WHITE;
+        sd.sprite.sprite = olc::vi2d(
+          spriteIDFromPiece(p.type),
+          p.color == pieces::White ? 0 : 1
+        );
+
+        drawSprite(sd, res.cf);
+      }
+    }
+  }
+
+  void
+  App::drawOverlays(const RenderDesc& res) noexcept {
+    SpriteDesc sd = {};
+    sd.loc = pge::RelativePosition::Center;
+
+    // Draw the overlay in case the mouse is over
+    // a cell with a piece.
+    olc::vi2d mp = GetMousePos();
+    olc::vi2d mtp = res.cf.pixelCoordsToTiles(mp, nullptr);
+    if (mtp.x >= 0 && mtp.x < m_board->w() && mtp.y >= 0 && mtp.y < m_board->h()) {
+      unsigned x = std::clamp(mtp.x, 0, static_cast<int>(m_board->w()));
+      unsigned y = std::clamp(mtp.y, 0, static_cast<int>(m_board->h()));
+
+      sd.radius = 1.0f;
+
+      sd.x = 1.0f * x;
+      sd.y = 1.0f * y;
+
+      sd.sprite.tint = olc::Pixel(0, 255, 0, pge::alpha::AlmostTransparent);
+      drawRect(sd, res.cf);
+    }
+
+    // Draw the overlay for the selected piece.
+    CoordinatesShPtr c = m_game->getSelectedPosition();
+    if (c != nullptr) {
+      sd.radius = 1.0f;
+
+      sd.x = 1.0f * c->x();
+        // Note that the board is upside down when drawn
+        // on screen.
+      sd.y = 7.0f - c->y();
+
+      sd.sprite.tint = olc::Pixel(0, 0, 128, pge::alpha::AlmostTransparent);
+      drawRect(sd, res.cf);
+
+      // Also, not the possible positions for this piece.
+      std::vector<Coordinates> ps = m_board->availablePositions(*c);
+
+      for (unsigned id = 0u ; id < ps.size() ; ++id) {
+        sd.x = 1.0f * ps[id].x();
+        // Note that the board is upside down when drawn
+        // on screen.
+        sd.y = 7.0f - ps[id].y();
+
+        sd.sprite.tint = olc::Pixel(0, 0, 255, pge::alpha::AlmostTransparent);
+        drawRect(sd, res.cf);
+      }
+    }
   }
 
 }
