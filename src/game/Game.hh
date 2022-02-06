@@ -4,6 +4,7 @@
 # include <vector>
 # include <memory>
 # include <core_utils/CoreObject.hh>
+# include <core_utils/TimeUtils.hh>
 # include "Board.hh"
 # include "AI.hh"
 
@@ -175,12 +176,18 @@ namespace pge {
         /// The check mate status.
         MenuShPtr status;
 
+        /// Information about when the check state was reached.
+        utils::TimeStamp checkDate;
+
         /// Keep track of whether the player was in check in the last
         /// frame.
         bool wasInCheck;
 
         /// The alert menu indicating that the player is now in check.
         MenuShPtr check;
+
+        /// Information about when the checkmate state was reached.
+        utils::TimeStamp checkmateDate;
 
         /// Keep track of whether the player was in checkmate in the
         /// last frame.

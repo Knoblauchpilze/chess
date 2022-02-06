@@ -3,6 +3,8 @@
 # include <cxxabi.h>
 # include "Menu.hh"
 
+# define ALERT_DURATION_MS 3000
+
 namespace {
 
   std::shared_ptr<chess::Coordinates>
@@ -133,7 +135,9 @@ namespace pge {
     // maximum number of move so that the first move
     // can actually be registered.
     m_menus.move = sk_lastMoves - 1u;
+    m_menus.checkDate = utils::TimeStamp();
     m_menus.wasInCheck = false;
+    m_menus.checkmateDate = utils::TimeStamp();
     m_menus.wasInCheckmate = false;
 
     // Generate the alert menu indicating that the player
@@ -274,28 +278,38 @@ namespace pge {
       st = "Check";
 
       if (!m_menus.wasInCheck) {
+        m_menus.checkDate = utils::now();
+        m_menus.wasInCheck = true;
         m_menus.check->setVisible(true);
       }
-      m_menus.wasInCheck = true;
-    }
-    else {
-      if (m_menus.wasInCheck) {
+      else if (utils::now() > m_menus.checkDate + utils::toMilliseconds(ALERT_DURATION_MS)) {
         m_menus.check->setVisible(false);
       }
+      else {
+        float d = utils::diffInMs(m_menus.checkDate, utils::now()) / ALERT_DURATION_MS;
+        uint8_t alpha = static_cast<uint8_t>(
+          std::clamp((1.0f - d) * pge::alpha::Opaque, 0.0f, 255.0f)
+        );
+        m_menus.check->setBackground(pge::menu::newColoredBackground(olc::Pixel(64, 0, 0, alpha)));
+      }
+    }
+    else if (m_menus.wasInCheck) {
+      m_menus.check->setVisible(false);
       m_menus.wasInCheck = false;
     }
     if (m_board->isInCheckmate(p)) {
       st = "Checkmate";
       if (!m_menus.wasInCheckmate) {
+        m_menus.checkmateDate = utils::now();
+        m_menus.wasInCheckmate = true;
         m_menus.checkmate->setVisible(true);
       }
-
-      m_menus.wasInCheckmate = true;
-    }
-    else {
-      if (m_menus.wasInCheckmate) {
+      else if (utils::now() > m_menus.checkmateDate + utils::toMilliseconds(500)) {
         m_menus.checkmate->setVisible(false);
       }
+    }
+    else if (m_menus.wasInCheckmate) {
+      m_menus.checkmate->setVisible(false);
       m_menus.wasInCheckmate = false;
     }
     m_menus.status->setText(st);

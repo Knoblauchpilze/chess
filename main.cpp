@@ -12,9 +12,6 @@
 # include "TopViewFrame.hh"
 # include "App.hh"
 
-/// TODO: Display a timed message when the user is in check
-/// or checkmate.
-
 /// @brief - Size of the tiles.
 # define TILE_SIZE 170
 
