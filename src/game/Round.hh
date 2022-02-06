@@ -1,8 +1,7 @@
-#ifndef    MOVE_HH
-# define   MOVE_HH
+#ifndef    ROUND_HH
+# define   ROUND_HH
 
 # include <string>
-# include <vector>
 # include "Pieces.hh"
 
 namespace chess {
@@ -11,7 +10,7 @@ namespace chess {
   /// use as parameter in the functions.
   class Board;
 
-  class Move {
+  class Round {
     public:
 
       /**
@@ -19,7 +18,7 @@ namespace chess {
        *          no data.
        * @param id - the index of the move.
        */
-      Move(unsigned id);
+      Round(unsigned id);
 
       /**
        * @brief - Used to register the part of the move related
@@ -128,49 +127,6 @@ namespace chess {
       std::string m_name;
   };
 
-  namespace pieces {
-
-    /**
-     * @brief - Determines whether or not the move from the input
-     *          piece is valid.
-     *          Note that this only account for whether the piece
-     *          is allowed to move but not considering if there's
-     *          actually a piece at the initial location or one
-     *          at the end position.
-     *          We also assume that the positions are valid and
-     *          are not checked against anything.
-     * @param t - the type of the piece.
-     * @param c - the color of the piece.
-     * @param start - the starting position.
-     * @param end - the end position.
-     * @param b - the current state of the board used to get some
-     *            additional information about the position of the
-     *            pieces.
-     * @return - `true` if the motion is valid.
-     */
-    bool
-    valid(const Type& t,
-          const Color& c,
-          const Coordinates& start,
-          const Coordinates& end,
-          const Board& b) noexcept;
-
-    /**
-     * @brief - Used to generate the list of possible positions which
-     *          can be reached by the input piece.
-     * @param t - the type of the piece.
-     * @param c - the color of the piece.
-     * @param p - the position of the piece.
-     * @param b - the board to get additional information about the
-     *            cells that are obstructed.
-     * @return - a list of cells reachable by the piece.
-     */
-    std::vector<Coordinates>
-    move(const Type& t,
-         const Color& c,
-         const Coordinates& p,
-         const Board& b) noexcept;
-  }
 }
 
-#endif    /* MOVE_HH */
+#endif    /* ROUND_HH */

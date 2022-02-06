@@ -268,7 +268,7 @@ namespace pge {
     // Fetch properties to update.
     chess::pieces::Color p = m_board->getPlayer();
     unsigned id = m_board->getCurrentRound();
-    chess::Move m = m_board->getLastMove();
+    chess::Round m = m_board->getLastRound();
 
     m_menus.round->setText("Round: " + std::to_string(id + 1u));
     m_menus.player->setText(chess::pieces::toString(p));

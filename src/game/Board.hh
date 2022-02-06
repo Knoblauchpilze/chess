@@ -5,7 +5,7 @@
 # include <memory>
 # include <core_utils/CoreObject.hh>
 # include "Pieces.hh"
-# include "Move.hh"
+# include "Round.hh"
 
 namespace chess {
 
@@ -45,11 +45,11 @@ namespace chess {
       getCurrentRound() const noexcept;
 
       /**
-       * @brief - Returns the last move player.
-       * @return - the last move played.
+       * @brief - Returns the last round played.
+       * @return - the last round played.
        */
-      chess::Move
-      getLastMove() const noexcept;
+      chess::Round
+      getLastRound() const noexcept;
 
       /**
        * @brief - Determines whether the king of the input color is
@@ -184,14 +184,14 @@ namespace chess {
       mutable State m_state;
 
       /**
-       * @brief - The current move.
+       * @brief - The current round.
        */
-      Move m_move;
+      Round m_round;
 
       /**
-       * @brief - The stack of moves.
+       * @brief - The list of rounds.
        */
-      std::vector<Move> m_moves;
+      std::vector<Round> m_rounds;
   };
 
   using BoardShPtr = std::shared_ptr<Board>;

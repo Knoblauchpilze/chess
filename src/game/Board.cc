@@ -2,8 +2,8 @@
 # include "Board.hh"
 # include <unordered_set>
 # include <algorithm>
+# include "Round.hh"
 # include "Move.hh"
-# include "Threat.hh"
 
 namespace chess {
 
@@ -20,8 +20,8 @@ namespace chess {
     m_index(0u),
     m_current(pieces::White),
     m_state({false, false, false, false, false}),
-    m_move(m_index),
-    m_moves()
+    m_round(m_index),
+    m_rounds()
   {
     setService("chess");
 
@@ -48,13 +48,13 @@ namespace chess {
     return m_index;
   }
 
-  chess::Move
-  Board::getLastMove() const noexcept {
-    if (m_moves.empty()) {
-      return m_move;
+  chess::Round
+  Board::getLastRound() const noexcept {
+    if (m_rounds.empty()) {
+      return m_round;
     }
 
-    return m_moves.back();
+    return m_rounds.back();
   }
 
   bool
@@ -139,14 +139,14 @@ namespace chess {
 
 
     // Register the move.
-    m_move.registerMove(s.color, s.type, start, end, e.type, false, false);
+    m_round.registerMove(s.color, s.type, start, end, e.type, false, false);
 
-    if (m_move.valid()) {
-      m_moves.push_back(m_move);
+    if (m_round.valid()) {
+      m_rounds.push_back(m_round);
       ++m_index;
-      m_move = Move(m_index);
+      m_round = Round(m_index);
 
-      log("Adding move " + m_moves.back().toString());
+      log("Adding round " + m_rounds.back().toString());
     }
 
     m_current = (m_current == pieces::White ? pieces::Black : pieces::White);
