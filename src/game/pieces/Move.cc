@@ -11,38 +11,6 @@
 namespace chess {
   namespace pieces {
 
-    /// @brief - None related functions.
-    namespace none {
-
-      inline
-      bool
-      valid(const Color& /*c*/,
-            const Coordinates& /*start*/,
-            const Coordinates& /*end*/,
-            const Board& /*b*/) noexcept
-      {
-        return false;
-      }
-
-      inline
-      std::vector<Coordinates>
-      threaten(const Color& /*c*/,
-               const Coordinates& /*p*/,
-               const Board& /*b*/) noexcept
-      {
-        return std::vector<Coordinates>();
-      }
-
-      inline
-      std::vector<Coordinates>
-      move(const Color& /*c*/,
-           const Coordinates& /*p*/,
-           const Board& /*b*/) noexcept
-      {
-        return std::vector<Coordinates>();
-      }
-    }
-
     bool
     valid(const Type& t,
           const Color& c,
@@ -65,7 +33,7 @@ namespace chess {
           return king::valid(c, start, end, b);
         case None:
         default:
-          return none::valid(c, start, end, b);
+          return false;
       }
     }
 
@@ -79,18 +47,18 @@ namespace chess {
         case Pawn:
           return pawn::threaten(c, p, b);
         case Knight:
-          return knight::threaten(c, p, b);
+          return knight::reachable(c, p, b);
         case Bishop:
-          return bishop::threaten(c, p, b);
+          return bishop::reachable(c, p, b);
         case Rook:
-          return rook::threaten(c, p, b);
+          return rook::reachable(c, p, b);
         case Queen:
-          return queen::threaten(c, p, b);
+          return queen::reachable(c, p, b);
         case King:
-          return king::threaten(c, p, b);
+          return king::reachable(c, p, b);
         case None:
         default:
-          return none::threaten(c, p, b);
+          return std::vector<Coordinates>();
       }
     }
 
@@ -104,18 +72,18 @@ namespace chess {
         case Pawn:
           return pawn::move(c, p, b);
         case Knight:
-          return knight::move(c, p, b);
+          return knight::reachable(c, p, b);
         case Bishop:
-          return bishop::move(c, p, b);
+          return bishop::reachable(c, p, b);
         case Rook:
-          return rook::move(c, p, b);
+          return rook::reachable(c, p, b);
         case Queen:
-          return queen::move(c, p, b);
+          return queen::reachable(c, p, b);
         case King:
-          return king::move(c, p, b);
+          return king::reachable(c, p, b);
         case None:
         default:
-          return none::move(c, p, b);
+          return std::vector<Coordinates>();
       }
     }
 

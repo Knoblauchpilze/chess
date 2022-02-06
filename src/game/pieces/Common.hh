@@ -13,6 +13,37 @@ namespace chess {
   namespace pieces {
 
     /**
+     * @brief - Generates the list of coordinates starting from
+     *          the initial location with the provided step for
+     *          a length at most equal to the input value and
+     *          maybe shorter in case it reaches the edge of the
+     *          board.
+     * @param c - the color of the piece (used in case the block
+     *            behavior is active).
+     * @param s - the starting coordinates.
+     * @param dx - the step along the x axis.
+     * @param dy - the step along the y axis.
+     * @param length - maximum extent of the generation. If this
+     *                 value is negative the edge of the board is
+     *                 used as a delimiter.
+     * @param b - information about the board.
+     * @param includeSelf - `true` in case the starting position
+     *                      should be included.
+     * @param stopWhenBlocked - `true` if the generation should stop
+     *                          after reaching another piece.
+     * @return - the list of generated coordinates.
+     */
+    std::vector<Coordinates>
+    generate(const Color& c,
+             const Coordinates& s,
+             int dx,
+             int dy,
+             int length,
+             const Board& b,
+             bool includeSelf,
+             bool stopWhenBlocked) noexcept;
+
+    /**
      * @brief - Compute the differentials along the x and y
      *          axis.
      * @param start - the start position.

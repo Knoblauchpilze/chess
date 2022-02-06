@@ -13,21 +13,16 @@ namespace chess {
   namespace pieces {
     namespace king {
 
+      std::vector<Coordinates>
+      reachable(const Color& c,
+                const Coordinates& p,
+                const Board& b) noexcept;
+
       bool
       valid(const Color& c,
             const Coordinates& start,
             const Coordinates& end,
             const Board& b) noexcept;
-
-      std::vector<Coordinates>
-      threaten(const Color& c,
-               const Coordinates& p,
-               const Board& b) noexcept;
-
-      std::vector<Coordinates>
-      move(const Color& c,
-           const Coordinates& p,
-           const Board& b) noexcept;
 
     }
   }

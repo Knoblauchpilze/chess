@@ -7,6 +7,55 @@ namespace chess {
   namespace pieces {
     namespace knight {
 
+      std::vector<Coordinates>
+      reachable(const Color& c,
+                const Coordinates& p,
+                const Board& b) noexcept
+      {
+        std::vector<Coordinates> out;
+
+        // Generate the hard coded values for the
+        // positions and then filter them based on
+        // whether there are within the board.
+        std::vector<Coordinates> coords = {
+          // Top right quadrant.
+          Coordinates(p.x() + 1, p.y() + 2),
+          Coordinates(p.x() + 2, p.y() + 1),
+
+          // Bottom right quadrant.
+          Coordinates(p.x() + 2, p.y() - 1),
+          Coordinates(p.x() + 1, p.y() - 2),
+
+          // Bottom left quadrant.
+          Coordinates(p.x() - 1, p.y() - 2),
+          Coordinates(p.x() - 2, p.y() - 1),
+
+          // Top left quadrant.
+          Coordinates(p.x() - 2, p.y() + 1),
+          Coordinates(p.x() - 1, p.y() + 2),
+        };
+
+        for (unsigned id = 0u ; id < coords.size() ; ++id) {
+          if (coords[id].x() < 0 || coords[id].x() >= b.w()) {
+            continue;
+          }
+          if (coords[id].y() < 0 || coords[id].y() >= b.h()) {
+            continue;
+          }
+
+          // Ignore coordinates where there's a piece of
+          // the same color.
+          Cell ce = b.at(coords[id]);
+          if (ce.type != None && ce.color == c) {
+            continue;
+          }
+
+          out.push_back(coords[id]);
+        }
+
+        return out;
+      }
+
       bool
       valid(const Color& /*c*/,
             const Coordinates& start,
@@ -32,98 +81,6 @@ namespace chess {
         }
 
         return false;
-      }
-
-      std::vector<Coordinates>
-      threaten(const Color& /*c*/,
-               const Coordinates& p,
-               const Board& b) noexcept
-      {
-        // A knight threatens a certain amount of cells around
-        // it with the following deltas compared to the current
-        // position:
-        // (1, 2) (1, -2)
-        // (-1, 2) (-1, -2)
-        // (2, 1) (-2, 1)
-        // (2, -1), (-2, -1)
-        std::vector<Coordinates> out;
-
-        std::vector<Coordinates> coords = {
-          Coordinates(p.x() + 1, p.y() + 2),
-          Coordinates(p.x() + 2, p.y() + 1),
-
-          Coordinates(p.x() + 2, p.y() - 1),
-          Coordinates(p.x() + 1, p.y() - 2),
-
-          Coordinates(p.x() - 1, p.y() - 2),
-          Coordinates(p.x() - 2, p.y() - 1),
-
-          Coordinates(p.x() - 2, p.y() + 1),
-          Coordinates(p.x() - 1, p.y() + 2),
-        };
-
-        for (unsigned id = 0u ; id < coords.size() ; ++id) {
-          // Ignore invalid coordinates.
-          if (coords[id].x() < 0 || coords[id].x() >= b.w()) {
-            continue;
-          }
-          if (coords[id].y() < 0 || coords[id].y() >= b.h()) {
-            continue;
-          }
-
-          out.push_back(coords[id]);
-        }
-
-        return out;
-      }
-
-      std::vector<Coordinates>
-      move(const Color& c,
-           const Coordinates& p,
-           const Board& b) noexcept
-      {
-        // A knight can move in a certain set of coordinates with
-        // the corresponding deltas:
-        // (1, 2) (1, -2)
-        // (-1, 2) (-1, -2)
-        // (2, 1) (-2, 1)
-        // (2, -1), (-2, -1)
-        std::vector<Coordinates> out;
-
-        std::vector<Coordinates> coords = {
-          Coordinates(p.x() + 1, p.y() + 2),
-          Coordinates(p.x() + 2, p.y() + 1),
-
-          Coordinates(p.x() + 2, p.y() - 1),
-          Coordinates(p.x() + 1, p.y() - 2),
-
-          Coordinates(p.x() - 1, p.y() - 2),
-          Coordinates(p.x() - 2, p.y() - 1),
-
-          Coordinates(p.x() - 2, p.y() + 1),
-          Coordinates(p.x() - 1, p.y() + 2),
-        };
-
-        for (unsigned id = 0u ; id < coords.size() ; ++id) {
-          // Ignore invalid coordinates.
-          if (coords[id].x() < 0 || coords[id].x() >= b.w()) {
-            continue;
-          }
-          if (coords[id].y() < 0 || coords[id].y() >= b.h()) {
-            continue;
-          }
-
-          // Ignore coordinates where there's a piece of
-          // the same color.
-          Cell ce = b.at(coords[id]);
-          if (ce.type != None && ce.color == c) {
-            continue;
-          }
-
-          out.push_back(coords[id]);
-        }
-
-        return out;
       }
 
     }

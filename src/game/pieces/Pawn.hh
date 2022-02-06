@@ -13,6 +13,11 @@ namespace chess {
   namespace pieces {
     namespace pawn {
 
+      std::vector<Coordinates>
+      reachable(const Color& c,
+                const Coordinates& p,
+                const Board& b) noexcept;
+
       bool
       valid(const Color& c,
             const Coordinates& start,
