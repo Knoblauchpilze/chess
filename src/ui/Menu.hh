@@ -117,7 +117,6 @@ namespace pge {
       void
       setSelectable(bool select) noexcept;
 
-
       /**
        * @brief- Interface method allowing to render a menu in
        *         a parent application. This is used to offload
