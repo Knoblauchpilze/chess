@@ -175,6 +175,20 @@ namespace pge {
         /// The check mate status.
         MenuShPtr status;
 
+        /// Keep track of whether the player was in check in the last
+        /// frame.
+        bool wasInCheck;
+
+        /// The alert menu indicating that the player is now in check.
+        MenuShPtr check;
+
+        /// Keep track of whether the player was in checkmate in the
+        /// last frame.
+        bool wasInCheckmate;
+
+        /// The alert menu indicating that the player is now in check.
+        MenuShPtr checkmate;
+
         /// The last moves.
         std::vector<MenuShPtr> moves;
 

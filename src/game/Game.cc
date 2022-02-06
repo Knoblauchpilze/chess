@@ -45,6 +45,28 @@ namespace {
     );
   }
 
+  pge::MenuShPtr
+  generateAlertMenu(const olc::vi2d& pos,
+                    const olc::vi2d& size,
+                    const std::string& text,
+                    const std::string& name)
+  {
+    pge::menu::MenuContentDesc fd = pge::menu::newMenuContent(text, "", size);
+    fd.color = olc::RED;
+    fd.align = pge::menu::Alignment::Center;
+
+    return std::make_shared<pge::Menu>(
+      pos,
+      size,
+      name,
+      pge::menu::newColoredBackground(olc::VERY_DARK_RED),
+      fd,
+      pge::menu::Layout::Horizontal,
+      false,
+      false
+    );
+  }
+
 }
 
 namespace pge {
@@ -72,7 +94,7 @@ namespace pge {
 
   std::vector<MenuShPtr>
   Game::generateMenus(float width,
-                      float /*height*/)
+                      float height)
   {
     // Generate the main menu.
     pge::MenuShPtr status = generateMenu(olc::vi2d(width, 50), "", "root");
@@ -111,8 +133,36 @@ namespace pge {
     // maximum number of move so that the first move
     // can actually be registered.
     m_menus.move = sk_lastMoves - 1u;
+    m_menus.wasInCheck = false;
+    m_menus.wasInCheckmate = false;
 
-    return std::vector<MenuShPtr>(1u, status);
+    // Generate the alert menu indicating that the player
+    // is in check or checkmate.
+    pge::menu::MenuContentDesc fd = pge::menu::newMenuContent("ALERT", "", olc::vi2d(300, 150));
+    fd.color = olc::RED;
+    fd.align = pge::menu::Alignment::Center;
+
+    m_menus.check = generateAlertMenu(
+      olc::vi2d((width - 300.0f) / 2.0f, (height - 150.0f) / 2.0f),
+      olc::vi2d(300, 150),
+      "You're in check !",
+      "check"
+    );
+    m_menus.check->setVisible(false);
+    m_menus.checkmate = generateAlertMenu(
+      olc::vi2d((width - 300.0f) / 2.0f, (height - 150.0f) / 2.0f),
+      olc::vi2d(300, 150),
+      "You're in checkmate !",
+      "check"
+    );
+    m_menus.checkmate->setVisible(false);
+
+    std::vector<MenuShPtr> menus;
+    menus.push_back(status);
+    menus.push_back(m_menus.check);
+    menus.push_back(m_menus.checkmate);
+
+    return menus;
   }
 
   void
@@ -180,9 +230,6 @@ namespace pge {
       return true;
     }
 
-    /// TODO: Handle this.
-    log("Perform step method of the game", utils::Level::Verbose);
-
     updateUI();
 
     return true;
@@ -225,9 +272,31 @@ namespace pge {
     std::string st = "All good";
     if (m_board->isInCheck(p)) {
       st = "Check";
+
+      if (!m_menus.wasInCheck) {
+        m_menus.check->setVisible(true);
+      }
+      m_menus.wasInCheck = true;
+    }
+    else {
+      if (m_menus.wasInCheck) {
+        m_menus.check->setVisible(false);
+      }
+      m_menus.wasInCheck = false;
     }
     if (m_board->isInCheckmate(p)) {
       st = "Checkmate";
+      if (!m_menus.wasInCheckmate) {
+        m_menus.checkmate->setVisible(true);
+      }
+
+      m_menus.wasInCheckmate = true;
+    }
+    else {
+      if (m_menus.wasInCheckmate) {
+        m_menus.checkmate->setVisible(false);
+      }
+      m_menus.wasInCheckmate = false;
     }
     m_menus.status->setText(st);
 
@@ -237,9 +306,6 @@ namespace pge {
       m_menus.moves[pos]->setText(m.toString());
       m_menus.move = m.id();
     }
-
-    /// TODO: Handle this.
-    log("Perform update of UI menus", utils::Level::Verbose);
   }
 
 }
