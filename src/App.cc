@@ -300,13 +300,16 @@ namespace chess {
       drawRect(sd, res.cf);
 
       // Also, not the possible positions for this piece.
-      std::vector<Coordinates> ps = m_board->availablePositions(*c);
+      std::unordered_set<Coordinates> ps = m_board->availablePositions(*c);
 
-      for (unsigned id = 0u ; id < ps.size() ; ++id) {
-        sd.x = 1.0f * ps[id].x();
+      for (std::unordered_set<Coordinates>::const_iterator it = ps.cbegin() ;
+           it != ps.cend() ;
+           ++it)
+      {
+        sd.x = 1.0f * it->x();
         // Note that the board is upside down when drawn
         // on screen.
-        sd.y = 7.0f - ps[id].y();
+        sd.y = 7.0f - it->y();
 
         sd.sprite.tint = olc::Pixel(0, 0, 255, pge::alpha::AlmostTransparent);
         drawRect(sd, res.cf);

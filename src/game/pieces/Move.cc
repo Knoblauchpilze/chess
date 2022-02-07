@@ -37,54 +37,42 @@ namespace chess {
       }
     }
 
-    std::vector<Coordinates>
-    threaten(const Type& t,
-             const Color& c,
-             const Coordinates& p,
-             const Board& b) noexcept
+    std::unordered_set<Coordinates>
+    reachable(const Type& t,
+              const Color& c,
+              const Coordinates& p,
+              const Board& b) noexcept
     {
+      std::vector<Coordinates> v;
       switch (t) {
         case Pawn:
-          return pawn::threaten(c, p, b);
+          v = pawn::reachable(c, p, b);
+          break;
         case Knight:
-          return knight::reachable(c, p, b);
+          v = knight::reachable(c, p, b);
+          break;
         case Bishop:
-          return bishop::reachable(c, p, b);
+          v = bishop::reachable(c, p, b);
+          break;
         case Rook:
-          return rook::reachable(c, p, b);
+          v = rook::reachable(c, p, b);
+          break;
         case Queen:
-          return queen::reachable(c, p, b);
+          v = queen::reachable(c, p, b);
+          break;
         case King:
-          return king::reachable(c, p, b);
+          v = king::reachable(c, p, b);
+          break;
         case None:
         default:
-          return std::vector<Coordinates>();
+          v = std::vector<Coordinates>();
+          break;
       }
-    }
 
-    std::vector<Coordinates>
-    move(const Type& t,
-         const Color& c,
-         const Coordinates& p,
-         const Board& b) noexcept
-    {
-      switch (t) {
-        case Pawn:
-          return pawn::move(c, p, b);
-        case Knight:
-          return knight::reachable(c, p, b);
-        case Bishop:
-          return bishop::reachable(c, p, b);
-        case Rook:
-          return rook::reachable(c, p, b);
-        case Queen:
-          return queen::reachable(c, p, b);
-        case King:
-          return king::reachable(c, p, b);
-        case None:
-        default:
-          return std::vector<Coordinates>();
-      }
+      std::unordered_set<Coordinates> out;
+      out.insert(v.begin(), v.end());
+
+      return out;
     }
 
   }

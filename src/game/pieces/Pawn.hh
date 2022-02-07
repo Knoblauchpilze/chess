@@ -24,16 +24,6 @@ namespace chess {
             const Coordinates& end,
             const Board& b) noexcept;
 
-      std::vector<Coordinates>
-      threaten(const Color& c,
-               const Coordinates& p,
-               const Board& b) noexcept;
-
-      std::vector<Coordinates>
-      move(const Color& c,
-           const Coordinates& p,
-           const Board& b) noexcept;
-
     }
   }
 }

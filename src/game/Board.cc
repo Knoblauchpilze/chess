@@ -81,15 +81,15 @@ namespace chess {
     return isInCheckmate(color);
   }
 
-  std::vector<Coordinates>
+  std::unordered_set<Coordinates>
   Board::availablePositions(const Coordinates& coords) noexcept {
     pieces::Cell c = at(coords);
     // Case of an empty piece: no available position.
     if (c.type == pieces::None) {
-      return std::vector<Coordinates>();
+      return std::unordered_set<Coordinates>();
     }
 
-    return pieces::move(c.type, c.color, coords, *this);
+    return pieces::reachable(c.type, c.color, coords, *this);
   }
 
   pieces::Cell
@@ -202,6 +202,14 @@ namespace chess {
     m_board[cells::F8] = { pieces::Black, pieces::Bishop };
     m_board[cells::G8] = { pieces::Black, pieces::Knight };
     m_board[cells::H8] = { pieces::Black, pieces::Rook };
+
+    // Handle custom initialization.
+    initializeCustom();
+  }
+
+  void
+  Board::initializeCustom() noexcept {
+    // Insert custom logic to initialize the board.
   }
 
   inline
@@ -258,38 +266,26 @@ namespace chess {
     // piece for both colors.
     std::unordered_set<Coordinates> wThreats;
     for (unsigned id = 0u ; id < wp.size() ; ++id) {
-      std::vector<Coordinates> t = pieces::threaten(
+      std::unordered_set<Coordinates> t = pieces::reachable(
         wp[id].first,
         pieces::White,
         wp[id].second,
         *this
       );
 
-      std::for_each(
-        t.cbegin(),
-        t.cend(),
-        [&wThreats](const Coordinates& c) {
-          wThreats.insert(c);
-        }
-      );
+      wThreats.merge(t);
     }
 
     std::unordered_set<Coordinates> bThreats;
     for (unsigned id = 0u ; id < bp.size() ; ++id) {
-      std::vector<Coordinates> t = pieces::threaten(
+      std::unordered_set<Coordinates> t = pieces::reachable(
         bp[id].first,
         pieces::Black,
         bp[id].second,
         *this
       );
 
-      std::for_each(
-        t.cbegin(),
-        t.cend(),
-        [&bThreats](const Coordinates& c) {
-          bThreats.insert(c);
-        }
-      );
+      bThreats.merge(t);
     }
 
     // Check if the king of each color stands among the

@@ -2,7 +2,7 @@
 # define   MOVE_HH
 
 # include <string>
-# include <vector>
+# include <unordered_set>
 # include "Pieces.hh"
 
 namespace chess {
@@ -39,24 +39,6 @@ namespace chess {
           const Board& b) noexcept;
 
     /**
-     * @brief - Provide a list of the cell that are threatened
-     *          by the piece in input. Note that only positions
-     *          that are valid based on the board are considered.
-     * @param t - the type of the piece.
-     * @param c - the color of the piece.
-     * @param p - the location of the piece.
-     * @param b - the current state of the board used to get some
-     *            additional information about the positions to
-     *            consider.
-     * @return - the list of threatened cells by the piece.
-     */
-    std::vector<Coordinates>
-    threaten(const Type& t,
-             const Color& c,
-             const Coordinates& p,
-             const Board& b) noexcept;
-
-    /**
      * @brief - Used to generate the list of possible positions which
      *          can be reached by the input piece.
      * @param t - the type of the piece.
@@ -66,11 +48,11 @@ namespace chess {
      *            cells that are obstructed.
      * @return - a list of cells reachable by the piece.
      */
-    std::vector<Coordinates>
-    move(const Type& t,
-         const Color& c,
-         const Coordinates& p,
-         const Board& b) noexcept;
+    std::unordered_set<Coordinates>
+    reachable(const Type& t,
+              const Color& c,
+              const Coordinates& p,
+              const Board& b) noexcept;
   }
 }
 

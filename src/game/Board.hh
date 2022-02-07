@@ -2,6 +2,7 @@
 # define   BOARD_HH
 
 # include <vector>
+# include <unordered_set>
 # include <memory>
 # include <core_utils/CoreObject.hh>
 # include "Pieces.hh"
@@ -78,7 +79,7 @@ namespace chess {
        * @param coords - the coordinates of the piece to generate.
        * @return - the list of coordinates reachable by the piece.
        */
-      std::vector<Coordinates>
+      std::unordered_set<Coordinates>
       availablePositions(const Coordinates& coords) noexcept;
 
       /**
@@ -115,6 +116,9 @@ namespace chess {
 
       void
       initialize() noexcept;
+
+      void
+      initializeCustom() noexcept;
 
       unsigned
       linear(int x, int y) const noexcept;
