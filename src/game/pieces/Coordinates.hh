@@ -1,54 +1,11 @@
-#ifndef    PIECES_HH
-# define   PIECES_HH
+#ifndef    COORDINATES_HH
+# define   COORDINATES_HH
 
 # include <string>
 # include <memory>
 # include <unordered_set>
 
 namespace chess {
-  /// @brief - Forward declaration of the coordinates class.
-  class Coordinates;
-
-  /// @brief - Convenience define for a pointer on coordinates.
-  using CoordinatesShPtr = std::shared_ptr<Coordinates>;
-
-  /// @brief - Convenience define for a list of unique coordinates.
-  using CoordinatesSet = std::unordered_set<Coordinates>;
-
-  namespace pieces {
-    /// @brief - The possible pieces.
-    enum Type {
-      Pawn,
-      Knight,
-      Bishop,
-      Rook,
-      Queen,
-      King,
-      None
-    };
-
-    std::string
-    toString(const Type& t) noexcept;
-
-    std::string
-    algebraic(const Type& t) noexcept;
-
-    /// @brief - The possible colors.
-    enum Color {
-      White,
-      Black
-    };
-
-    std::string
-    toString(const Color& c) noexcept;
-
-    /// @brief - A convenience structure to represent a piece.
-    struct Cell {
-      Color color;
-      Type type;
-    };
-  }
-
   namespace cells {
     /// @brief - The cells of the board
     enum Value {
@@ -159,8 +116,13 @@ namespace chess {
       int m_y;
   };
 
+  /// @brief - Convenience define for a pointer on coordinates.
+  using CoordinatesShPtr = std::shared_ptr<Coordinates>;
+
+  /// @brief - Convenience define for a list of unique coordinates.
+  using CoordinatesSet = std::unordered_set<Coordinates>;
 }
 
-# include "Pieces_std_specialization.hh"
+# include "Coordinates_std_specialization.hh"
 
-#endif    /* PIECES_HH */
+#endif    /* COORDINATES_HH */

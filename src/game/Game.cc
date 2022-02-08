@@ -86,7 +86,7 @@ namespace pge {
 
     m_board(board),
     m_start(nullptr),
-    m_ai(std::make_shared<chess::AI>(chess::pieces::Black)),
+    m_ai(std::make_shared<chess::AI>(chess::Color::Black)),
     m_menus()
   {
     setService("game");
@@ -188,14 +188,14 @@ namespace pge {
     // Two main possbilities: either we already have a valid
     // starting location, or we don't.
     if (!m_start) {
-      chess::pieces::Cell c = m_board->at(*coords);
-      if (c.type == chess::pieces::None) {
+      const chess::Piece& c = m_board->at(*coords);
+      if (c.invalid()) {
         return;
       }
 
       // Prevent selection of pieces that are not meant to
       // play at the moment.
-      if (c.color != m_board->getPlayer()) {
+      if (c.color() != m_board->getPlayer()) {
         return;
       }
 
@@ -266,12 +266,12 @@ namespace pge {
   void
   Game::updateUI() {
     // Fetch properties to update.
-    chess::pieces::Color p = m_board->getPlayer();
+    chess::Color p = m_board->getPlayer();
     unsigned id = m_board->getCurrentRound();
     chess::Round m = m_board->getLastRound();
 
     m_menus.round->setText("Round: " + std::to_string(id + 1u));
-    m_menus.player->setText(chess::pieces::toString(p));
+    m_menus.player->setText(chess::colorToString(p));
 
     std::string st = "All good";
     if (m_board->isInCheck(p)) {

@@ -1,8 +1,8 @@
 #ifndef    QUEEN_HH
 # define   QUEEN_HH
 
-# include <vector>
-# include "Pieces.hh"
+# include "Coordinates.hh"
+# include "Piece.hh"
 
 namespace chess {
 
@@ -10,15 +10,13 @@ namespace chess {
   /// use as parameter in the functions.
   class Board;
 
-  namespace pieces {
-    namespace queen {
+  namespace queen {
 
-      CoordinatesSet
-      reachable(const Color& c,
-                const Coordinates& p,
-                const Board& b) noexcept;
+    CoordinatesSet
+    reachable(const Color& c,
+              const Coordinates& p,
+              const Board& b) noexcept;
 
-    }
   }
 }
 

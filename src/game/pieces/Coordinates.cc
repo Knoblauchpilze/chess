@@ -1,66 +1,9 @@
 
-# include "Pieces.hh"
+# include "Coordinates.hh"
 # include <algorithm>
 # include <core_utils/CoreException.hh>
 
 namespace chess {
-  namespace pieces {
-
-    std::string
-    toString(const Type& t) noexcept {
-      switch (t) {
-        case Pawn:
-          return "pawn";
-        case Knight:
-          return "knight";
-        case Bishop:
-          return "bishop";
-        case Rook:
-          return "rook";
-        case Queen:
-          return "queen";
-        case King:
-          return "king";
-        case None:
-        default:
-          return "none";
-      }
-    }
-
-    std::string
-    algebraic(const Type& t) noexcept {
-      switch (t) {
-        case Pawn:
-          // Empty string for a pawn.
-          return "";
-        case Knight:
-          return "N";
-        case Bishop:
-          return "B";
-        case Rook:
-          return "R";
-        case Queen:
-          return "Q";
-        case King:
-          return "K";
-        case None:
-        default:
-          return "?";
-      }
-    }
-
-    std::string
-    toString(const Color& c) noexcept {
-      switch (c) {
-        case Black:
-          return "black";
-        default:
-        case White:
-          return "white";
-      }
-    }
-  }
-
   namespace cells {
 
     std::string

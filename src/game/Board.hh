@@ -5,8 +5,8 @@
 # include <unordered_set>
 # include <memory>
 # include <core_utils/CoreObject.hh>
-# include "Pieces.hh"
 # include "Round.hh"
+# include "Piece.hh"
 
 namespace chess {
 
@@ -35,7 +35,7 @@ namespace chess {
        *          round.
        * @return - the next color to play.
        */
-      chess::pieces::Color
+      Color
       getPlayer() const noexcept;
 
       /**
@@ -49,7 +49,7 @@ namespace chess {
        * @brief - Returns the last round played.
        * @return - the last round played.
        */
-      chess::Round
+      Round
       getLastRound() const noexcept;
 
       /**
@@ -59,7 +59,7 @@ namespace chess {
        * @return - `true` if the king of the input color is in check.
        */
       bool
-      isInCheck(const pieces::Color& color) const noexcept;
+      isInCheck(const Color& color) const noexcept;
 
       /**
        * @brief - Determines whether the king of the input color is
@@ -69,7 +69,7 @@ namespace chess {
        *           checkmate position.
        */
       bool
-      isInCheckmate(const pieces::Color& color) const noexcept;
+      isInCheckmate(const Color& color) const noexcept;
 
       /**
        * @brief - Used to generate the possible positions that can
@@ -89,7 +89,7 @@ namespace chess {
        * @param y - the y coordinates.
        * @return - the piece at this place.
        */
-      pieces::Cell
+      const Piece&
       at(int x, int y) const;
 
       /**
@@ -98,7 +98,7 @@ namespace chess {
        * @param c - the coordinates to check.
        * @return - the piece at this place.
        */
-      pieces::Cell
+      const Piece&
       at(const Coordinates& c) const;
 
       /**
@@ -169,7 +169,7 @@ namespace chess {
       /**
        * @brief - The current state of the board.
        */
-      std::vector<pieces::Cell> m_board;
+      std::vector<PieceShPtr> m_board;
 
       /**
        * @brief - The current move index.
@@ -180,7 +180,7 @@ namespace chess {
        * @brief - The color of pieces currently allowed to
        *          move. Gets updated after each round.
        */
-      pieces::Color m_current;
+      Color m_current;
 
       /**
        * @brief - The current state of the board.

@@ -1,7 +1,7 @@
-#ifndef    PIECES_STD_SPECIALIZATION_HH
-# define   PIECES_STD_SPECIALIZATION_HH
+#ifndef    COORDINATES_STD_SPECIALIZATION_HH
+# define   COORDINATES_STD_SPECIALIZATION_HH
 
-# include "Pieces.hh"
+# include "Coordinates.hh"
 
 namespace std {
 
@@ -24,4 +24,4 @@ namespace std {
 
 }
 
-#endif    /* PIECES_HH */
+#endif    /* COORDINATES_STD_SPECIALIZATION_HH */

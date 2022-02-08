@@ -3,7 +3,7 @@
 
 namespace chess {
 
-  AI::AI(const pieces::Color& color):
+  AI::AI(const Color& color):
     utils::CoreObject("ai"),
 
     m_color(color)
@@ -14,7 +14,7 @@ namespace chess {
   void
   AI::play(Board& /*b*/) noexcept {
     /// TODO: Handle the AI play.
-    warn("Should play for \"" + pieces::toString(m_color) + "\"");
+    warn("Should play for \"" + colorToString(m_color) + "\"");
   }
 
 }

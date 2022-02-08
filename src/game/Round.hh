@@ -2,7 +2,8 @@
 # define   ROUND_HH
 
 # include <string>
-# include "Pieces.hh"
+# include "Coordinates.hh"
+# include "Piece.hh"
 
 namespace chess {
 
@@ -23,20 +24,19 @@ namespace chess {
       /**
        * @brief - Used to register the part of the move related
        *          to the input color's actions.
-       * @param c - the color for which the move should be set.
+       * @param p - the piece which moved.
        * @param t - the type of piece executing the move.
        * @param start - the starting position of the move.
        * @param end - the end position of the move.
-       * @param captured - the piece that was captured (if any).
+       * @param captured - whether the move resulted in a capture.
        * @param check - whether the move creates a check.
        * @param checkmate - whether the move creates a checkmate.
        */
       void
-      registerMove(const pieces::Color& c,
-                   const pieces::Type& t,
+      registerMove(PieceShPtr p,
                    const Coordinates& start,
                    const Coordinates& end,
-                   const pieces::Type& captured,
+                   bool captured,
                    bool check,
                    bool checkmate) noexcept;
 
@@ -76,7 +76,7 @@ namespace chess {
       /// of either white or black.
       struct Part {
         /// @brief - The piece that was moved.
-        pieces::Type piece;
+        PieceShPtr piece;
 
         /// @brief - The starting position of the piece that
         /// was moved.
@@ -86,9 +86,9 @@ namespace chess {
         /// moved.
         Coordinates end;
 
-        /// @brief - The type of the piece that was captured.
-        /// Set to `None` in case no piece was captured.
-        pieces::Type captured;
+        /// @brief - Whether or not the move resulted in a
+        /// capture of a piece.
+        bool captured;
 
         /// @brief - Whether this move put the enemy king in
         /// check.

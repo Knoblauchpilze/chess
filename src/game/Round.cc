@@ -7,8 +7,8 @@ namespace chess {
     m_id(id),
 
     m_valid(false),
-    m_white({pieces::None, Coordinates(0, 0), Coordinates(0, 0), pieces::None, false, false}),
-    m_black({pieces::None, Coordinates(0, 0), Coordinates(0, 0), pieces::None, false, false}),
+    m_white({Piece::generate(), Coordinates(0, 0), Coordinates(0, 0), false, false, false}),
+    m_black({Piece::generate(), Coordinates(0, 0), Coordinates(0, 0), false, false, false}),
 
     m_name()
   {
@@ -16,20 +16,19 @@ namespace chess {
   }
 
   void
-  Round::registerMove(const pieces::Color& c,
-                      const pieces::Type& t,
+  Round::registerMove(PieceShPtr p,
                       const Coordinates& start,
                       const Coordinates& end,
-                      const pieces::Type& captured,
+                      bool captured,
                       bool check,
                       bool checkmate) noexcept
   {
     Part* out = &m_white;
-    if (c == pieces::Black) {
+    if (p->color() == Color::Black) {
       out = &m_black;
     }
 
-    out->piece = t;
+    out->piece = p;
 
     out->start = start;
     out->end = end;
@@ -46,7 +45,7 @@ namespace chess {
 
   bool
   Round::valid() const noexcept {
-    return m_white.piece != pieces::None && m_black.piece != pieces::None;
+    return m_white.piece->valid() && m_black.piece->valid();
   }
 
   unsigned
@@ -72,10 +71,10 @@ namespace chess {
     }
 
     auto nameMove = [](const Part& p) {
-      std::string out = pieces::algebraic(p.piece);
+      std::string out = p.piece->algebraic();
 
-      if (p.captured != pieces::None) {
-        if (p.piece == pieces::Pawn) {
+      if (p.captured) {
+        if (p.piece->pawn()) {
           out += cells::file(p.start.asValue());
         }
         out += "x";
@@ -103,7 +102,7 @@ namespace chess {
     }
 
     // Generate the name from black's move if needed.
-    if (m_black.piece == pieces::None) {
+    if (m_black.piece->invalid()) {
       return;
     }
 

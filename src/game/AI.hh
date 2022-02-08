@@ -4,7 +4,6 @@
 # include <memory>
 # include <core_utils/CoreObject.hh>
 # include "Board.hh"
-# include "Pieces.hh"
 
 namespace chess {
 
@@ -16,7 +15,7 @@ namespace chess {
        *          color.
        * @param color - the color the AI should play.
        */
-      AI(const pieces::Color& color);
+      AI(const Color& color);
 
       /**
        * @brief - Plays a round with the specified color.
@@ -30,7 +29,7 @@ namespace chess {
       /**
        * @brief - The color the AI is playing.
        */
-      pieces::Color m_color;
+      Color m_color;
   };
 
   using AIShPtr = std::shared_ptr<AI>;

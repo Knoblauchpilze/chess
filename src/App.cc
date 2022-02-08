@@ -9,23 +9,25 @@
 namespace {
 
   int
-  spriteIDFromPiece(const chess::pieces::Type& p) noexcept {
-    switch (p) {
-      case chess::pieces::Knight:
-        return 3;
-      case chess::pieces::Bishop:
-        return 2;
-      case chess::pieces::Rook:
-        return 4;
-      case chess::pieces::Queen:
-        return 1;
-      case chess::pieces::King:
-        return 0;
-      case chess::pieces::Pawn:
-      case chess::pieces::None:
-      default:
-        // Assume pawn.
-        return 5;
+  spriteIDFromPiece(const chess::Piece& p) noexcept {
+    if (p.knight()) {
+      return 3;
+    }
+    else if (p.bishop()) {
+      return 2;
+    }
+    else if (p.rook()) {
+      return 4;
+    }
+    else if (p.queen()) {
+      return 1;
+    }
+    else if (p.king()) {
+      return 0;
+    }
+    else {
+      // Assume pawn.
+      return 5;
     }
   }
 
@@ -239,8 +241,8 @@ namespace chess {
     for (unsigned y = 0u ; y < 8u ; ++y) {
       for (unsigned x = 0u ; x < 8u ; ++x) {
         // Check if something is at this position.
-        pieces::Cell p = m_board->at(x, y);
-        if (p.type == pieces::None) {
+        const Piece& p = m_board->at(x, y);
+        if (p.invalid()) {
           continue;
         }
 
@@ -255,8 +257,8 @@ namespace chess {
         sd.sprite.id = 0;
         sd.sprite.tint = olc::WHITE;
         sd.sprite.sprite = olc::vi2d(
-          spriteIDFromPiece(p.type),
-          p.color == pieces::White ? 0 : 1
+          spriteIDFromPiece(p),
+          p.color() == Color::White ? 0 : 1
         );
 
         drawSprite(sd, res.cf);
