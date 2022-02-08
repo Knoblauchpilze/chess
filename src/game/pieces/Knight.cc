@@ -7,12 +7,12 @@ namespace chess {
   namespace pieces {
     namespace knight {
 
-      std::vector<Coordinates>
+      CoordinatesSet
       reachable(const Color& c,
                 const Coordinates& p,
                 const Board& b) noexcept
       {
-        std::vector<Coordinates> out;
+        CoordinatesSet out;
 
         // Generate the hard coded values for the
         // positions and then filter them based on
@@ -50,37 +50,10 @@ namespace chess {
             continue;
           }
 
-          out.push_back(coords[id]);
+          out.insert(coords[id]);
         }
 
         return out;
-      }
-
-      bool
-      valid(const Color& /*c*/,
-            const Coordinates& start,
-            const Coordinates& end,
-            const Board& /*b*/) noexcept
-      {
-        // Pawn can move in a weird way and also jump over
-        // pieces of the same color (so ignoring any form
-        // of obstruction).
-        int dx, dy;
-        differentials(start, end, dx, dy);
-
-        // Combination of `(dx, dy)` can be:
-        // (1, 2) (1, -2)
-        // (-1, 2) (-1, -2)
-        // (2, 1) (-2, 1)
-        // (2, -1), (-2, -1)
-        if (std::abs(dx) == 1 && std::abs(dy) == 2) {
-          return true;
-        }
-        if (std::abs(dx) == 2 && std::abs(dy) == 1) {
-          return true;
-        }
-
-        return false;
       }
 
     }

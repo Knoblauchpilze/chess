@@ -300,12 +300,9 @@ namespace chess {
       drawRect(sd, res.cf);
 
       // Also, not the possible positions for this piece.
-      std::unordered_set<Coordinates> ps = m_board->availablePositions(*c);
+      CoordinatesSet ps = m_board->availablePositions(*c);
 
-      for (std::unordered_set<Coordinates>::const_iterator it = ps.cbegin() ;
-           it != ps.cend() ;
-           ++it)
-      {
+      for (CoordinatesSet::const_iterator it = ps.cbegin() ; it != ps.cend() ; ++it) {
         sd.x = 1.0f * it->x();
         // Note that the board is upside down when drawn
         // on screen.

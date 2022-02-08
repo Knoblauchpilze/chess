@@ -13,16 +13,10 @@ namespace chess {
   namespace pieces {
     namespace queen {
 
-      std::vector<Coordinates>
+      CoordinatesSet
       reachable(const Color& c,
                 const Coordinates& p,
                 const Board& b) noexcept;
-
-      bool
-      valid(const Color& c,
-            const Coordinates& start,
-            const Coordinates& end,
-            const Board& b) noexcept;
 
     }
   }

@@ -7,12 +7,12 @@ namespace chess {
   namespace pieces {
     namespace pawn {
 
-      std::vector<Coordinates>
+      CoordinatesSet
       reachable(const Color& c,
                 const Coordinates& p,
                 const Board& b) noexcept
       {
-        std::vector<Coordinates> out;
+        CoordinatesSet out;
 
         // Pawns can move forward one or two cells, and also
         // diagonally in case there's a piece to capture or
@@ -31,7 +31,7 @@ namespace chess {
         if (p.y() + dy >= 0 && p.y() + dy < b.h()) {
           Cell ce = b.at(p.x(), p.y() + dy);
           if (ce.type == None) {
-            out.push_back(Coordinates(p.x(), p.y() + dy));
+            out.insert(Coordinates(p.x(), p.y() + dy));
             clearAhead = true;
           }
         }
@@ -42,13 +42,13 @@ namespace chess {
         if (c == White && p.y() == 1 && clearAhead) {
           Cell ce = b.at(p.x(), p.y() + 2);
           if (ce.type == None) {
-            out.push_back(Coordinates(p.x(), p.y() + 2));
+            out.insert(Coordinates(p.x(), p.y() + 2));
           }
         }
         if (c == Black && p.y() == 6 && clearAhead) {
           Cell ce = b.at(p.x(), p.y() - 2);
           if (ce.type == None) {
-            out.push_back(Coordinates(p.x(), p.y() - 2));
+            out.insert(Coordinates(p.x(), p.y() - 2));
           }
         }
 
@@ -57,7 +57,7 @@ namespace chess {
         if (ctl.x() >= 0 && ctl.x() < b.w() && ctl.y() >= 0 && ctl.y() < b.h()) {
           Cell ce = b.at(ctl);
           if (ce.type != None && ce.color != c) {
-            out.push_back(ctl);
+            out.insert(ctl);
           }
         }
 
@@ -65,7 +65,7 @@ namespace chess {
         if (ctr.x() >= 0 && ctr.x() < b.w() && ctr.y() >= 0 && ctr.y() < b.h()) {
           Cell ce = b.at(ctr);
           if (ce.type != None && ce.color != c) {
-            out.push_back(ctr);
+            out.insert(ctr);
           }
         }
 
@@ -73,6 +73,7 @@ namespace chess {
         // https://en.wikipedia.org/wiki/En_passant#Conditions
         // for more info about how it works.
         /// TODO: Handle last move.
+# ifdef EN_PASSANT
         bool enPassantAllowed = (c == White && p.y() == 4) || (c == Black && p.y() == 3);
         if (enPassantAllowed) {
           Coordinates eptl(p.x() - 1, p.y());
@@ -83,7 +84,7 @@ namespace chess {
               Coordinates ep(p.x() - 1, p.y() + dy);
               Cell epce = b.at(ep);
               if (epce.type == None) {
-                out.push_back(ep);
+                out.insert(ep);
               }
             }
           }
@@ -96,108 +97,14 @@ namespace chess {
               Coordinates ep(p.x() + 1, p.y() + dy);
               Cell epce = b.at(ep);
               if (epce.type == None) {
-                out.push_back(ep);
+                out.insert(ep);
               }
             }
           }
         }
+# endif
 
         return out;
-      }
-
-      bool
-      valid(const Color& c,
-            const Coordinates& start,
-            const Coordinates& end,
-            const Board& b) noexcept
-      {
-        // Pawn can move only vertically and diagonally
-        // when capturing or doing _en passant_.
-        int dx, dy;
-        differentials(start, end, dx, dy);
-
-        // Backward moves are prevented.
-        if (c == White && dy <= 0) {
-          return false;
-        }
-        if (c == Black && dy >= 0) {
-          return false;
-        }
-
-        if (dx == 0) {
-          // Depending on the color we want to allow the
-          // move to the top or to the bottom of the board.
-          if (c == White && dy < 0) {
-            return false;
-          }
-
-          if (c == Black && dy > 0) {
-            return false;
-          }
-
-          // We only allow two cells move in case the pawn
-          // is on its initial line.
-          if (c == White && start.y() != 1 && dy > 1) {
-            return false;
-          }
-          if (c == White && dy > 2) {
-            return false;
-          }
-
-          if (c == Black && start.y() != 6 && dy < -1) {
-            return false;
-          }
-          if (c == Black && dy < -2) {
-            return false;
-          }
-
-          // Prevent move to an obstructed cell.
-          Cell ce = b.at(end.x(), end.y());
-          if (ce.type != None) {
-            return false;
-          }
-
-          return true;
-        }
-
-        if (std::abs(dy) > 1) {
-          return false;
-        }
-
-        Cell ce = b.at(end.x(), end.y());
-        if (ce.type != None) {
-          // In case there's something, we have to make
-          // sure that the piece is of opposite color.
-          return ce.color != c;
-        }
-
-        // Otherwise, handle the en passant case. According
-        // to this page: https://en.wikipedia.org/wiki/En_passant
-        // The pawns should be in their fifth row.
-        if (c == White && start.y() != 4) {
-          return false;
-        }
-        if (c == Black && start.y() != 3) {
-          return false;
-        }
-
-        if (dx > 0 && start.x() >= b.w() - 2) {
-          return false;
-        }
-        if (dx < 0 && start.x() < 1) {
-          return false;
-        }
-
-        // There must be an adjacent pawn in the direction
-        // of the move.
-        Cell toCapture = b.at(end.x(), start.y());
-        if (toCapture.color == c || toCapture.type != Pawn) {
-          return false;
-        }
-
-        // The last move must have been the double-step move
-        // from the opposite pawn.
-        return false;
       }
 
     }

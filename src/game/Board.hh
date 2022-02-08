@@ -79,7 +79,7 @@ namespace chess {
        * @param coords - the coordinates of the piece to generate.
        * @return - the list of coordinates reachable by the piece.
        */
-      std::unordered_set<Coordinates>
+      CoordinatesSet
       availablePositions(const Coordinates& coords) noexcept;
 
       /**

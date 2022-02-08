@@ -81,12 +81,12 @@ namespace chess {
     return isInCheckmate(color);
   }
 
-  std::unordered_set<Coordinates>
+  CoordinatesSet
   Board::availablePositions(const Coordinates& coords) noexcept {
     pieces::Cell c = at(coords);
     // Case of an empty piece: no available position.
     if (c.type == pieces::None) {
-      return std::unordered_set<Coordinates>();
+      return CoordinatesSet();
     }
 
     return pieces::reachable(c.type, c.color, coords, *this);
@@ -130,13 +130,15 @@ namespace chess {
       return false;
     }
 
-    // Make sure the move is valid.
+    // Make sure the move is valid: check the list of
+    // reachable positions and verify that the ending
+    // position belong to them.
     pieces::Cell sp = m_board[linear(start)];
-    if (!pieces::valid(sp.type, s.color, start, end, *this)) {
+    CoordinatesSet avail = pieces::reachable(sp.type, s.color, start, *this);
+    if (avail.count(end) == 0) {
       warn("Move from " + start.toString() + " to " + end.toString() + " for " + pieces::toString(sp.type) + " is invalid");
       return false;
     }
-
 
     // Register the move.
     m_round.registerMove(s.color, s.type, start, end, e.type, false, false);

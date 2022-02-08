@@ -12,9 +12,6 @@
 # include "TopViewFrame.hh"
 # include "App.hh"
 
-/// TODO: Improve methods in `Move` and `Threat` to mutualize
-/// some of the code. Will probably be useful when checking
-/// for checkmate.
 /// TODO: Prevent pieces to move in a way where it would
 /// put the kind in check.
 

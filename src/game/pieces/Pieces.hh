@@ -3,13 +3,17 @@
 
 # include <string>
 # include <memory>
+# include <unordered_set>
 
 namespace chess {
   /// @brief - Forward declaration of the coordinates class.
   class Coordinates;
 
   /// @brief - Convenience define for a pointer on coordinates.
-  using CoordinatesShPtr = std::shared_ptr<chess::Coordinates>;
+  using CoordinatesShPtr = std::shared_ptr<Coordinates>;
+
+  /// @brief - Convenience define for a list of unique coordinates.
+  using CoordinatesSet = std::unordered_set<Coordinates>;
 
   namespace pieces {
     /// @brief - The possible pieces.
