@@ -112,6 +112,22 @@ namespace chess {
       bool
       move(const Coordinates& start, const Coordinates& end);
 
+      /**
+       * @brief - Determine whether the move defined by the input
+       *          starting and end position would leave the king
+       *          with the color of the piece at the starting
+       *          position in check or not.
+       *          We make no assumptions as to whether the king
+       *          is already in check or not.
+       *          In case one of the position is not valid then an
+       *          error is raised.
+       * @param start - the starting position.
+       * @param end - the ending position.
+       * @return - `true` if the move leaves the king in check.
+       */
+      bool
+      leadsToCheck(const Coordinates& start, const Coordinates& end);
+
     private:
 
       void
@@ -132,6 +148,16 @@ namespace chess {
        */
       void
       updateState() const noexcept;
+
+      /**
+       * @brief - Used to compute the check status for the input color
+       *          without using the cache.
+       * @param c - the color for which the check status needs to be
+       *            compited.
+       * @return - `true` if the king of the input color is in check.
+       */
+      bool
+      computeCheck(const Color& c) const noexcept;
 
     private:
 
