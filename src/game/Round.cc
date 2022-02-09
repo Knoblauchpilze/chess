@@ -4,6 +4,8 @@
 namespace chess {
 
   Round::Round(unsigned id):
+    utils::CoreObject("round"),
+
     m_id(id),
 
     m_valid(false),
@@ -12,11 +14,12 @@ namespace chess {
 
     m_name()
   {
+    setService("chess");
     generateName();
   }
 
   void
-  Round::registerMove(PieceShPtr p,
+  Round::registerMove(Piece p,
                       const Coordinates& start,
                       const Coordinates& end,
                       bool captured,
@@ -24,7 +27,7 @@ namespace chess {
                       bool checkmate) noexcept
   {
     Part* out = &m_white;
-    if (p->color() == Color::Black) {
+    if (p.color() == Color::Black) {
       out = &m_black;
     }
 
@@ -44,13 +47,71 @@ namespace chess {
   }
 
   bool
+  Round::whitePlayed() const noexcept {
+    return m_white.piece.valid();
+  }
+
+  bool
+  Round::blackPlayed() const noexcept {
+    return m_black.piece.valid();
+  }
+
+  bool
   Round::valid() const noexcept {
-    return m_white.piece->valid() && m_black.piece->valid();
+    return whitePlayed() && blackPlayed();
   }
 
   unsigned
   Round::id() const noexcept {
     return m_id;
+  }
+
+  Coordinates
+  Round::getMoveStart(const Color& c) const {
+    if (c == Color::White) {
+      if (!whitePlayed()) {
+        error(
+          "Failed to get starting position for move",
+          "White move is not registered"
+        );
+      }
+
+      return m_white.start;
+    }
+
+    // Assume we request the black color.
+    if (!blackPlayed()) {
+      error(
+        "Failed to get starting position for move",
+        "Black move is not registered"
+      );
+    }
+
+    return m_black.start;
+  }
+
+  Coordinates
+  Round::getMoveEnd(const Color& c) const {
+    if (c == Color::White) {
+      if (!whitePlayed()) {
+        error(
+          "Failed to get ending position for move",
+          "White move is not registered"
+        );
+      }
+
+      return m_white.end;
+    }
+
+    // Assume we request the black color.
+    if (!blackPlayed()) {
+      error(
+        "Failed to get ending position for move",
+        "Black move is not registered"
+      );
+    }
+
+    return m_black.end;
   }
 
   std::string
@@ -71,10 +132,10 @@ namespace chess {
     }
 
     auto nameMove = [](const Part& p) {
-      std::string out = p.piece->algebraic();
+      std::string out = p.piece.algebraic();
 
       if (p.captured) {
-        if (p.piece->pawn()) {
+        if (p.piece.pawn()) {
           out += cells::file(p.start.asValue());
         }
         out += "x";
@@ -102,7 +163,7 @@ namespace chess {
     }
 
     // Generate the name from black's move if needed.
-    if (m_black.piece->invalid()) {
+    if (m_black.piece.invalid()) {
       return;
     }
 

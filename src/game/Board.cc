@@ -14,7 +14,7 @@ namespace chess {
     m_height(height),
 
     // White by default.
-    m_board(width * height, std::make_shared<Piece>()),
+    m_board(width * height, Piece::generate()),
 
     m_index(0u),
     m_current(Color::White),
@@ -42,9 +42,9 @@ namespace chess {
     return m_current;
   }
 
-  unsigned
+  Round
   Board::getCurrentRound() const noexcept {
-    return m_index;
+    return m_round;
   }
 
   Round
@@ -100,7 +100,7 @@ namespace chess {
       );
     }
 
-    return *m_board[linear(x, y)];
+    return m_board[linear(x, y)];
   }
 
   const Piece&
@@ -111,30 +111,30 @@ namespace chess {
   bool
   Board::move(const Coordinates& start, const Coordinates& end) {
     // Check piece at the start and end location.
-    PieceShPtr sp = m_board[linear(start)];
+    const Piece& sp = m_board[linear(start)];
     const Piece& e = at(end);
 
-    if (sp->invalid()) {
+    if (sp.invalid()) {
       warn("Failed to move from " + start.toString(), "Empty location");
       return false;
     }
-    if (e.valid() && sp->color() == e.color()) {
+    if (e.valid() && sp.color() == e.color()) {
       warn("Move from " + start.toString() + " would conflict with " + end.toString());
       return false;
     }
 
     // Prevent wrong pieces to move.
-    if (sp->color() != m_current) {
-      warn("Trying to move " + colorToString(sp->color()) + " when " + colorToString(m_current) + " should play");
+    if (sp.color() != m_current) {
+      warn("Trying to move " + colorToString(sp.color()) + " when " + colorToString(m_current) + " should play");
       return false;
     }
 
     // Make sure the move is valid: check the list of
     // reachable positions and verify that the ending
     // position belong to them.
-    CoordinatesSet avail = sp->reachable(start, *this);
+    CoordinatesSet avail = sp.reachable(start, *this);
     if (avail.count(end) == 0) {
-      warn("Move from " + start.toString() + " to " + end.toString() + " for " + sp->name() + " is invalid");
+      warn("Move from " + start.toString() + " to " + end.toString() + " for " + sp.name() + " is invalid");
       return false;
     }
 
@@ -154,8 +154,8 @@ namespace chess {
     // Swap the piece at the starting position with the
     // one at the end position. We also need to erase
     // the data at the starting position.
-    m_board[linear(end)] = std::make_shared<Piece>(*sp);
-    m_board[linear(start)]->reset();
+    m_board[linear(end)] = sp;
+    m_board[linear(start)].reset();
 
     // Invalidate cached data.
     m_state.dirty = true;
@@ -230,8 +230,8 @@ namespace chess {
     // Gather the list of pieces remaining for white
     // and black. Also, keep track of the position of
     // the king as it will be useful later.
-    std::vector<std::pair<const PieceShPtr, Coordinates>> wp;
-    std::vector<std::pair<const PieceShPtr, Coordinates>> bp;
+    std::vector<std::pair<const Piece, Coordinates>> wp;
+    std::vector<std::pair<const Piece, Coordinates>> bp;
 
     // Note that we don't check whether the kings are
     // found as it is guaranteed by other means.
@@ -240,23 +240,23 @@ namespace chess {
 
     for (int y = 0 ; y < m_height ; ++y) {
       for (int x = 0 ; x < m_width ; ++x) {
-        const PieceShPtr c = m_board[linear(x, y)];
+        const Piece& c = m_board[linear(x, y)];
 
-        if (c->invalid()) {
+        if (c.invalid()) {
           continue;
         }
 
-        if (c->color() == Color::White) {
+        if (c.color() == Color::White) {
           wp.push_back(std::make_pair(c, Coordinates(x, y)));
         }
         else {
           bp.push_back(std::make_pair(c, Coordinates(x, y)));
         }
 
-        if (c->king() && c->color() == Color::White) {
+        if (c.king() && c.color() == Color::White) {
           wKing = Coordinates(x, y);
         }
-        if (c->king() && c->color() == Color::Black) {
+        if (c.king() && c.color() == Color::Black) {
           bKing = Coordinates(x, y);
         }
       }
@@ -266,13 +266,13 @@ namespace chess {
     // piece for both colors.
     std::unordered_set<Coordinates> wThreats;
     for (unsigned id = 0u ; id < wp.size() ; ++id) {
-      std::unordered_set<Coordinates> t = wp[id].first->reachable(wp[id].second, *this);
+      std::unordered_set<Coordinates> t = wp[id].first.reachable(wp[id].second, *this);
       wThreats.merge(t);
     }
 
     std::unordered_set<Coordinates> bThreats;
     for (unsigned id = 0u ; id < bp.size() ; ++id) {
-      std::unordered_set<Coordinates> t = bp[id].first->reachable(bp[id].second, *this);
+      std::unordered_set<Coordinates> t = bp[id].first.reachable(bp[id].second, *this);
       bThreats.merge(t);
     }
 

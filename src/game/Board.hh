@@ -39,10 +39,10 @@ namespace chess {
       getPlayer() const noexcept;
 
       /**
-       * @brief - Returns the current round index.
-       * @return - the index of the current round.
+       * @brief - Returns the current round.
+       * @return - the current round.
        */
-      unsigned
+      Round
       getCurrentRound() const noexcept;
 
       /**
@@ -169,7 +169,7 @@ namespace chess {
       /**
        * @brief - The current state of the board.
        */
-      std::vector<PieceShPtr> m_board;
+      std::vector<Piece> m_board;
 
       /**
        * @brief - The current move index.

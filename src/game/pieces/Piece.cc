@@ -41,11 +41,11 @@ namespace chess {
     setService("piece");
   }
 
-  PieceShPtr
+  Piece
   Piece::generate(const Type& type,
                   const Color& color) noexcept
   {
-    return std::shared_ptr<Piece>(new Piece(type, color));
+    return Piece(type, color);
   }
 
   void

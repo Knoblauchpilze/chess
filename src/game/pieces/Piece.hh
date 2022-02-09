@@ -1,7 +1,6 @@
 #ifndef    PIECE_HH
 # define   PIECE_HH
 
-# include <memory>
 # include <core_utils/CoreObject.hh>
 # include "Coordinates.hh"
 
@@ -32,13 +31,6 @@ namespace chess {
   std::string
   colorToString(const Color& c) noexcept;
 
-  /// @brief - Forward declaration of a piece to use the
-  /// shared pointer on it.
-  class Piece;
-
-  /// @brief - Definition of a shared pointer on a piece.
-  using PieceShPtr = std::shared_ptr<Piece>;
-
   /// @brief - Forward declaration of a board to be used
   /// in the definition of methods.
   class Board;
@@ -59,7 +51,7 @@ namespace chess {
        * @return - the generated piece.
        */
       static
-      PieceShPtr
+      Piece
       generate(const Type& type = Type::None,
                const Color& color = Color::White) noexcept;
 

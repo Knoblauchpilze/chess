@@ -120,6 +120,22 @@ namespace pge {
       chess::CoordinatesShPtr
       getSelectedPosition() const noexcept;
 
+      /**
+       * @brief - Returns the current move being played. May be
+       *          incomplete if the current player is black.
+       * @return - the current round being played.
+       */
+      chess::Round
+      getCurrentRound() const noexcept;
+
+      /**
+       * @brief - Returns the last complete move that was played.
+       *          Always complete unless it's the first move.
+       * @return - the last round played.
+       */
+      chess::Round
+      getLastRound() const noexcept;
+
     private:
 
       /**

@@ -48,6 +48,18 @@ namespace pge {
     return m_start;
   }
 
+  inline
+  chess::Round
+  Game::getCurrentRound() const noexcept {
+    return m_board->getCurrentRound();
+  }
+
+  inline
+  chess::Round
+  Game::getLastRound() const noexcept {
+    return m_board->getLastRound();
+  }
+
 }
 
 #endif    /* GAME_HXX */

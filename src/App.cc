@@ -213,14 +213,14 @@ namespace chess {
     SpriteDesc sd = {};
     sd.loc = pge::RelativePosition::Center;
 
+    // Assume that the tile size is a square and scale
+    // the tiles so that they occupy one tile.
+    sd.radius = 1.0f;
+
     // Draw the board.
     for (unsigned y = 0u ; y < 8u ; ++y) {
       for (unsigned x = 0u ; x < 8u ; ++x) {
         unsigned det = (y % 2u + x) % 2u;
-
-        // Assume that the tile size is a square and scale
-        // the tiles so that they occupy one tile.
-        sd.radius = 1.0f;
 
         sd.x = x;
         sd.y = y;
@@ -236,6 +236,7 @@ namespace chess {
   App::drawPieces(const RenderDesc& res) noexcept {
     SpriteDesc sd = {};
     sd.loc = pge::RelativePosition::Center;
+    sd.radius = 0.9f;
 
     /// TODO: Change in case the player is playing blacks.
     for (unsigned y = 0u ; y < 8u ; ++y) {
@@ -245,8 +246,6 @@ namespace chess {
         if (p.invalid()) {
           continue;
         }
-
-        sd.radius = 0.9f;
 
         sd.x = x;
         // Note that the board is upside down when drawn
@@ -270,6 +269,7 @@ namespace chess {
   App::drawOverlays(const RenderDesc& res) noexcept {
     SpriteDesc sd = {};
     sd.loc = pge::RelativePosition::Center;
+    sd.radius = 1.0f;
 
     // Draw the overlay in case the mouse is over
     // a cell with a piece.
@@ -279,12 +279,54 @@ namespace chess {
       unsigned x = std::clamp(mtp.x, 0, static_cast<int>(m_board->w()));
       unsigned y = std::clamp(mtp.y, 0, static_cast<int>(m_board->h()));
 
-      sd.radius = 1.0f;
-
       sd.x = 1.0f * x;
       sd.y = 1.0f * y;
 
       sd.sprite.tint = olc::Pixel(0, 255, 0, pge::alpha::AlmostTransparent);
+      drawRect(sd, res.cf);
+    }
+
+    // Draw overlay for the last move.
+    Coordinates s(0, 0), e(0, 0);
+    bool valid = false;
+
+    // Start with the current rount.
+    Round r = m_game->getCurrentRound();
+    if (!r.whitePlayed()) {
+      // In case white didn't play yet it means that
+      // we should use the last round to get meaningful
+      // information.
+      r = m_game->getLastRound();
+    }
+
+    // Start by consider black: if they played it means
+    // that we should display this information as it is
+    // always the second thing happening in a move.
+    if (r.blackPlayed()) {
+      s = r.getMoveStart(Color::Black);
+      e = r.getMoveEnd(Color::Black);
+
+      valid = true;
+    }
+    // Otherwise display white information if any.
+    else if (r.whitePlayed()) {
+      s = r.getMoveStart(Color::White);
+      e = r.getMoveEnd(Color::White);
+
+      valid = true;
+    }
+
+    // If one move is to be displayed, then display as
+    // an overlay the starting and ending positions.
+    if (valid) {
+      sd.sprite.tint = olc::Pixel(128, 128, 0, pge::alpha::SemiOpaque);
+
+      sd.x = 1.0f * s.x();
+      sd.y = 7.0f - s.y();
+      drawRect(sd, res.cf);
+
+      sd.x = 1.0f * e.x();
+      sd.y = 7.0f - e.y();
       drawRect(sd, res.cf);
     }
 

@@ -2,6 +2,7 @@
 # define   ROUND_HH
 
 # include <string>
+# include <core_utils/CoreObject.hh>
 # include "Coordinates.hh"
 # include "Piece.hh"
 
@@ -11,7 +12,7 @@ namespace chess {
   /// use as parameter in the functions.
   class Board;
 
-  class Round {
+  class Round: public utils::CoreObject {
     public:
 
       /**
@@ -33,12 +34,28 @@ namespace chess {
        * @param checkmate - whether the move creates a checkmate.
        */
       void
-      registerMove(PieceShPtr p,
+      registerMove(Piece p,
                    const Coordinates& start,
                    const Coordinates& end,
                    bool captured,
                    bool check,
                    bool checkmate) noexcept;
+
+      /**
+       * @brief - Wehether or not the information for the
+       *          white move is registered already.
+       * @return - `true` if the white move is available.
+       */
+      bool
+      whitePlayed() const noexcept;
+
+      /**
+       * @brief - Wehether or not the information for the
+       *          black move is registered already.
+       * @return - `true` if the black move is available.
+       */
+      bool
+      blackPlayed() const noexcept;
 
       /**
        * @brief - Whether or not this move is valid.
@@ -53,6 +70,28 @@ namespace chess {
        */
       unsigned
       id() const noexcept;
+
+      /**
+       * @brief - Returns the starting position for the move
+       *          related to the input color. In case the info
+       *          for this move is not available an error is
+       *          raised.
+       * @param c - the color of the move to return.
+       * @return - the starting coordinates for the move.
+       */
+      Coordinates
+      getMoveStart(const Color& c) const;
+
+      /**
+       * @brief - Returns the ending position for the move
+       *          related to the input color. In case the info
+       *          for this move is not available an error is
+       *          raised.
+       * @param c - the color of the move to return.
+       * @return - the ending coordinates for the move.
+       */
+      Coordinates
+      getMoveEnd(const Color& c) const;
 
       /**
        * @brief - Prints the move as a standard string to
@@ -76,7 +115,7 @@ namespace chess {
       /// of either white or black.
       struct Part {
         /// @brief - The piece that was moved.
-        PieceShPtr piece;
+        Piece piece;
 
         /// @brief - The starting position of the piece that
         /// was moved.

@@ -267,10 +267,10 @@ namespace pge {
   Game::updateUI() {
     // Fetch properties to update.
     chess::Color p = m_board->getPlayer();
-    unsigned id = m_board->getCurrentRound();
+    chess::Round r = m_board->getCurrentRound();
     chess::Round m = m_board->getLastRound();
 
-    m_menus.round->setText("Round: " + std::to_string(id + 1u));
+    m_menus.round->setText("Round: " + std::to_string(r.id() + 1u));
     m_menus.player->setText(chess::colorToString(p));
 
     std::string st = "All good";
