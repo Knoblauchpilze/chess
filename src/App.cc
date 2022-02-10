@@ -83,7 +83,7 @@ namespace chess {
   App::loadMenuResources() {
     m_state = std::make_shared<pge::GameState>(
       olc::vi2d(ScreenWidth(), ScreenHeight()),
-      pge::Screen::Home
+      pge::Screen::Game
     );
     m_menus = m_game->generateMenus(ScreenWidth(), ScreenHeight());
   }
@@ -271,6 +271,27 @@ namespace chess {
 
         drawRect(sd, res.cf);
       }
+    }
+
+    // Draw the indications about files and rows.
+    for (unsigned id = 0u ; id < 8u ; ++id) {
+      Coordinates cFile(id, 0);
+      std::string file = cells::file(cFile.asValue());
+
+      Coordinates cRow(0, id);
+      std::string row = cells::row(cRow.asValue());
+
+      // Draw files and row on both sides of the
+      // board.
+      olc::vf2d pFile = res.cf.tileCoordsToPixels(0.35f + id, -0.15f, pge::RelativePosition::Center, 1.0f);
+      DrawStringDecal(pFile, file, olc::BLACK);
+      pFile = res.cf.tileCoordsToPixels(0.35f + id, 8.05f, pge::RelativePosition::Center, 1.0f);
+      DrawStringDecal(pFile, file, olc::BLACK);
+
+      olc::vf2d pRow = res.cf.tileCoordsToPixels(-0.15f, 0.5f + id, pge::RelativePosition::Center, 1.0f);
+      DrawStringDecal(pRow, row, olc::BLACK);
+      pRow = res.cf.tileCoordsToPixels(8.05f, 0.5f + id, pge::RelativePosition::Center, 1.0f);
+      DrawStringDecal(pRow, row, olc::BLACK);
     }
   }
 

@@ -81,6 +81,9 @@ namespace chess {
     std::string
     file(const Value& v) noexcept;
 
+    std::string
+    row(const Value& v) noexcept;
+
     Value
     fromString(const std::string& s);
   }

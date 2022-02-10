@@ -221,7 +221,88 @@ namespace chess {
       }
 
       // Shouldn't happen.
-      return "unknown";
+      return "?";
+    }
+
+    std::string
+    row(const Value& v) noexcept {
+      switch (v) {
+        case Value::A1:
+        case Value::B1:
+        case Value::C1:
+        case Value::D1:
+        case Value::E1:
+        case Value::F1:
+        case Value::G1:
+        case Value::H1:
+          return "1";
+        case Value::A2:
+        case Value::B2:
+        case Value::C2:
+        case Value::D2:
+        case Value::E2:
+        case Value::F2:
+        case Value::G2:
+        case Value::H2:
+          return "2";
+        case Value::A3:
+        case Value::B3:
+        case Value::C3:
+        case Value::D3:
+        case Value::E3:
+        case Value::F3:
+        case Value::G3:
+        case Value::H3:
+          return "3";
+        case Value::A4:
+        case Value::B4:
+        case Value::C4:
+        case Value::D4:
+        case Value::E4:
+        case Value::F4:
+        case Value::G4:
+        case Value::H4:
+          return "4";
+        case Value::A5:
+        case Value::B5:
+        case Value::C5:
+        case Value::D5:
+        case Value::E5:
+        case Value::F5:
+        case Value::G5:
+        case Value::H5:
+          return "5";
+        case Value::A6:
+        case Value::B6:
+        case Value::C6:
+        case Value::D6:
+        case Value::E6:
+        case Value::F6:
+        case Value::G6:
+        case Value::H6:
+          return "6";
+        case Value::A7:
+        case Value::B7:
+        case Value::C7:
+        case Value::D7:
+        case Value::E7:
+        case Value::F7:
+        case Value::G7:
+        case Value::H7:
+          return "7";
+        case Value::A8:
+        case Value::B8:
+        case Value::C8:
+        case Value::D8:
+        case Value::E8:
+        case Value::F8:
+        case Value::G8:
+        case Value::H8:
+          return "8";
+      }
+
+      // Shouldn't happen.
+      return "?";
     }
 
     Value
