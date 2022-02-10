@@ -18,7 +18,11 @@ namespace chess {
 
     m_index(0u),
     m_current(Color::White),
-    m_state({false, false, false, false, false}),
+    m_state({
+      false, // Dirty state
+      { false, false, false }, // White state
+      { false, false, false }  // Black state
+    }),
     m_round(m_index),
     m_rounds()
   {
@@ -59,7 +63,7 @@ namespace chess {
   bool
   Board::isInCheck(const Color& color) const noexcept {
     if (!m_state.dirty) {
-      return (color == Color::White ? m_state.whiteInCheck : m_state.blackInCheck);
+      return (color == Color::White ? m_state.white.check : m_state.black.check);
     }
 
     updateState();
@@ -71,13 +75,25 @@ namespace chess {
   bool
   Board::isInCheckmate(const Color& color) const noexcept {
     if (!m_state.dirty) {
-      return (color == Color::White ? m_state.whiteInCheckmate : m_state.blackInCheckmate);
+      return (color == Color::White ? m_state.white.checkmate : m_state.black.checkmate);
     }
 
     updateState();
 
     // Call the same routine.
     return isInCheckmate(color);
+  }
+
+  bool
+  Board::isInStalemate(const Color& color) const noexcept {
+    if (!m_state.dirty) {
+      return (color == Color::White ? m_state.white.stalemate : m_state.black.stalemate);
+    }
+
+    updateState();
+
+    // Call the same routine.
+    return isInStalemate(color);
   }
 
   CoordinatesSet
@@ -207,15 +223,22 @@ namespace chess {
   void
   Board::initialize() noexcept {
     // Whites.
+# define ONLY_KING
+# ifndef ONLY_KING
     m_board[cells::A1] = Piece::generate(Type::Rook, Color::White);
     m_board[cells::B1] = Piece::generate(Type::Knight, Color::White);
     m_board[cells::C1] = Piece::generate(Type::Bishop, Color::White);
     m_board[cells::D1] = Piece::generate(Type::Queen, Color::White);
+# endif
     m_board[cells::E1] = Piece::generate(Type::King, Color::White);
+# ifndef ONLY_KING
     m_board[cells::F1] = Piece::generate(Type::Bishop, Color::White);
     m_board[cells::G1] = Piece::generate(Type::Knight, Color::White);
     m_board[cells::H1] = Piece::generate(Type::Rook, Color::White);
+# endif
 
+// # define PAWNS
+# ifdef PAWNS
     m_board[cells::A2] = Piece::generate(Type::Pawn, Color::White);
     m_board[cells::B2] = Piece::generate(Type::Pawn, Color::White);
     m_board[cells::C2] = Piece::generate(Type::Pawn, Color::White);
@@ -224,8 +247,10 @@ namespace chess {
     m_board[cells::F2] = Piece::generate(Type::Pawn, Color::White);
     m_board[cells::G2] = Piece::generate(Type::Pawn, Color::White);
     m_board[cells::H2] = Piece::generate(Type::Pawn, Color::White);
+# endif
 
     // Blacks.
+# ifdef PAWNS
     m_board[cells::A7] = Piece::generate(Type::Pawn, Color::Black);
     m_board[cells::B7] = Piece::generate(Type::Pawn, Color::Black);
     m_board[cells::C7] = Piece::generate(Type::Pawn, Color::Black);
@@ -234,6 +259,7 @@ namespace chess {
     m_board[cells::F7] = Piece::generate(Type::Pawn, Color::Black);
     m_board[cells::G7] = Piece::generate(Type::Pawn, Color::Black);
     m_board[cells::H7] = Piece::generate(Type::Pawn, Color::Black);
+# endif
 
     m_board[cells::A8] = Piece::generate(Type::Rook, Color::Black);
     m_board[cells::B8] = Piece::generate(Type::Knight, Color::Black);
@@ -270,23 +296,35 @@ namespace chess {
   Board::updateState() const noexcept {
     // Check if the king of each color stands among the
     // list of threatened cells.
-    m_state.whiteInCheck = computeCheck(Color::White);
-    m_state.blackInCheck = computeCheck(Color::Black);
+    m_state.white.check = computeCheck(Color::White);
+    m_state.black.check = computeCheck(Color::Black);
 
-    if (m_state.whiteInCheck) {
+    if (m_state.white.check) {
       warn("White is in check");
     }
-    if (m_state.blackInCheck) {
+    if (m_state.black.check) {
       warn("Black is in check");
     }
 
-    m_state.whiteInCheckmate = computeCheckmate(Color::White);
-    m_state.blackInCheckmate = computeCheckmate(Color::Black);
+    bool bStalemate = computeStalemate(Color::White);
+    bool wStalemate = computeStalemate(Color::Black);
+    m_state.white.stalemate = !m_state.white.check && bStalemate;
+    m_state.black.stalemate = !m_state.black.check && wStalemate;
 
-    if (m_state.whiteInCheckmate) {
+    if (m_state.white.stalemate) {
+      warn("White is in stalemate");
+    }
+    if (m_state.black.stalemate) {
+      warn("Black is in stalemate");
+    }
+
+    m_state.white.checkmate = m_state.white.check && bStalemate;
+    m_state.black.checkmate = m_state.black.check && bStalemate;
+
+    if (m_state.white.checkmate) {
       warn("White is in checkmate");
     }
-    if (m_state.blackInCheckmate) {
+    if (m_state.black.checkmate) {
       warn("Black is in checkmate");
     }
 
@@ -336,7 +374,7 @@ namespace chess {
   }
 
   bool
-  Board::computeCheckmate(const Color& c) const noexcept {
+  Board::computeStalemate(const Color& c) const noexcept {
     // Gather the pieces of the corresponding color.
     std::vector<std::pair<const Piece, Coordinates>> pieces;
 

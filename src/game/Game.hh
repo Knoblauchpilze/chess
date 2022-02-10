@@ -152,8 +152,15 @@ namespace pge {
        *          that needs to update the UI and the text content
        *          of menus.
        */
-      virtual void
+      void
       updateUI();
+
+      /**
+       * @brief - Update the menu displaying whether the player is
+       *          in check or checkmate etc.
+       */
+      void
+      updateStateMenu() noexcept;
 
     private:
 
@@ -180,42 +187,57 @@ namespace pge {
         bool terminated;
       };
 
+      /// @brief - Convenience structure allowing to group information
+      /// about a timed menu.
+      struct TimedMenu {
+        // Information about when the menu started appearing.
+        utils::TimeStamp date;
+
+        // Keep track of whether the menu was already active.
+        bool wasActive;
+
+        // The alert menu indicating controlled by this object.
+        MenuShPtr menu;
+
+        // The duration of the alert.
+        int duration;
+
+        /**
+         * @brief - Used to update the internal attribute with
+         *          the current value of whether the menu should
+         *          be active or not.
+         * @param active - `true` if the menu should still be
+         *                 active.
+         */
+        void
+        update(bool active) noexcept;
+      };
+
       /// @brief - Convenience structure allowing to display the info
       /// about the current game.
       struct Menus {
-        /// The current round.
+        // The current round.
         MenuShPtr round;
 
-        /// Who is next to play.
+        // Who is next to play.
         MenuShPtr player;
 
-        /// The check mate status.
+        // The check mate status.
         MenuShPtr status;
 
-        /// Information about when the check state was reached.
-        utils::TimeStamp checkDate;
+        // Information about when the check state was reached.
+        TimedMenu check;
 
-        /// Keep track of whether the player was in check in the last
-        /// frame.
-        bool wasInCheck;
+        // Information about when the checkmate state was reached.
+        TimedMenu checkmate;
 
-        /// The alert menu indicating that the player is now in check.
-        MenuShPtr check;
+        // Information about when the stalemate state was reached.
+        TimedMenu stalemate;
 
-        /// Information about when the checkmate state was reached.
-        utils::TimeStamp checkmateDate;
-
-        /// Keep track of whether the player was in checkmate in the
-        /// last frame.
-        bool wasInCheckmate;
-
-        /// The alert menu indicating that the player is now in check.
-        MenuShPtr checkmate;
-
-        /// The last moves.
+        // The last moves.
         std::vector<MenuShPtr> moves;
 
-        /// The current menu to update for the next move.
+        // The current menu to update for the next move.
         unsigned move;
       };
 

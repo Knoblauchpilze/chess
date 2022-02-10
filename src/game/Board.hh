@@ -72,6 +72,16 @@ namespace chess {
       isInCheckmate(const Color& color) const noexcept;
 
       /**
+       * @brief - Determines whether the player of the input color is
+       *          currently in stalemate.
+       * @param color - the color to check.
+       * @return - `true` if the player of the input color is in a
+       *           stalemate position.
+       */
+      bool
+      isInStalemate(const Color& color) const noexcept;
+
+      /**
        * @brief - Used to generate the possible positions that can
        *          be reached by the piece at the input coordinates.
        *          In case the cell is empty, the returned list will
@@ -160,18 +170,28 @@ namespace chess {
       computeCheck(const Color& c) const noexcept;
 
       /**
-       * @brief - Used to compute the checkmate status for the input
+       * @brief - Used to compute the stalemate status for the input
        *          color without using the cache.
-       *          NOTE: this method assume that the check status for
-       *          the input color is valid already.
-       * @param c - the color for which the checkmate status needs to
+       * @param c - the color for which the stalemate status needs to
        *            be computed.
-       * @return - `true` if the king of the input color is in checkmate.
+       * @return - `true` if the king of the input color is in stalemate.
        */
       bool
-      computeCheckmate(const Color& c) const noexcept;
+      computeStalemate(const Color& c) const noexcept;
 
     private:
+
+      /// @brief - The data for a single color.
+      struct Player {
+        // Whether the player is in check.
+        bool check;
+
+        // Whether the player is in checkmate.
+        bool checkmate;
+
+        // Whether the player is in stalemate.
+        bool stalemate;
+      };
 
       /// @brief - Convenience structure allowing to keep track
       /// of the state of the board to speed-up some computations.
@@ -181,17 +201,11 @@ namespace chess {
         // Whether or not the information here is up to date.
         bool dirty;
 
-        // Whether the white kind is in check.
-        bool whiteInCheck;
+        // information about th state of white.
+        Player white;
 
-        // Whether the black kind is in check.
-        bool blackInCheck;
-
-        // Whether the white kind is in checkmate.
-        bool whiteInCheckmate;
-
-        // Whether the black kind is in checkmate.
-        bool blackInCheckmate;
+        // Information about the state of black.
+        Player black;
       };
 
       /**

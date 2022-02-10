@@ -135,10 +135,15 @@ namespace pge {
     // maximum number of move so that the first move
     // can actually be registered.
     m_menus.move = sk_lastMoves - 1u;
-    m_menus.checkDate = utils::TimeStamp();
-    m_menus.wasInCheck = false;
-    m_menus.checkmateDate = utils::TimeStamp();
-    m_menus.wasInCheckmate = false;
+    m_menus.check.date = utils::TimeStamp();
+    m_menus.check.wasActive = false;
+    m_menus.check.duration = ALERT_DURATION_MS;
+    m_menus.checkmate.date = utils::TimeStamp();
+    m_menus.checkmate.wasActive = false;
+    m_menus.checkmate.duration = ALERT_DURATION_MS;
+    m_menus.stalemate.date = utils::TimeStamp();
+    m_menus.stalemate.wasActive = false;
+    m_menus.stalemate.duration = ALERT_DURATION_MS;
 
     // Generate the alert menu indicating that the player
     // is in check or checkmate.
@@ -146,25 +151,35 @@ namespace pge {
     fd.color = olc::RED;
     fd.align = pge::menu::Alignment::Center;
 
-    m_menus.check = generateAlertMenu(
+    m_menus.check.menu = generateAlertMenu(
       olc::vi2d((width - 300.0f) / 2.0f, (height - 150.0f) / 2.0f),
       olc::vi2d(300, 150),
       "You're in check !",
       "check"
     );
-    m_menus.check->setVisible(false);
-    m_menus.checkmate = generateAlertMenu(
+    m_menus.check.menu->setVisible(false);
+
+    m_menus.checkmate.menu = generateAlertMenu(
       olc::vi2d((width - 300.0f) / 2.0f, (height - 150.0f) / 2.0f),
       olc::vi2d(300, 150),
       "You're in checkmate !",
-      "check"
+      "checkmate"
     );
-    m_menus.checkmate->setVisible(false);
+    m_menus.checkmate.menu->setVisible(false);
+
+    m_menus.stalemate.menu = generateAlertMenu(
+      olc::vi2d((width - 300.0f) / 2.0f, (height - 150.0f) / 2.0f),
+      olc::vi2d(300, 150),
+      "You're in stalemate !",
+      "stalemate"
+    );
+    m_menus.stalemate.menu->setVisible(false);
 
     std::vector<MenuShPtr> menus;
     menus.push_back(status);
-    menus.push_back(m_menus.check);
-    menus.push_back(m_menus.checkmate);
+    menus.push_back(m_menus.check.menu);
+    menus.push_back(m_menus.checkmate.menu);
+    menus.push_back(m_menus.stalemate.menu);
 
     return menus;
   }
@@ -272,62 +287,67 @@ namespace pge {
     m_menus.round->setText("Round: " + std::to_string(r.id() + 1u));
     m_menus.player->setText(chess::colorToString(p));
 
-    std::string st = "All good";
-    // Start with checkmate as it's 'stronger' than
-    // regular check.
-    if (m_board->isInCheckmate(p)) {
-      st = "Checkmate";
-      if (!m_menus.wasInCheckmate) {
-        m_menus.checkmateDate = utils::now();
-        m_menus.wasInCheckmate = true;
-        m_menus.checkmate->setVisible(true);
-      }
-      else if (utils::now() > m_menus.checkmateDate + utils::toMilliseconds(ALERT_DURATION_MS)) {
-        m_menus.checkmate->setVisible(false);
-      }
-      else {
-        float d = utils::diffInMs(m_menus.checkmateDate, utils::now()) / ALERT_DURATION_MS;
-        uint8_t alpha = static_cast<uint8_t>(
-          std::clamp((1.0f - d) * pge::alpha::Opaque, 0.0f, 255.0f)
-        );
-        m_menus.checkmate->setBackground(pge::menu::newColoredBackground(olc::Pixel(64, 0, 0, alpha)));
-      }
-    }
-    else if (m_menus.wasInCheckmate) {
-      m_menus.checkmate->setVisible(false);
-      m_menus.wasInCheckmate = false;
-    }
-    m_menus.status->setText(st);
-
-    if (m_board->isInCheck(p) && !m_board->isInCheckmate(p)) {
-      st = "Check";
-
-      if (!m_menus.wasInCheck) {
-        m_menus.checkDate = utils::now();
-        m_menus.wasInCheck = true;
-        m_menus.check->setVisible(true);
-      }
-      else if (utils::now() > m_menus.checkDate + utils::toMilliseconds(ALERT_DURATION_MS)) {
-        m_menus.check->setVisible(false);
-      }
-      else {
-        float d = utils::diffInMs(m_menus.checkDate, utils::now()) / ALERT_DURATION_MS;
-        uint8_t alpha = static_cast<uint8_t>(
-          std::clamp((1.0f - d) * pge::alpha::Opaque, 0.0f, 255.0f)
-        );
-        m_menus.check->setBackground(pge::menu::newColoredBackground(olc::Pixel(64, 0, 0, alpha)));
-      }
-    }
-    else if (m_menus.wasInCheck) {
-      m_menus.check->setVisible(false);
-      m_menus.wasInCheck = false;
-    }
+    // Update the state of the game.
+    updateStateMenu();
 
     if (m.id() != m_menus.move && m.valid()) {
       unsigned pos = m.id() % m_menus.moves.size();
       m_menus.moves[pos]->setText(m.toString());
       m_menus.move = m.id();
     }
+  }
+
+  void
+  Game::TimedMenu::update(bool active) noexcept {
+      // In case the menu should be active
+    if (active) {
+      if (!wasActive) {
+        // Make it active if it's the first time that
+        // we detect that it should be active.
+        date = utils::now();
+        wasActive = true;
+        menu->setVisible(true);
+      }
+      else if (utils::now() > date + utils::toMilliseconds(duration)) {
+        // Deactivate the menu in case it's been active
+        // for too long.
+        menu->setVisible(false);
+      }
+      else {
+        // Update the alpha value in case it's active
+        // for not long enough.
+        float d = utils::diffInMs(date, utils::now()) / duration;
+        uint8_t alpha = static_cast<uint8_t>(
+          std::clamp((1.0f - d) * pge::alpha::Opaque, 0.0f, 255.0f)
+        );
+        menu->setBackground(pge::menu::newColoredBackground(olc::Pixel(64, 0, 0, alpha)));
+      }
+    }
+    // Or if the menu shouldn't be active anymore and
+    // it's the first time we detect that.
+    else if (wasActive) {
+      // Deactivate the menu.
+      menu->setVisible(false);
+      wasActive = false;
+    }
+  }
+
+  void
+  Game::updateStateMenu() noexcept {
+    chess::Color p = m_board->getPlayer();
+
+    // Start with checkmate as it's 'stronger' than
+    // regular check.
+    bool cm = m_board->isInCheckmate(p);
+    bool c = m_board->isInCheck(p);
+    bool sm = m_board->isInStalemate(p);
+
+    m_menus.checkmate.update(cm);
+    m_menus.check.update(c && !cm);
+    m_menus.stalemate.update(sm);
+
+    std::string st = (cm ? "Checkmate" : (cm ? "Check" : (sm ? "Stalemate" : "All good")));
+    m_menus.status->setText(st);
   }
 
 }

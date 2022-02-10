@@ -14,7 +14,6 @@
 
 /// TODO: Handle the load/save of games.
 /// TODO: Welcome menu and choose side.
-/// TODO: Compute stalemate.
 
 /// @brief - Size of the tiles.
 # define TILE_SIZE 170
