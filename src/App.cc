@@ -83,7 +83,7 @@ namespace chess {
   App::loadMenuResources() {
     m_state = std::make_shared<pge::GameState>(
       olc::vi2d(ScreenWidth(), ScreenHeight()),
-      pge::Screen::LoadGame
+      pge::Screen::Home
     );
     m_menus = m_game->generateMenus(ScreenWidth(), ScreenHeight());
   }
@@ -144,6 +144,18 @@ namespace chess {
     if (c.keys[pge::controls::keys::P]) {
       m_game->togglePause();
     }
+  }
+
+  void
+  App::cleanResources() {
+    if (m_packs != nullptr) {
+      m_packs.reset();
+    }
+  }
+
+  void
+  App::cleanMenuResources() {
+    m_menus.clear();
   }
 
   void

@@ -8,20 +8,6 @@ namespace chess {
 
   inline
   void
-  App::cleanResources() {
-    if (m_packs != nullptr) {
-      m_packs.reset();
-    }
-  }
-
-  inline
-  void
-  App::cleanMenuResources() {
-    m_menus.clear();
-  }
-
-  inline
-  void
   App::drawSprite(const SpriteDesc& t, const pge::CoordinateFrame& cf) {
     olc::vf2d p = cf.tileCoordsToPixels(t.x, t.y, t.loc, t.radius);
 
