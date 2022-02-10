@@ -39,6 +39,7 @@ namespace chess {
     pge::App(desc),
 
     m_game(nullptr),
+    m_state(nullptr),
     m_menus(),
 
     m_packs(std::make_shared<pge::TexturePack>()),
@@ -73,13 +74,17 @@ namespace chess {
     // for now to achieve it.
     setLayerTint(Layer::Draw, olc::Pixel(255, 255, 255, pge::alpha::SemiOpaque));
 
-    // Create the game.
+    // Create the game and its state.
     m_game = std::make_shared<pge::Game>(m_board);
     m_game->togglePause();
   }
 
   void
   App::loadMenuResources() {
+    m_state = std::make_shared<pge::GameState>(
+      olc::vi2d(ScreenWidth(), ScreenHeight()),
+      pge::Screen::LoadGame
+    );
     m_menus = m_game->generateMenus(ScreenWidth(), ScreenHeight());
   }
 
@@ -116,6 +121,11 @@ namespace chess {
       relevant = (relevant || ih.relevant);
     }
 
+    if (m_state != nullptr) {
+      pge::menu::InputHandle ih = m_state->processUserInput(c, actions);
+      relevant = (relevant || ih.relevant);
+    }
+
     for (unsigned id = 0u ; id < actions.size() ; ++id) {
       actions[id]->apply(*m_game);
     }
@@ -141,6 +151,12 @@ namespace chess {
     // Clear rendering target.
     SetPixelMode(olc::Pixel::ALPHA);
     Clear(olc::Pixel(0, 100, 0));
+
+    // In case we're not in the game screen, do nothing.
+    if (m_state->getScreen() != pge::Screen::Game) {
+      SetPixelMode(olc::Pixel::NORMAL);
+      return;
+    }
 
     SpriteDesc sd = {};
     sd.loc = pge::RelativePosition::Center;
@@ -176,6 +192,14 @@ namespace chess {
     SetPixelMode(olc::Pixel::ALPHA);
     Clear(olc::Pixel(255, 255, 255, pge::alpha::Transparent));
 
+    // In case we're not in game mode, just render
+    // the state.
+    if (m_state->getScreen() != pge::Screen::Game) {
+      m_state->render(this);
+      SetPixelMode(olc::Pixel::NORMAL);
+      return;
+    }
+
     // Render the game menus.
     for (unsigned id = 0u ; id < m_menus.size() ; ++id) {
       m_menus[id]->render(this);
@@ -189,6 +213,12 @@ namespace chess {
     // Clear rendering target.
     SetPixelMode(olc::Pixel::ALPHA);
     Clear(olc::Pixel(255, 255, 255, pge::alpha::Transparent));
+
+    // Disable rendering if we're not in the game screen.
+    if (m_state->getScreen() != pge::Screen::Game) {
+      SetPixelMode(olc::Pixel::NORMAL);
+      return;
+    }
 
     // Draw cursor's position.
     olc::vi2d mp = GetMousePos();

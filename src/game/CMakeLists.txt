@@ -11,4 +11,5 @@ target_sources (chess_lib PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/AI.cc
 
 	${CMAKE_CURRENT_SOURCE_DIR}/Game.cc
+	${CMAKE_CURRENT_SOURCE_DIR}/GameState.cc
 	)

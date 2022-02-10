@@ -6,6 +6,7 @@
 # include "Menu.hh"
 # include "Game.hh"
 # include "Board.hh"
+# include "GameState.hh"
 
 namespace chess {
 
@@ -124,6 +125,13 @@ namespace chess {
        * @brief - The game managed by this application.
        */
       pge::GameShPtr m_game;
+
+      /**
+       * @brief - The management of the game state, which includes
+       *          loading the saved games, handling game over and
+       *          such things.
+       */
+      pge::GameStateShPtr m_state;
 
       /**
        * @brief - Defines the list of menus available for
