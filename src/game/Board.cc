@@ -170,7 +170,7 @@ namespace chess {
   }
 
   bool
-  Board::leadsToCheck(const Coordinates& start, const Coordinates& end) {
+  Board::leadsToCheck(const Coordinates& start, const Coordinates& end) const {
     // Control the inputs.
     if (start.x() < 0 || start.x() >= w() || start.y() < 0 || start.y() >= h()) {
       error(
@@ -280,10 +280,8 @@ namespace chess {
       warn("Black is in check");
     }
 
-    /// TODO: Handle checkmate by comparing if any of the
-    /// accessible squares for the king is not in threat.
-    /// We also need to take into consideration possible
-    /// moves of other pieces.
+    m_state.whiteInCheckmate = computeCheckmate(Color::White);
+    m_state.blackInCheckmate = computeCheckmate(Color::Black);
 
     if (m_state.whiteInCheckmate) {
       warn("White is in checkmate");
@@ -335,6 +333,48 @@ namespace chess {
     // The king is in check if its position appears in
     // the final list of threats.
     return threats.count(king) > 0u;
+  }
+
+  bool
+  Board::computeCheckmate(const Color& c) const noexcept {
+    // Gather the pieces of the corresponding color.
+    std::vector<std::pair<const Piece, Coordinates>> pieces;
+
+    for (int y = 0 ; y < m_height ; ++y) {
+      for (int x = 0 ; x < m_width ; ++x) {
+        const Piece& ce = m_board[linear(x, y)];
+
+        if (ce.invalid() || ce.color() != c) {
+          continue;
+        }
+
+        pieces.push_back(std::make_pair(ce, Coordinates(x, y)));
+      }
+    }
+
+    // For each piece, traverse the list of possible
+    // moves and see if it leaves the king out of the
+    // check.
+    bool canLeaveCheck = false;
+    unsigned id = 0u;
+
+    while (id < pieces.size() && !canLeaveCheck) {
+      CoordinatesSet s = pieces[id].first.reachable(pieces[id].second, *this);
+
+      CoordinatesSet::const_iterator it = s.cbegin();
+      while (it != s.cend() && !canLeaveCheck) {
+        if (!leadsToCheck(pieces[id].second, *it)) {
+          log("Move " + pieces[id].first.name() + " (" + colorToString(pieces[id].first.color()) + ", " + colorToString(c) + ") from " + pieces[id].second.toString() + " to " + it->toString() + " prevents check");
+          canLeaveCheck = true;
+        }
+
+        ++it;
+      }
+
+      ++id;
+    }
+
+    return !canLeaveCheck;
   }
 
 }

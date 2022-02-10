@@ -200,7 +200,6 @@ namespace pge {
       }
 
       m_start = coords;
-      log("Click at " + m_start->toString());
       return;
     }
 
@@ -274,7 +273,33 @@ namespace pge {
     m_menus.player->setText(chess::colorToString(p));
 
     std::string st = "All good";
-    if (m_board->isInCheck(p)) {
+    // Start with checkmate as it's 'stronger' than
+    // regular check.
+    if (m_board->isInCheckmate(p)) {
+      st = "Checkmate";
+      if (!m_menus.wasInCheckmate) {
+        m_menus.checkmateDate = utils::now();
+        m_menus.wasInCheckmate = true;
+        m_menus.checkmate->setVisible(true);
+      }
+      else if (utils::now() > m_menus.checkmateDate + utils::toMilliseconds(ALERT_DURATION_MS)) {
+        m_menus.checkmate->setVisible(false);
+      }
+      else {
+        float d = utils::diffInMs(m_menus.checkmateDate, utils::now()) / ALERT_DURATION_MS;
+        uint8_t alpha = static_cast<uint8_t>(
+          std::clamp((1.0f - d) * pge::alpha::Opaque, 0.0f, 255.0f)
+        );
+        m_menus.checkmate->setBackground(pge::menu::newColoredBackground(olc::Pixel(64, 0, 0, alpha)));
+      }
+    }
+    else if (m_menus.wasInCheckmate) {
+      m_menus.checkmate->setVisible(false);
+      m_menus.wasInCheckmate = false;
+    }
+    m_menus.status->setText(st);
+
+    if (m_board->isInCheck(p) && !m_board->isInCheckmate(p)) {
       st = "Check";
 
       if (!m_menus.wasInCheck) {
@@ -297,26 +322,9 @@ namespace pge {
       m_menus.check->setVisible(false);
       m_menus.wasInCheck = false;
     }
-    if (m_board->isInCheckmate(p)) {
-      st = "Checkmate";
-      if (!m_menus.wasInCheckmate) {
-        m_menus.checkmateDate = utils::now();
-        m_menus.wasInCheckmate = true;
-        m_menus.checkmate->setVisible(true);
-      }
-      else if (utils::now() > m_menus.checkmateDate + utils::toMilliseconds(500)) {
-        m_menus.checkmate->setVisible(false);
-      }
-    }
-    else if (m_menus.wasInCheckmate) {
-      m_menus.checkmate->setVisible(false);
-      m_menus.wasInCheckmate = false;
-    }
-    m_menus.status->setText(st);
 
     if (m.id() != m_menus.move && m.valid()) {
       unsigned pos = m.id() % m_menus.moves.size();
-      log("Setting move " + std::to_string(m.id()) + " at " + std::to_string(pos) + " to " + m.toString());
       m_menus.moves[pos]->setText(m.toString());
       m_menus.move = m.id();
     }

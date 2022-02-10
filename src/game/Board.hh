@@ -126,7 +126,7 @@ namespace chess {
        * @return - `true` if the move leaves the king in check.
        */
       bool
-      leadsToCheck(const Coordinates& start, const Coordinates& end);
+      leadsToCheck(const Coordinates& start, const Coordinates& end) const;
 
     private:
 
@@ -153,11 +153,23 @@ namespace chess {
        * @brief - Used to compute the check status for the input color
        *          without using the cache.
        * @param c - the color for which the check status needs to be
-       *            compited.
+       *            computed.
        * @return - `true` if the king of the input color is in check.
        */
       bool
       computeCheck(const Color& c) const noexcept;
+
+      /**
+       * @brief - Used to compute the checkmate status for the input
+       *          color without using the cache.
+       *          NOTE: this method assume that the check status for
+       *          the input color is valid already.
+       * @param c - the color for which the checkmate status needs to
+       *            be computed.
+       * @return - `true` if the king of the input color is in checkmate.
+       */
+      bool
+      computeCheckmate(const Color& c) const noexcept;
 
     private:
 
@@ -195,7 +207,7 @@ namespace chess {
       /**
        * @brief - The current state of the board.
        */
-      std::vector<Piece> m_board;
+      mutable std::vector<Piece> m_board;
 
       /**
        * @brief - The current move index.
