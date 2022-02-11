@@ -93,6 +93,14 @@ namespace chess {
       availablePositions(const Coordinates& coords) noexcept;
 
       /**
+       * @brief - Return the list of piece for a certain color.
+       * @param color - the color of the piece.
+       * @return - the list of pieces for this color.
+       */
+      std::vector<Piece>
+      pieces(const Color& color) const noexcept;
+
+      /**
        * @brief - Returns the piece at the specified position or none in
        *          case the cell is empty.
        * @param x - the x coordinate.

@@ -107,6 +107,19 @@ namespace chess {
     return c.reachable(coords, *this);
   }
 
+  std::vector<Piece>
+  Board::pieces(const Color& color) const noexcept {
+    std::vector<Piece> out;
+
+    for (unsigned id = 0u ; id < m_board.size() ; ++id) {
+      if (m_board[id].color() == color) {
+        out.push_back(m_board[id]);
+      }
+    }
+
+    return out;
+  }
+
   const Piece&
   Board::at(int x, int y) const {
     if (x >= m_width || y >= m_height) {

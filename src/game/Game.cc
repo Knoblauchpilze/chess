@@ -410,7 +410,52 @@ namespace pge {
 
   void
   Game::updateCapturedPieces() {
-    /// TODO: Handle update of captured pieces.
+    // Fetch pieces for each color
+    std::vector<chess::Piece> wp = m_board->pieces(chess::Color::White);
+    std::vector<chess::Piece> bp = m_board->pieces(chess::Color::Black);
+
+    auto count = [](const std::vector<chess::Piece>& pieces, Captured& cap) {
+      cap.pawns = 8u;
+      cap.knights = 2u;
+      cap.bishops = 2u;
+      cap.rooks = 2u;
+      cap.queens = 1u;
+
+      for (unsigned id =  0u ; id < pieces.size() ; ++id) {
+        // Accumulate pieces count.
+        if (pieces[id].pawn()) {
+          --cap.pawns;
+        }
+        if (pieces[id].knight()) {
+          --cap.knights;
+        }
+        if (pieces[id].bishop()) {
+          --cap.bishops;
+        }
+        if (pieces[id].rook()) {
+          --cap.rooks;
+        }
+        if (pieces[id].queen()) {
+          --cap.queens;
+        }
+      }
+    };
+
+    count(wp, m_menus.wCaptured);
+
+    m_menus.wCaptured.pMenu->setText(std::to_string(m_menus.wCaptured.pawns));
+    m_menus.wCaptured.kMenu->setText(std::to_string(m_menus.wCaptured.knights));
+    m_menus.wCaptured.bMenu->setText(std::to_string(m_menus.wCaptured.bishops));
+    m_menus.wCaptured.rMenu->setText(std::to_string(m_menus.wCaptured.rooks));
+    m_menus.wCaptured.qMenu->setText(std::to_string(m_menus.wCaptured.queens));
+
+    count(bp, m_menus.bCaptured);
+
+    m_menus.bCaptured.pMenu->setText(std::to_string(m_menus.bCaptured.pawns));
+    m_menus.bCaptured.kMenu->setText(std::to_string(m_menus.bCaptured.knights));
+    m_menus.bCaptured.bMenu->setText(std::to_string(m_menus.bCaptured.bishops));
+    m_menus.bCaptured.rMenu->setText(std::to_string(m_menus.bCaptured.rooks));
+    m_menus.bCaptured.qMenu->setText(std::to_string(m_menus.bCaptured.queens));
   }
 
   Game::Captured
