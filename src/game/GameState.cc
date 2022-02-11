@@ -40,7 +40,7 @@ namespace {
     bg.hColor = olc::GREY;
 
     pge::menu::MenuContentDesc fd = pge::menu::newMenuContent(text, "", dims);
-    fd.color = olc::WHITE;
+    fd.color = (bgColor == olc::WHITE ? olc::BLACK : olc::WHITE);
     fd.hColor = olc::BLACK;
     fd.align = pge::menu::Alignment::Center;
 
@@ -71,12 +71,14 @@ namespace pge {
 
     m_home(nullptr),
     m_loadGame(nullptr),
+    m_side(nullptr),
     m_gameOver(nullptr)
   {
     setService("chess");
 
     generateHomeScreen(dims);
     generateLoadGameScreen(dims);
+    generateSideSelectionScreen(dims);
     generateGameOverScreen(dims);
 
     // Assign the screen, which will handle the visibility
@@ -101,6 +103,7 @@ namespace pge {
     // Update screens' visibility.
     m_home->setVisible(m_screen == Screen::Home);
     m_loadGame->setVisible(m_screen == Screen::LoadGame);
+    m_side->setVisible(m_screen == Screen::SideSelection);
     m_gameOver->setVisible(m_screen == Screen::GameOver);
   }
 
@@ -108,6 +111,7 @@ namespace pge {
   GameState::render(olc::PixelGameEngine* pge) const {
     m_home->render(pge);
     m_loadGame->render(pge);
+    m_side->render(pge);
     m_gameOver->render(pge);
   }
 
@@ -123,6 +127,10 @@ namespace pge {
     res.selected = (res.selected || cur.selected);
 
     cur = m_loadGame->processUserInput(c, actions);
+    res.relevant = (res.relevant || cur.relevant);
+    res.selected = (res.selected || cur.selected);
+
+    cur = m_side->processUserInput(c, actions);
     res.relevant = (res.relevant || cur.relevant);
     res.selected = (res.selected || cur.selected);
 
@@ -142,7 +150,7 @@ namespace pge {
     MenuShPtr m = generateScreenOption(dims, "New game", olc::VERY_DARK_PINK, "new_game", true);
     m->setSimpleAction(
       [this](Game& /*g*/) {
-        setScreen(Screen::Game);
+        setScreen(Screen::SideSelection);
       }
     );
     m_home->addMenu(m);
@@ -181,6 +189,31 @@ namespace pge {
       }
     );
     m_loadGame->addMenu(m);
+  }
+
+  void
+  GameState::generateSideSelectionScreen(const olc::vi2d& dims) {
+    // Generate the main screen.
+    m_side = generateDefaultScreen(dims, olc::DARK_CYAN);
+
+    // Add each option to the screen.
+    MenuShPtr m = generateScreenOption(dims, "White", olc::WHITE, "white", true);
+    m->setSimpleAction(
+      [this](Game& g) {
+        g.setPlayer(chess::Color::White);
+        setScreen(Screen::Game);
+      }
+    );
+    m_side->addMenu(m);
+
+    m = generateScreenOption(dims, "Black", olc::BLACK, "black", true);
+    m->setSimpleAction(
+      [this](Game& g) {
+        g.setPlayer(chess::Color::Black);
+        setScreen(Screen::Game);
+      }
+    );
+    m_side->addMenu(m);
   }
 
   void

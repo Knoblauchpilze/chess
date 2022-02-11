@@ -136,6 +136,13 @@ namespace pge {
       chess::Round
       getLastRound() const noexcept;
 
+      /**
+       * @brief - Set the side which should be played by the user.
+       * @param color - the color of the player.
+       */
+      void
+      setPlayer(const chess::Color& color) noexcept;
+
     private:
 
       /**

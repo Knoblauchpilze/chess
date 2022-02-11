@@ -31,18 +31,6 @@ namespace pge {
   }
 
   inline
-  void
-  Game::resume() {
-    // Do nothing in case the game is already running.
-    if (!m_state.paused) {
-      return;
-    }
-
-    log("Game is now resumed", utils::Level::Info);
-    m_state.paused = false;
-  }
-
-  inline
   chess::CoordinatesShPtr
   Game::getSelectedPosition() const noexcept {
     return m_start;

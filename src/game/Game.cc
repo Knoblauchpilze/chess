@@ -86,7 +86,7 @@ namespace pge {
 
     m_board(board),
     m_start(nullptr),
-    m_ai(std::make_shared<chess::AI>(chess::Color::Black)),
+    m_ai(nullptr),
     m_menus()
   {
     setService("game");
@@ -263,6 +263,29 @@ namespace pge {
     }
 
     enable(!m_state.paused);
+  }
+
+  void
+  Game::resume() {
+    // Do nothing in case the game is already running.
+    if (!m_state.paused) {
+      return;
+    }
+
+    log("Game is now resumed", utils::Level::Info);
+    m_state.paused = false;
+
+    // Also, make the AI play: this will make sure that
+    // in case it's needed the player will be able to
+    // play right away.
+    m_ai->play(*m_board);
+  }
+
+  void
+  Game::setPlayer(const chess::Color& color) noexcept {
+    // Create the AI with the oppostie color as the player.
+    m_ai = std::make_shared<chess::AI>(color == chess::Color::White ? chess::Color::Black : chess::Color::White);
+    log("Player will be " + colorToString(color), utils::Level::Info);
   }
 
   void
