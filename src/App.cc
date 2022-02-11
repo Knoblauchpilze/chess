@@ -278,7 +278,7 @@ namespace chess {
       Coordinates cFile(id, 0);
       std::string file = cells::file(cFile.asValue());
 
-      Coordinates cRow(0, id);
+      Coordinates cRow(0, m_game->getPlayer() == Color::White ? 7u - id : id);
       std::string row = cells::row(cRow.asValue());
 
       // Draw files and row on both sides of the
