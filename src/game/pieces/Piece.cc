@@ -12,6 +12,27 @@
 namespace chess {
 
   std::string
+  pieceToString(const Type& p) noexcept {
+    switch (p) {
+      case Type::Pawn:
+        return "pawn";
+      case Type::Knight:
+        return "knight";
+      case Type::Bishop:
+        return "bishop";
+      case Type::Rook:
+        return "rook";
+      case Type::Queen:
+        return "queen";
+      case Type::King:
+        return "king";
+      case Type::None:
+      default:
+        return "none";
+    }
+  }
+
+  std::string
   colorToString(const Color& c) noexcept {
     switch (c) {
       case Color::Black:
@@ -93,23 +114,7 @@ namespace chess {
 
   std::string
   Piece::name() const noexcept {
-    switch (m_type) {
-      case Type::Pawn:
-        return "pawn";
-      case Type::Knight:
-        return "knight";
-      case Type::Bishop:
-        return "bishop";
-      case Type::Rook:
-        return "rook";
-      case Type::Queen:
-        return "queen";
-      case Type::King:
-        return "king";
-      case Type::None:
-      default:
-        return "none";
-    }
+    return pieceToString(m_type);
   }
 
   bool

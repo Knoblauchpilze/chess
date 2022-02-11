@@ -28,7 +28,8 @@ namespace {
   }
 
   pge::MenuShPtr
-  generateMenu(const olc::vi2d& size,
+  generateMenu(const olc::vi2d& pos,
+               const olc::vi2d& size,
                const std::string& text,
                const std::string& name)
   {
@@ -36,7 +37,7 @@ namespace {
     fd.color = olc::WHITE;
 
     return std::make_shared<pge::Menu>(
-      olc::vi2d(),
+      pos,
       size,
       name,
       pge::menu::newColoredBackground(olc::VERY_DARK_GREEN),
@@ -86,7 +87,7 @@ namespace pge {
 
     m_board(board),
     m_start(nullptr),
-    m_ai(nullptr),
+    m_ai(std::make_shared<chess::AI>(chess::Color::Black)),
     m_menus()
   {
     setService("game");
@@ -99,7 +100,7 @@ namespace pge {
                       float height)
   {
     // Generate the main menu.
-    pge::MenuShPtr status = generateMenu(olc::vi2d(width, 50), "", "root");
+    pge::MenuShPtr status = generateMenu(olc::vi2d(), olc::vi2d(width, 50), "", "root");
 
     static const unsigned sk_lastMoves = 5u;
     // And additional menus: we will display 3 menus
@@ -112,13 +113,13 @@ namespace pge {
 
     int mHeight = 30;
 
-    m_menus.round = generateMenu(olc::vi2d(wRound, mHeight), "Round: N/A", "round");
-    m_menus.player = generateMenu(olc::vi2d(wPlayer, mHeight), "White", "player");
-    m_menus.status = generateMenu(olc::vi2d(wStatus, mHeight), "All good", "status");
+    m_menus.round = generateMenu(olc::vi2d(), olc::vi2d(wRound, mHeight), "Round: N/A", "round");
+    m_menus.player = generateMenu(olc::vi2d(), olc::vi2d(wPlayer, mHeight), "White", "player");
+    m_menus.status = generateMenu(olc::vi2d(), olc::vi2d(wStatus, mHeight), "All good", "status");
 
     for (unsigned id = 0u ; id < sk_lastMoves ; ++id) {
       m_menus.moves.push_back(
-        generateMenu(olc::vi2d(wMove, mHeight), "", "move_" + std::to_string(id))
+        generateMenu(olc::vi2d(), olc::vi2d(wMove, mHeight), "", "move_" + std::to_string(id))
       );
     }
 
@@ -175,11 +176,42 @@ namespace pge {
     );
     m_menus.stalemate.menu->setVisible(false);
 
+    // Generate the menu indicating the pieces that
+    // were taken during the game.
+    pge::MenuShPtr taken = generateMenu(olc::vi2d(0, height - 50), olc::vi2d(width, 50), "", "taken_title");
+
+    olc::vi2d size(width / 2, 50);
+    pge::MenuShPtr wPieces = generateMenu(olc::vi2d(0, height - 50), size, "root", "");
+    wPieces->addMenu(generateMenu(olc::vi2d(), size, "whites", "label"));
+    m_menus.wCaptured = generatePiecesMenu(chess::Color::White, size.x, size.y);
+
+    wPieces->addMenu(m_menus.wCaptured.pMenu);
+    wPieces->addMenu(m_menus.wCaptured.kMenu);
+    wPieces->addMenu(m_menus.wCaptured.bMenu);
+    wPieces->addMenu(m_menus.wCaptured.rMenu);
+    wPieces->addMenu(m_menus.wCaptured.qMenu);
+
+    pge::MenuShPtr bPieces = generateMenu(olc::vi2d(width / 2, height - 50), size, "root", "");
+    bPieces->addMenu(generateMenu(olc::vi2d(), size, "blacks", "label"));
+    m_menus.bCaptured = generatePiecesMenu(chess::Color::Black, size.x, size.y);
+
+    bPieces->addMenu(m_menus.bCaptured.pMenu);
+    bPieces->addMenu(m_menus.bCaptured.kMenu);
+    bPieces->addMenu(m_menus.bCaptured.bMenu);
+    bPieces->addMenu(m_menus.bCaptured.rMenu);
+    bPieces->addMenu(m_menus.bCaptured.qMenu);
+
+    taken->addMenu(wPieces);
+    taken->addMenu(bPieces);
+
+    // Regenerate the menus.
     std::vector<MenuShPtr> menus;
     menus.push_back(status);
     menus.push_back(m_menus.check.menu);
     menus.push_back(m_menus.checkmate.menu);
     menus.push_back(m_menus.stalemate.menu);
+
+    menus.push_back(taken);
 
     return menus;
   }
@@ -313,6 +345,9 @@ namespace pge {
     // Update the state of the game.
     updateStateMenu();
 
+    // Update captured pieces.
+    updateCapturedPieces();
+
     if (m.id() != m_menus.move && m.valid()) {
       unsigned pos = m.id() % m_menus.moves.size();
       m_menus.moves[pos]->setText(m.toString());
@@ -371,6 +406,56 @@ namespace pge {
 
     std::string st = (cm ? "Checkmate" : (cm ? "Check" : (sm ? "Stalemate" : "All good")));
     m_menus.status->setText(st);
+  }
+
+  void
+  Game::updateCapturedPieces() {
+    /// TODO: Handle update of captured pieces.
+  }
+
+  Game::Captured
+  Game::generatePiecesMenu(const chess::Color& c,
+                           int width,
+                           int height) const noexcept
+  {
+    Captured out = {};
+
+    std::string cl = chess::colorToString(c);
+
+    auto generatePiece = [width, height, &cl](const chess::Type& t, unsigned count) {
+      std::string icon = "data/img/" + cl + "_" + chess::pieceToString(t) + ".png";
+      pge::menu::MenuContentDesc fg = pge::menu::newMenuContent(std::to_string(count), icon, olc::vi2d());
+      fg.color = olc::WHITE;
+      // We have 6 menus: 5 for the pieces and one for the
+      // title. For only the piece menu, we want the icon
+      // to use 2/3 of the available space.
+      int desired = static_cast<int>(std::min(2.0f * width / (6.0f * 3.0f), 1.0f * height));
+      fg.size = olc::vi2d(desired, desired);
+
+      return std::make_shared<pge::Menu>(
+        olc::vi2d(),
+        olc::vi2d(),
+        chess::pieceToString(t),
+        pge::menu::newColoredBackground(olc::VERY_DARK_GREEN),
+        fg,
+        pge::menu::Layout::Horizontal,
+        false,
+        false
+      );
+    };
+
+    out.pawns = 0u;
+    out.pMenu = generatePiece(chess::Type::Pawn, out.pawns);
+    out.knights = 0u;
+    out.kMenu = generatePiece(chess::Type::Knight, out.knights);
+    out.bishops = 0u;
+    out.bMenu = generatePiece(chess::Type::Bishop, out.bishops);
+    out.rooks = 0u;
+    out.rMenu = generatePiece(chess::Type::Rook, out.rooks);
+    out.queens = 0u;
+    out.qMenu = generatePiece(chess::Type::Queen, out.queens);
+
+    return out;
   }
 
 }

@@ -17,6 +17,14 @@ namespace chess {
     None
   };
 
+  /**
+   * @brief - Returns a string describing the piece.
+   * @param p - the piece whose name should be retrieved.
+   * @return - the corresponding string.
+   */
+  std::string
+  pieceToString(const Type& p) noexcept;
+
   /// @brief - The possible colors.
   enum class Color {
     White,

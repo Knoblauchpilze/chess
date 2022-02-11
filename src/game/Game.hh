@@ -145,6 +145,41 @@ namespace pge {
 
     private:
 
+      /// @brief - Convenience structure which allows to group
+      /// the list of pieces that have been captured for some
+      /// color and the menus to display it.
+      struct Captured {
+        // Number of captured pawns.
+        unsigned pawns;
+
+        // The menu displaying the captured pawns.
+        MenuShPtr pMenu;
+
+        // Number of captured knights.
+        unsigned knights;
+
+        // The menu displaying the captured knights.
+        MenuShPtr kMenu;
+
+        // Number of captured bishops.
+        unsigned bishops;
+
+        // The menu displaying the captured bishops.
+        MenuShPtr bMenu;
+
+        // Number of captured rooks.
+        unsigned rooks;
+
+        // The menu displaying the captured rooks.
+        MenuShPtr rMenu;
+
+        // Number of captured queens.
+        unsigned queens;
+
+        // The menu displaying the captured queens.
+        MenuShPtr qMenu;
+      };
+
       /**
        * @brief - Used to enable or disable the menus that
        *          compose the game. This allows to easily
@@ -168,6 +203,27 @@ namespace pge {
        */
       void
       updateStateMenu() noexcept;
+
+      /**
+       * @brief - Update the menu dislpaying the captured pieces for
+       *          each player.
+       */
+      void
+      updateCapturedPieces();
+
+      /**
+       * @brief - Used to generate the piece menu and produce the
+       *          convenience structure regrouping all the data to
+       *          use to update the count if needed.
+       * @param c - the color for which the menu will be created.
+       * @param width - the width available to the pieces menu.
+       * @param width - the height available to the pieces menu.
+       * @return - the generated menu structure.
+       */
+      Captured
+      generatePiecesMenu(const chess::Color& c,
+                         int width,
+                         int height) const noexcept;
 
     private:
 
@@ -246,6 +302,12 @@ namespace pge {
 
         // The current menu to update for the next move.
         unsigned move;
+
+        // The captured piece for whites.
+        Captured wCaptured;
+
+        // The captured pieces for blacks.
+        Captured bCaptured;
       };
 
       /**
