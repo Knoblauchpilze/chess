@@ -18,6 +18,13 @@ namespace chess {
       AI(const Color& color);
 
       /**
+       * @brief - Return the side for which this AI is playing.
+       * @return - the side played by the AI.
+       */
+      Color
+      side() const noexcept;
+
+      /**
        * @brief - Plays a round with the specified color.
        * @param b - the board on which to play.
        */

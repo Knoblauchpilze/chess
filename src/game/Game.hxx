@@ -48,6 +48,12 @@ namespace pge {
     return m_board->getLastRound();
   }
 
+  inline
+  chess::Color
+  Game::getPlayer() const noexcept {
+    return m_ai->side() == chess::Color::White ? chess::Color::Black : chess::Color::White;
+  }
+
 }
 
 #endif    /* GAME_HXX */

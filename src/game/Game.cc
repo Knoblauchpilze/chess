@@ -8,7 +8,7 @@
 namespace {
 
   std::shared_ptr<chess::Coordinates>
-  convertCoords(float x, float y, float w, float h) {
+  convertCoords(float x, float y, float w, float h, const chess::Color& c) {
     // Account for center of tile.
     x += 0.5f;
     y += 0.5f;
@@ -22,7 +22,7 @@ namespace {
     unsigned uy = static_cast<unsigned>(y);
 
     // Note that the board is actually displayed upside down.
-    uy = h - 1u - uy;
+    uy = c == chess::Color::White ? h - 1u - uy : uy;
 
     return std::make_shared<chess::Coordinates>(ux, uy);
   }
@@ -224,7 +224,7 @@ namespace pge {
       return;
     }
 
-    chess::CoordinatesShPtr coords = convertCoords(x, y, 1.0f * m_board->w(), 1.0f * m_board->h());
+    chess::CoordinatesShPtr coords = convertCoords(x, y, 1.0f * m_board->w(), 1.0f * m_board->h(), getPlayer());
     if (coords == nullptr) {
       // Reset the current selected starting position for
       // a piece move.

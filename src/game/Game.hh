@@ -143,6 +143,13 @@ namespace pge {
       void
       setPlayer(const chess::Color& color) noexcept;
 
+      /**
+       * @brief - Returns the color chosen by the player.
+       * @return - the color chosen by the player.
+       */
+      chess::Color
+      getPlayer() const noexcept;
+
     private:
 
       /// @brief - Convenience structure which allows to group

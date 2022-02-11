@@ -11,6 +11,11 @@ namespace chess {
     setService("chess");
   }
 
+  Color
+  AI::side() const noexcept {
+    return m_color;
+  }
+
   void
   AI::play(Board& b) noexcept {
     // Make sure that the current player is the one

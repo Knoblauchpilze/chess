@@ -83,7 +83,7 @@ namespace chess {
   App::loadMenuResources() {
     m_state = std::make_shared<pge::GameState>(
       olc::vi2d(ScreenWidth(), ScreenHeight()),
-      pge::Screen::Game
+      pge::Screen::Home
     );
     m_menus = m_game->generateMenus(ScreenWidth(), ScreenHeight());
   }
@@ -265,7 +265,7 @@ namespace chess {
         unsigned det = (y % 2u + x) % 2u;
 
         sd.x = x;
-        sd.y = y;
+        sd.y = m_game->getPlayer() == Color::White ? y : 7.0f - y;
 
         sd.sprite.tint = (det == 1u ? dark : bright);
 
@@ -301,7 +301,6 @@ namespace chess {
     sd.loc = pge::RelativePosition::Center;
     sd.radius = 0.9f;
 
-    /// TODO: Change in case the player is playing blacks.
     for (unsigned y = 0u ; y < 8u ; ++y) {
       for (unsigned x = 0u ; x < 8u ; ++x) {
         // Check if something is at this position.
@@ -312,8 +311,9 @@ namespace chess {
 
         sd.x = x;
         // Note that the board is upside down when drawn
-        // on screen.
-        sd.y = 7.0f - y;
+        // on screen. This leads to displaying it in the
+        // reverse direction for black.
+        sd.y = m_game->getPlayer() == Color::White ? 7.0f - y : y;
 
         sd.sprite.pack = m_piecesPackID;
         sd.sprite.id = 0;
@@ -385,11 +385,11 @@ namespace chess {
       sd.sprite.tint = olc::Pixel(128, 128, 0, pge::alpha::SemiOpaque);
 
       sd.x = 1.0f * s.x();
-      sd.y = 7.0f - s.y();
+      sd.y = m_game->getPlayer() == Color::White ? 7.0f - s.y() : s.y();
       drawRect(sd, res.cf);
 
       sd.x = 1.0f * e.x();
-      sd.y = 7.0f - e.y();
+      sd.y = m_game->getPlayer() == Color::White ? 7.0f - e.y() : e.y();
       drawRect(sd, res.cf);
     }
 
@@ -399,9 +399,9 @@ namespace chess {
       sd.radius = 1.0f;
 
       sd.x = 1.0f * c->x();
-        // Note that the board is upside down when drawn
-        // on screen.
-      sd.y = 7.0f - c->y();
+      // Note that the board is upside down when drawn
+      // on screen.
+      sd.y = m_game->getPlayer() == Color::White ? 7.0f - c->y() : c->y();
 
       sd.sprite.tint = olc::Pixel(0, 0, 128, pge::alpha::AlmostTransparent);
       drawRect(sd, res.cf);
@@ -413,7 +413,7 @@ namespace chess {
         sd.x = 1.0f * it->x();
         // Note that the board is upside down when drawn
         // on screen.
-        sd.y = 7.0f - it->y();
+        sd.y = m_game->getPlayer() == Color::White ? 7.0f - it->y() : it->y();
 
         sd.sprite.tint = olc::Pixel(0, 0, 255, pge::alpha::AlmostTransparent);
         drawRect(sd, res.cf);
