@@ -146,6 +146,15 @@ namespace chess {
       bool
       leadsToCheck(const Coordinates& start, const Coordinates& end) const;
 
+      /**
+       * @brief - Used to determine whether the piece currently at
+       *          the input coordinates already moved in the past.
+       * @param p - the coordinates of the piece to check.
+       * @return - `true` if the piece already moved.
+       */
+      bool
+      hasMoved(const Coordinates& p) const noexcept;
+
     private:
 
       void
