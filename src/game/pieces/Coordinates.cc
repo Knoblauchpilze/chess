@@ -459,7 +459,7 @@ namespace chess {
     }
     else {
       out += ('a' + m_x);
-      out += ('0' + m_y);
+      out += ('1' + m_y);
     }
     out += "]";
 
