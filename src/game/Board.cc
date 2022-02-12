@@ -242,9 +242,29 @@ namespace chess {
   }
 
   bool
-  Board::hasMoved(const Coordinates& /*p*/) const noexcept {
-    /// TODO: Handle this.
-    return false;
+  Board::hasMoved(const Coordinates& p) const noexcept {
+    // Traverse the list of rounds and see if one of
+    // the move references this position either as
+    // starting or ending position.
+    bool moved = false;
+    unsigned id = 0u;
+
+    const Piece& pi = at(p);
+    if (!pi.valid()) {
+      // Nothing here, consider that nothing moved.
+      return false;
+    }
+
+    while (!moved && id < m_rounds.size()) {
+      const Round& r = m_rounds[id];
+      // NOTE: we don't control whether the color of
+      // the king has played as all moves that make
+      // it to the `m_rounds` should be completed.
+      moved = (r.getMoveEnd(pi.color()) == p || r.getMoveStart(pi.color()) == p);
+      ++id;
+    }
+
+    return moved;
   }
 
   void
