@@ -71,37 +71,68 @@ namespace chess {
       // Handle en passant on each side. See here:
       // https://en.wikipedia.org/wiki/En_passant#Conditions
       // for more info about how it works.
-      /// TODO: Handle last move for en passant.
-# ifdef EN_PASSANT
       bool enPassantAllowed = (c == Color::White && p.y() == 4) || (c == Color::Black && p.y() == 3);
       if (enPassantAllowed) {
+        // Check that the en passant cell has valid coordinates.
         Coordinates eptl(p.x() - 1, p.y());
         if (eptl.x() >= 0 && eptl.x() < b.w() && eptl.y() >= 0 && eptl.y() < b.h()) {
+          // Check that the piece is a pawn of opposite color.
           const Piece& ce = b.at(eptl);
           if (ce.pawn() && ce.color() != c) {
-            // Make sure that the en passant cell is empty.
-            Coordinates ep(p.x() - 1, p.y() + dy);
-            const Piece& epce = b.at(ep);
-            if (epce.invalid()) {
-              out.insert(ep);
+            // Check that the pawn has just moved. Note that it
+            // can happen that the opposite color didn't play
+            // yet. Indeed, it could be that we are trying to
+            // determine if the current move of the opposite
+            // color is valid, in which case we didn't register
+            // it yet and so it's not possible to have the info.
+            // In this case, use the previous move.
+            // Note that this can only happen for black, as we
+            // have the guarantee that the last round is valid.
+            Round r = (c == Color::White ? b.getLastRound() : b.getCurrentRound());
+            if (c == Color::Black && !r.whitePlayed()) {
+              r = b.getLastRound();
+            }
+
+            Coordinates slm = r.getMoveStart(oppositeColor(c));
+            Coordinates elm = r.getMoveEnd(oppositeColor(c));
+
+            if (std::abs(slm.y() - elm.y()) == 2 && elm == eptl) {
+              // Make sure that the en passant cell is empty.
+              Coordinates ep(p.x() - 1, p.y() + dy);
+              const Piece& epce = b.at(ep);
+              if (epce.invalid()) {
+                out.insert(ep);
+              }
             }
           }
         }
 
+        // Check that the en passant cell has valid coordinates.
         Coordinates eptr(p.x() + 1, p.y());
         if (eptr.x() >= 0 && eptr.x() < b.w() && eptr.y() >= 0 && eptr.y() < b.h()) {
+          // Check that the piece is a pawn of opposite color.
           const Piece& ce = b.at(eptr);
           if (ce.pawn() && ce.color() != c) {
-            // Make sure that the en passant cell is empty.
-            Coordinates ep(p.x() + 1, p.y() + dy);
-            const Piece& epce = b.at(ep);
-            if (epce.invalid()) {
-              out.insert(ep);
+            // Check that the pawn has just moved.
+            Round r = (c == Color::White ? b.getLastRound() : b.getCurrentRound());
+            if (c == Color::Black && !r.whitePlayed()) {
+              r = b.getLastRound();
+            }
+
+            Coordinates slm = r.getMoveStart(oppositeColor(c));
+            Coordinates elm = r.getMoveEnd(oppositeColor(c));
+
+            if (std::abs(slm.y() - elm.y()) == 2 && elm == eptr) {
+              // Make sure that the en passant cell is empty.
+              Coordinates ep(p.x() + 1, p.y() + dy);
+              const Piece& epce = b.at(ep);
+              if (epce.invalid()) {
+                out.insert(ep);
+              }
             }
           }
         }
       }
-# endif
 
       return out;
     }

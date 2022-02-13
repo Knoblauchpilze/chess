@@ -43,6 +43,11 @@ namespace chess {
     }
   }
 
+  Color
+  oppositeColor(const Color& c) noexcept {
+    return (c == Color::White ? Color::Black : Color::White);
+  }
+
   Piece::Piece() noexcept:
     utils::CoreObject("chess"),
 

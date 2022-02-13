@@ -39,6 +39,14 @@ namespace chess {
   std::string
   colorToString(const Color& c) noexcept;
 
+  /**
+   * @brief - Return the opposite color.
+   * @param c - the color to reverse.
+   * @return - the opposite color to the input one.
+   */
+  Color
+  oppositeColor(const Color& c) noexcept;
+
   /// @brief - Forward declaration of a board to be used
   /// in the definition of methods.
   class Board;

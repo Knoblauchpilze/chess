@@ -160,6 +160,10 @@ namespace chess {
       }
       out += cells::toString(p.end.asValue());
 
+      if (p.piece.pawn() && !p.captured && p.start.x() != p.end.x()) {
+        out += " e.p.";
+      }
+
       if (p.checkmate) {
         out += "#";
       }

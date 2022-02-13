@@ -265,7 +265,7 @@ namespace chess {
 # endif
     m_board[cells::H1] = Piece::generate(Type::Rook, Color::White);
 
-// # define PAWNS
+# define PAWNS
 # ifdef PAWNS
     m_board[cells::A2] = Piece::generate(Type::Pawn, Color::White);
     m_board[cells::B2] = Piece::generate(Type::Pawn, Color::White);
@@ -292,7 +292,7 @@ namespace chess {
     m_board[cells::A8] = Piece::generate(Type::Rook, Color::Black);
     m_board[cells::B8] = Piece::generate(Type::Knight, Color::Black);
     m_board[cells::C8] = Piece::generate(Type::Bishop, Color::Black);
-# ifdef PAWNS
+# ifndef ONLY_KING
     m_board[cells::D8] = Piece::generate(Type::Queen, Color::Black);
 # endif
     m_board[cells::E8] = Piece::generate(Type::King, Color::Black);
@@ -432,7 +432,7 @@ namespace chess {
       CoordinatesSet::const_iterator it = s.cbegin();
       while (it != s.cend() && !canLeaveCheck) {
         if (!leadsToCheck(pieces[id].second, *it)) {
-          log("Move " + pieces[id].first.name() + " (" + colorToString(pieces[id].first.color()) + ", " + colorToString(c) + ") from " + pieces[id].second.toString() + " to " + it->toString() + " prevents check");
+          log("Move " + pieces[id].first.name() + " (" + colorToString(pieces[id].first.color()) + ", " + colorToString(c) + ") from " + pieces[id].second.toString() + " to " + it->toString() + " prevents check", utils::Level::Verbose);
           canLeaveCheck = true;
         }
 
@@ -449,7 +449,7 @@ namespace chess {
   Board::movePiece(const Coordinates& start, const Coordinates& end) noexcept {
     // Fetch starting and ending position.
     Piece sp = m_board[linear(start)];
-    const Piece& e = at(end);
+    Piece e = at(end);
 
     // Register the move.
     m_round.registerMove(sp, start, end, e.valid(), false, false);
@@ -459,7 +459,7 @@ namespace chess {
       ++m_index;
       m_round = Round(m_index);
 
-      log("Adding round " + m_rounds.back().toString());
+      log("Adding round " + m_rounds.back().toString(), utils::Level::Info);
     }
 
     m_current = (m_current == Color::White ? Color::Black : Color::White);
@@ -480,6 +480,12 @@ namespace chess {
       Piece r = m_board[linear(rs)];
       m_board[linear(re)] = r;
       m_board[linear(rs)].reset();
+    }
+
+    // Handle case of en passant.
+    if (sp.pawn() && start.x() != end.x() && !e.valid()) {
+      Coordinates cp(end.x() , start.y());
+      m_board[linear(cp)].reset();
     }
 
     // Invalidate cached data.
