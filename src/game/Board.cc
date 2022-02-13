@@ -173,27 +173,8 @@ namespace chess {
       return false;
     }
 
-    // Register the move.
-    m_round.registerMove(sp, start, end, e.valid(), false, false);
-
-    if (m_round.valid()) {
-      m_rounds.push_back(m_round);
-      ++m_index;
-      m_round = Round(m_index);
-
-      log("Adding round " + m_rounds.back().toString());
-    }
-
-    m_current = (m_current == Color::White ? Color::Black : Color::White);
-
-    // Swap the piece at the starting position with the
-    // one at the end position. We also need to erase
-    // the data at the starting position.
-    m_board[linear(end)] = sp;
-    m_board[linear(start)].reset();
-
-    // Invalidate cached data.
-    m_state.dirty = true;
+    // Perform the move.
+    movePiece(start, end);
 
     return true;
   }
@@ -311,7 +292,9 @@ namespace chess {
     m_board[cells::A8] = Piece::generate(Type::Rook, Color::Black);
     m_board[cells::B8] = Piece::generate(Type::Knight, Color::Black);
     m_board[cells::C8] = Piece::generate(Type::Bishop, Color::Black);
+# ifdef PAWNS
     m_board[cells::D8] = Piece::generate(Type::Queen, Color::Black);
+# endif
     m_board[cells::E8] = Piece::generate(Type::King, Color::Black);
     m_board[cells::F8] = Piece::generate(Type::Bishop, Color::Black);
     m_board[cells::G8] = Piece::generate(Type::Knight, Color::Black);
@@ -460,6 +443,47 @@ namespace chess {
     }
 
     return !canLeaveCheck;
+  }
+
+  void
+  Board::movePiece(const Coordinates& start, const Coordinates& end) noexcept {
+    // Fetch starting and ending position.
+    Piece sp = m_board[linear(start)];
+    const Piece& e = at(end);
+
+    // Register the move.
+    m_round.registerMove(sp, start, end, e.valid(), false, false);
+
+    if (m_round.valid()) {
+      m_rounds.push_back(m_round);
+      ++m_index;
+      m_round = Round(m_index);
+
+      log("Adding round " + m_rounds.back().toString());
+    }
+
+    m_current = (m_current == Color::White ? Color::Black : Color::White);
+
+    // Swap the piece at the starting position with the
+    // one at the end position. We also need to erase
+    // the data at the starting position.
+    m_board[linear(end)] = sp;
+    m_board[linear(start)].reset();
+
+    // Handle case of castling.
+    if (sp.king() && std::abs(start.x() - end.x()) > 1) {
+      // We consider that the move is allowed so we just
+      // need to move the position of the rook.
+      Coordinates rs(start.x() < end.x() ? w() - 1 : 0, start.y());
+      Coordinates re(start.x() < end.x() ? end.x() - 1 : end.x() + 1, start.y());
+
+      Piece r = m_board[linear(rs)];
+      m_board[linear(re)] = r;
+      m_board[linear(rs)].reset();
+    }
+
+    // Invalidate cached data.
+    m_state.dirty = true;
   }
 
 }

@@ -196,6 +196,19 @@ namespace chess {
       bool
       computeStalemate(const Color& c) const noexcept;
 
+      /**
+       * @brief - ALlows to handle the actual action to move a piece on
+       *          the board, also handling the post-processing needed
+       *          for some complex moves (like castling or en passant)
+       *          without cluttering the generic move function.
+       *          NOTE: no controls are performed to verify that the
+       *          move is valid.
+       * @param start - the starting position.
+       * @param end - the ending position.
+       */
+      void
+      movePiece(const Coordinates& start, const Coordinates& end) noexcept;
+
     private:
 
       /// @brief - The data for a single color.

@@ -13,7 +13,6 @@
 # include "App.hh"
 
 /// TODO: Handle the load/save of games.
-/// TODO: Handle castling.
 /// TODO: Handle promoting.
 /// https://www.freecodecamp.org/news/simple-chess-ai-step-by-step-1d55a9266977/
 

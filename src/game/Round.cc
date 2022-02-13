@@ -121,18 +121,36 @@ namespace chess {
 
   void
   Round::generateName() noexcept {
+    // Always include the identifier.
+    m_name = std::to_string(m_id + 1);
+    m_name += ".";
+
     // In case of an invalid move, generate an invalid
     // string.
     if (!valid()) {
       // Case of checkmate.
       if (!m_white.checkmate) {
-        m_name = std::to_string(m_id) + ". N/A";
+        m_name += " N/A";
         return;
       }
     }
 
     auto nameMove = [](const Part& p) {
-      std::string out = p.piece.algebraic();
+      std::string out;
+
+      // Handle castling.
+      if (p.piece.king() && std::abs(p.start.x() - p.end.x()) > 1) {
+        if (p.start.x() > p.end.x()) {
+          out += "0-0-0";
+        }
+        else {
+          out += "0-0";
+        }
+
+        return out;
+      }
+
+      out = p.piece.algebraic();
 
       if (p.captured) {
         if (p.piece.pawn()) {
@@ -153,9 +171,6 @@ namespace chess {
     };
 
     // Generate the name from white's move.
-    m_name = std::to_string(m_id);
-    m_name += ".";
-
     m_name += nameMove(m_white);
 
     if (m_white.checkmate) {
