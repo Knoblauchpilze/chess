@@ -90,7 +90,7 @@ namespace chess {
        * @return - the list of coordinates reachable by the piece.
        */
       CoordinatesSet
-      availablePositions(const Coordinates& coords) noexcept;
+      availablePositions(const Coordinates& coords) const noexcept;
 
       /**
        * @brief - Return the list of piece for a certain color.

@@ -97,14 +97,25 @@ namespace chess {
   }
 
   CoordinatesSet
-  Board::availablePositions(const Coordinates& coords) noexcept {
+  Board::availablePositions(const Coordinates& coords) const noexcept {
     const Piece& c = at(coords);
     // Case of an empty piece: no available position.
     if (c.invalid()) {
       return CoordinatesSet();
     }
 
-    return c.reachable(coords, *this);
+    CoordinatesSet tmp = c.reachable(coords, *this);
+
+    // Filter coordinates that lead to the king being
+    // in check.
+    CoordinatesSet out;
+    for (CoordinatesSet::const_iterator it = tmp.cbegin() ; it != tmp.cend() ; ++it) {
+      if (!leadsToCheck(coords, *it)) {
+        out.insert(*it);
+      }
+    }
+
+    return out;
   }
 
   std::vector<Piece>
