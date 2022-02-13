@@ -150,6 +150,15 @@ namespace pge {
       chess::Color
       getPlayer() const noexcept;
 
+      /**
+       * @brief - Assigns the promotion to use when a pawn
+       *          reaches the final row.
+       * @param promotion - the promotion to assign to pawns.
+       * @param c - the color of the promotion.
+       */
+      void
+      setPromotion(const chess::Type& promotion, const chess::Color& c) noexcept;
+
     private:
 
       /// @brief - Convenience structure which allows to group
@@ -224,13 +233,25 @@ namespace pge {
        *          use to update the count if needed.
        * @param c - the color for which the menu will be created.
        * @param width - the width available to the pieces menu.
-       * @param width - the height available to the pieces menu.
+       * @param height - the height available to the pieces menu.
        * @return - the generated menu structure.
        */
       Captured
       generatePiecesMenu(const chess::Color& c,
                          int width,
                          int height) const noexcept;
+
+      /**
+       * @brief - Used to generate a menu for the promotion of a
+       *          piece.
+       * @param width - the width available to the pieces menu.
+       * @param height - the height available to the pieces menu.
+       * @param c - the color for which the promotions should be
+       *            generated.
+       * @return - the generated menu.
+       */
+      MenuShPtr
+      generatePromotionMenu(int width, int height, const chess::Color& c) const noexcept;
 
     private:
 
@@ -315,6 +336,12 @@ namespace pge {
 
         // The captured pieces for blacks.
         Captured bCaptured;
+
+        // The selection menu for a promotion for white.
+        MenuShPtr wPromotion;
+
+        // The selection menu for a promotion for black.
+        MenuShPtr bPromotion;
       };
 
       /**
@@ -334,6 +361,14 @@ namespace pge {
        *          No location selected if null.
        */
       chess::CoordinatesShPtr m_start;
+
+      /**
+       * @brief - The promotion coordinate. This value is set
+       *          and exclusive with the start position. It is
+       *          used to save the promotion until it is chosen
+       *          by the user.
+       */
+      chess::CoordinatesShPtr m_promote;
 
       /**
        * @brief - The AI used to play the other color compared

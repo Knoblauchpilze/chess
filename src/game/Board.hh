@@ -131,6 +131,16 @@ namespace chess {
       move(const Coordinates& start, const Coordinates& end);
 
       /**
+       * @brief - Attempts to promote the piece at the position in
+       *          input to the desired value.
+       *          Raises an error if the piece is not valid.
+       * @param p - the coordinates of the piece to promote.
+       * @param promote - the promotion to apply.
+       */
+      void
+      promote(const Coordinates& p, const Type& promote);
+
+      /**
        * @brief - Determine whether the move defined by the input
        *          starting and end position would leave the king
        *          with the color of the piece at the starting

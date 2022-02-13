@@ -15,6 +15,7 @@ namespace {
   {
     pge::menu::MenuContentDesc fd = pge::menu::newMenuContent(text, "", size);
     fd.color = olc::WHITE;
+    fd.align = pge::menu::Alignment::Center;
 
     return std::make_shared<pge::Menu>(
       pos,
@@ -67,6 +68,7 @@ namespace pge {
 
     m_board(board),
     m_start(nullptr),
+    m_promote(nullptr),
     m_ai(std::make_shared<chess::AI>(chess::Color::Black)),
     m_menus()
   {
@@ -184,6 +186,12 @@ namespace pge {
     taken->addMenu(wPieces);
     taken->addMenu(bPieces);
 
+    // Generate the promotion menu.
+    m_menus.wPromotion = generatePromotionMenu(width, height, chess::Color::White);
+    m_menus.wPromotion->setVisible(false);
+    m_menus.bPromotion = generatePromotionMenu(width, height, chess::Color::Black);
+    m_menus.bPromotion->setVisible(false);
+
     // Regenerate the menus.
     std::vector<MenuShPtr> menus;
     menus.push_back(status);
@@ -192,6 +200,9 @@ namespace pge {
     menus.push_back(m_menus.stalemate.menu);
 
     menus.push_back(taken);
+
+    menus.push_back(m_menus.wPromotion);
+    menus.push_back(m_menus.bPromotion);
 
     return menus;
   }
@@ -209,6 +220,13 @@ namespace pge {
       // Reset the current selected starting position for
       // a piece move.
       m_start.reset();
+      return;
+    }
+
+    // In case a promotion coordinates is available, disable
+    // the selection of a new one.
+    if (m_promote) {
+      log("Waiting for promoting");
       return;
     }
 
@@ -242,6 +260,23 @@ namespace pge {
     if (!m_board->move(*m_start, *coords)) {
       // Keep the initial position, the user can try again.
       return;
+    }
+
+    // Handle pawn promotion.
+    if (coords->y() == 0 || coords->y() == m_board->h() - 1) {
+      const chess::Piece& p = m_board->at(*coords);
+      if (p.pawn()) {
+        if (p.color() == chess::Color::White) {
+          m_menus.wPromotion->setVisible(true);
+        }
+        else {
+          m_menus.bPromotion->setVisible(true);
+        }
+
+        m_promote = coords;
+
+        return;
+      }
     }
 
     // Make the AI play as the move was valid if we reach this
@@ -298,6 +333,37 @@ namespace pge {
     // Create the AI with the oppostie color as the player.
     m_ai = std::make_shared<chess::AI>(color == chess::Color::White ? chess::Color::Black : chess::Color::White);
     log("Player will be " + colorToString(color), utils::Level::Info);
+  }
+
+  void
+  Game::setPromotion(const chess::Type& promotion, const chess::Color& c) noexcept {
+    if (!m_promote) {
+      warn(
+        "Failed to handle pawn promotion to " + chess::pieceToString(promotion),
+        "Invalid promotion coordinate"
+      );
+
+      return;
+    }
+
+    log("Promoting for " + chess::colorToString(c));
+
+    // Handle promoting.
+    m_board->promote(*m_promote, promotion);
+    m_promote.reset();
+
+    // Deactivate the menu to pick the promotion.
+    if (c == chess::Color::White) {
+      m_menus.wPromotion->setVisible(false);
+    }
+    else {
+      m_menus.bPromotion->setVisible(false);
+    }
+
+    // Resume the course of the move: the AI should play
+    // play and we can reset the starting location.
+    m_ai->play(*m_board);
+    m_start.reset();
   }
 
   void
@@ -479,6 +545,75 @@ namespace pge {
     out.rMenu = generatePiece(chess::Type::Rook, out.rooks);
     out.queens = 0u;
     out.qMenu = generatePiece(chess::Type::Queen, out.queens);
+
+    return out;
+  }
+
+  MenuShPtr
+  Game::generatePromotionMenu(int width, int height, const chess::Color& c) const noexcept {
+    MenuShPtr out = std::make_shared<pge::Menu>(
+      olc::vi2d((width - 300.0f) / 2.0f, (height - 150.0f) / 2.0f),
+      olc::vi2d(300, 150),
+      "root",
+      pge::menu::newColoredBackground(olc::VERY_DARK_GREEN),
+      pge::menu::newTextContent(""),
+      pge::menu::Layout::Vertical,
+      false,
+      false
+    );
+
+    MenuShPtr title = generateMenu(olc::vi2d(), olc::vi2d(), "Choose a promotion:", "title");
+    std::string n = chess::colorToString(c);
+
+    MenuShPtr promotions = generateMenu(olc::vi2d(), olc::vi2d(300, 150), "", "title");
+    pge::menu::BackgroundDesc bg = pge::menu::newColoredBackground(olc::VERY_DARK_GREEN);
+
+    // Generate knight promotion.
+    pge::menu::MenuContentDesc fd = pge::menu::newImageContent("data/img/" + n + "_knight.png", olc::vi2d(64, 64));
+    MenuShPtr prom = std::make_shared<pge::Menu>(olc::vi2d(), olc::vi2d(64, 64), "knight", bg, fd);
+    prom->setSimpleAction(
+      [c](Game& g) {
+        g.setPromotion(chess::Type::Knight, c);
+      }
+    );
+
+    promotions->addMenu(prom);
+
+    // Generate bishop promotion.
+    fd = pge::menu::newImageContent("data/img/" + n + "_bishop.png", olc::vi2d(64, 64));
+    prom = std::make_shared<pge::Menu>(olc::vi2d(), olc::vi2d(64, 64), "bishop", bg, fd);
+    prom->setSimpleAction(
+      [c](Game& g) {
+        g.setPromotion(chess::Type::Bishop, c);
+      }
+    );
+
+    promotions->addMenu(prom);
+
+    // Generate rook promotion.
+    fd = pge::menu::newImageContent("data/img/" + n + "_rook.png", olc::vi2d(64, 64));
+    prom = std::make_shared<pge::Menu>(olc::vi2d(), olc::vi2d(64, 64), "rook", bg, fd);
+    prom->setSimpleAction(
+      [c](Game& g) {
+        g.setPromotion(chess::Type::Rook, c);
+      }
+    );
+
+    promotions->addMenu(prom);
+
+    // Generate queen promotion.
+    fd = pge::menu::newImageContent("data/img/" + n + "_queen.png", olc::vi2d(64, 64));
+    prom = std::make_shared<pge::Menu>(olc::vi2d(), olc::vi2d(64, 64), "queen", bg, fd);
+    prom->setSimpleAction(
+      [c](Game& g) {
+        g.setPromotion(chess::Type::Queen, c);
+      }
+    );
+
+    promotions->addMenu(prom);
+
+    out->addMenu(title);
+    out->addMenu(promotions);
 
     return out;
   }

@@ -190,6 +190,32 @@ namespace chess {
     return true;
   }
 
+  void
+  Board::promote(const Coordinates& p, const Type& promote) {
+    if (p.x() < 0 || p.x() >= w() || p.y() < 0 || p.y() >= h()) {
+      error(
+        "Failed to promote " + p.toString() + " to " + pieceToString(promote),
+        "Invalid coordinates"
+      );
+    }
+
+    Piece& pi = m_board[linear(p)];
+
+    if (!pi.valid() || !pi.pawn()) {
+      error(
+        "Failed to promote " + p.toString() + " to " + pieceToString(promote),
+        "Piece has type " + pi.name()
+      );
+    }
+
+    log("Promoting " + colorToString(pi.color()) + " " + pi.name() + " to " + pieceToString(promote), utils::Level::Info);
+
+    pi = Piece::generate(promote, pi.color());
+
+    // Dirty the check state.
+    m_state.dirty = true;
+  }
+
   bool
   Board::leadsToCheck(const Coordinates& start, const Coordinates& end) const {
     // Control the inputs.
@@ -263,8 +289,8 @@ namespace chess {
   Board::initialize() noexcept {
     // Whites.
 # define ONLY_KING
-    m_board[cells::A1] = Piece::generate(Type::Rook, Color::White);
 # ifndef ONLY_KING
+    m_board[cells::A1] = Piece::generate(Type::Rook, Color::White);
     m_board[cells::B1] = Piece::generate(Type::Knight, Color::White);
     m_board[cells::C1] = Piece::generate(Type::Bishop, Color::White);
     m_board[cells::D1] = Piece::generate(Type::Queen, Color::White);
@@ -273,10 +299,10 @@ namespace chess {
 # ifndef ONLY_KING
     m_board[cells::F1] = Piece::generate(Type::Bishop, Color::White);
     m_board[cells::G1] = Piece::generate(Type::Knight, Color::White);
-# endif
     m_board[cells::H1] = Piece::generate(Type::Rook, Color::White);
+# endif
 
-# define PAWNS
+// # define PAWNS
 # ifdef PAWNS
     m_board[cells::A2] = Piece::generate(Type::Pawn, Color::White);
     m_board[cells::B2] = Piece::generate(Type::Pawn, Color::White);
@@ -300,16 +326,18 @@ namespace chess {
     m_board[cells::H7] = Piece::generate(Type::Pawn, Color::Black);
 # endif
 
+# ifndef ONLY_KING
     m_board[cells::A8] = Piece::generate(Type::Rook, Color::Black);
     m_board[cells::B8] = Piece::generate(Type::Knight, Color::Black);
     m_board[cells::C8] = Piece::generate(Type::Bishop, Color::Black);
-# ifndef ONLY_KING
     m_board[cells::D8] = Piece::generate(Type::Queen, Color::Black);
 # endif
     m_board[cells::E8] = Piece::generate(Type::King, Color::Black);
+# ifndef ONLY_KING
     m_board[cells::F8] = Piece::generate(Type::Bishop, Color::Black);
     m_board[cells::G8] = Piece::generate(Type::Knight, Color::Black);
     m_board[cells::H8] = Piece::generate(Type::Rook, Color::Black);
+# endif
 
     // Handle custom initialization.
     initializeCustom();
@@ -318,6 +346,13 @@ namespace chess {
   void
   Board::initializeCustom() noexcept {
     // Insert custom logic to initialize the board.
+    m_board[cells::A7] = Piece::generate(Type::Pawn, Color::White);
+    m_board[cells::B2] = Piece::generate(Type::Pawn, Color::White);
+    m_board[cells::C4] = Piece::generate(Type::Pawn, Color::White);
+
+    m_board[cells::A2] = Piece::generate(Type::Pawn, Color::Black);
+    m_board[cells::E7] = Piece::generate(Type::Pawn, Color::Black);
+    m_board[cells::F5] = Piece::generate(Type::Pawn, Color::Black);
   }
 
   inline
