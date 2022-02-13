@@ -4,6 +4,7 @@
 # include <string>
 # include <memory>
 # include <unordered_set>
+# include "Color.hh"
 
 namespace chess {
   namespace cells {
@@ -124,6 +125,33 @@ namespace chess {
 
   /// @brief - Convenience define for a list of unique coordinates.
   using CoordinatesSet = std::unordered_set<Coordinates>;
+
+  /**
+   * @brief - Used to convert the coordinates expressed in raw
+   *          cells to something that is usable in the board.
+   * @param x - the raw coordinate along the x axis.
+   * @param y - the raw coordinate along the y axis.
+   * @param w - the width of the board.
+   * @param h - the height of the board.
+   * @param c - the color, used to adapt for the direction the
+   *            board is displayed.
+   * @param fx - optional output argument which will return the
+   *             floating coordinates in the cell along the x
+   *             axis.
+   * @param fy - optional output argument which will return the
+   *             floating coordinates in the cell along the y
+   *             axis.
+   * @return - a pointer to the generated coordinates.
+   */
+  CoordinatesShPtr
+  convertCoords(float x,
+                float y,
+                float w,
+                float h,
+                const Color& c,
+                float* fx = nullptr,
+                float* fy = nullptr) noexcept;
+
 }
 
 # include "Coordinates_std_specialization.hh"

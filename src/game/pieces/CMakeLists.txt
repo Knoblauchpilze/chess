@@ -1,5 +1,6 @@
 
 target_sources (chess_lib PRIVATE
+	${CMAKE_CURRENT_SOURCE_DIR}/Color.cc
 	${CMAKE_CURRENT_SOURCE_DIR}/Coordinates.cc
 	${CMAKE_CURRENT_SOURCE_DIR}/Piece.cc
 	${CMAKE_CURRENT_SOURCE_DIR}/Common.cc

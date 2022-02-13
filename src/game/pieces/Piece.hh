@@ -2,6 +2,7 @@
 # define   PIECE_HH
 
 # include <core_utils/CoreObject.hh>
+# include "Color.hh"
 # include "Coordinates.hh"
 
 namespace chess {
@@ -24,28 +25,6 @@ namespace chess {
    */
   std::string
   pieceToString(const Type& p) noexcept;
-
-  /// @brief - The possible colors.
-  enum class Color {
-    White,
-    Black
-  };
-
-  /**
-   * @brief - Returns a string describing the color.
-   * @param c - the color whose name should be retrieved.
-   * @return - the corresponding string.
-   */
-  std::string
-  colorToString(const Color& c) noexcept;
-
-  /**
-   * @brief - Return the opposite color.
-   * @param c - the color to reverse.
-   * @return - the opposite color to the input one.
-   */
-  Color
-  oppositeColor(const Color& c) noexcept;
 
   /// @brief - Forward declaration of a board to be used
   /// in the definition of methods.

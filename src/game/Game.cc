@@ -7,26 +7,6 @@
 
 namespace {
 
-  std::shared_ptr<chess::Coordinates>
-  convertCoords(float x, float y, float w, float h, const chess::Color& c) {
-    // Account for center of tile.
-    x += 0.5f;
-    y += 0.5f;
-
-    if (x < 0.0f || y < 0.0f || x > w || y > h) {
-      // Outside of the board.
-      return nullptr;
-    }
-
-    unsigned ux = static_cast<unsigned>(x);
-    unsigned uy = static_cast<unsigned>(y);
-
-    // Note that the board is actually displayed upside down.
-    uy = c == chess::Color::White ? h - 1u - uy : uy;
-
-    return std::make_shared<chess::Coordinates>(ux, uy);
-  }
-
   pge::MenuShPtr
   generateMenu(const olc::vi2d& pos,
                const olc::vi2d& size,

@@ -83,7 +83,7 @@ namespace chess {
   App::loadMenuResources() {
     m_state = std::make_shared<pge::GameState>(
       olc::vi2d(ScreenWidth(), ScreenHeight()),
-      pge::Screen::Home
+      pge::Screen::Game
     );
     m_menus = m_game->generateMenus(ScreenWidth(), ScreenHeight());
   }
@@ -130,15 +130,12 @@ namespace chess {
       actions[id]->apply(*m_game);
     }
 
-    bool lClick = (c.buttons[pge::controls::mouse::Left] == pge::controls::ButtonState::Released);
-    if (lClick && !relevant) {
+    pge::controls::ButtonState be = c.buttons[pge::controls::mouse::Left];
+    if (!relevant && be == pge::controls::ButtonState::Pressed) {
       olc::vf2d it;
       olc::vi2d tp = cf.pixelCoordsToTiles(olc::vi2d(c.mPosX, c.mPosY), &it);
 
       m_game->performAction(tp.x + it.x, tp.y + it.y);
-    }
-    if (c.buttons[pge::controls::mouse::Left] == pge::controls::ButtonState::Held) {
-      /// TODO: Add drag and drop.
     }
 
     if (c.keys[pge::controls::keys::P]) {
