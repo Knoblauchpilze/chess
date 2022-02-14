@@ -18,6 +18,12 @@ namespace pge {
   }
 
   inline
+  olc::Pixel
+  Menu::getBackgroundColor() const noexcept {
+    return m_bg.color;
+  }
+
+  inline
   void
   Menu::setVisible(bool visible) noexcept {
     m_state.visible = visible;

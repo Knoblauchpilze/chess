@@ -3,7 +3,7 @@
 # include <cxxabi.h>
 # include "Menu.hh"
 
-# define ALERT_DURATION_MS 500
+# define ALERT_DURATION_MS 3000
 
 namespace {
 
@@ -30,20 +30,21 @@ namespace {
   }
 
   pge::MenuShPtr
-  generateAlertMenu(const olc::vi2d& pos,
-                    const olc::vi2d& size,
-                    const std::string& text,
-                    const std::string& name)
+  generateMessageBoxMenu(const olc::vi2d& pos,
+                         const olc::vi2d& size,
+                         const std::string& text,
+                         const std::string& name,
+                         bool alert)
   {
     pge::menu::MenuContentDesc fd = pge::menu::newMenuContent(text, "", size);
-    fd.color = olc::RED;
+    fd.color = (alert ? olc::RED : olc::GREEN);
     fd.align = pge::menu::Alignment::Center;
 
     return std::make_shared<pge::Menu>(
       pos,
       size,
       name,
-      pge::menu::newColoredBackground(olc::VERY_DARK_RED),
+      pge::menu::newColoredBackground(alert ? olc::VERY_DARK_RED : olc::VERY_DARK_GREEN),
       fd,
       pge::menu::Layout::Horizontal,
       false,
@@ -135,29 +136,59 @@ namespace pge {
     fd.color = olc::RED;
     fd.align = pge::menu::Alignment::Center;
 
-    m_menus.check.menu = generateAlertMenu(
+    m_menus.check.menu = generateMessageBoxMenu(
       olc::vi2d((width - 300.0f) / 2.0f, (height - 150.0f) / 2.0f),
       olc::vi2d(300, 150),
       "You're in check !",
-      "check"
+      "check",
+      true
     );
     m_menus.check.menu->setVisible(false);
 
-    m_menus.checkmate.menu = generateAlertMenu(
+    m_menus.checkmate.menu = generateMessageBoxMenu(
       olc::vi2d((width - 300.0f) / 2.0f, (height - 150.0f) / 2.0f),
       olc::vi2d(300, 150),
       "You're in checkmate !",
-      "checkmate"
+      "checkmate",
+      true
     );
     m_menus.checkmate.menu->setVisible(false);
 
-    m_menus.stalemate.menu = generateAlertMenu(
+    m_menus.stalemate.menu = generateMessageBoxMenu(
       olc::vi2d((width - 300.0f) / 2.0f, (height - 150.0f) / 2.0f),
       olc::vi2d(300, 150),
       "You're in stalemate !",
-      "stalemate"
+      "stalemate",
+      true
     );
     m_menus.stalemate.menu->setVisible(false);
+
+    m_menus.oStalemate.menu = generateMessageBoxMenu(
+      olc::vi2d((width - 300.0f) / 2.0f, (height - 150.0f) / 2.0f),
+      olc::vi2d(300, 150),
+      "Your opponent is in stalemate !",
+      "oStalemate",
+      true
+    );
+    m_menus.oStalemate.menu->setVisible(false);
+
+    m_menus.oStalemate.menu = generateMessageBoxMenu(
+      olc::vi2d((width - 300.0f) / 2.0f, (height - 150.0f) / 2.0f),
+      olc::vi2d(300, 150),
+      "Your opponent is in stalemate !",
+      "oStalemate",
+      true
+    );
+    m_menus.oStalemate.menu->setVisible(false);
+
+    m_menus.win.menu = generateMessageBoxMenu(
+      olc::vi2d((width - 300.0f) / 2.0f, (height - 150.0f) / 2.0f),
+      olc::vi2d(300, 150),
+      "Your checkmated your opponent !",
+      "win",
+      false
+    );
+    m_menus.win.menu->setVisible(false);
 
     // Generate the menu indicating the pieces that
     // were taken during the game.
@@ -298,13 +329,13 @@ namespace pge {
 
     updateUI();
 
-    // Disable UI in case the game is lost.
-    if (m_state.lost) {
+    // Disable UI in case the game is done.
+    if (m_state.done) {
       pause();
       enable(!m_state.paused);
     }
 
-    return !m_state.lost;
+    return !m_state.done;
   }
 
   void
@@ -347,8 +378,8 @@ namespace pge {
     // Reset the board.
     m_board->initialize();
 
-    // Prevent the game from being lost from the start.
-    m_state.lost = false;
+    // Prevent the game from being done from the start.
+    m_state.done = false;
 
     resume();
     enable(!m_state.paused);
@@ -439,11 +470,13 @@ namespace pge {
       else {
         // Update the alpha value in case it's active
         // for not long enough.
+        olc::Pixel c = menu->getBackgroundColor();
+
         float d = utils::diffInMs(date, utils::now()) / duration;
-        uint8_t alpha = static_cast<uint8_t>(
+        c.a = static_cast<uint8_t>(
           std::clamp((1.0f - d) * pge::alpha::Opaque, 0.0f, 255.0f)
         );
-        menu->setBackground(pge::menu::newColoredBackground(olc::Pixel(64, 0, 0, alpha)));
+        menu->setBackground(pge::menu::newColoredBackground(c));
       }
     }
     // Or if the menu shouldn't be active anymore and
@@ -467,19 +500,38 @@ namespace pge {
     bool c = m_board->isInCheck(p);
     bool sm = m_board->isInStalemate(p);
 
+    bool ocm = m_board->isInCheckmate(oppositeColor(p));
+    bool osm = m_board->isInStalemate(oppositeColor(p));
+
     bool cmDone = m_menus.checkmate.menu->visible();
     cmDone &= !m_menus.checkmate.update(cm);
     m_menus.check.update(c && !cm);
     bool sDone = m_menus.stalemate.menu->visible();
     sDone &= !m_menus.stalemate.update(sm);
+    bool osDone = m_menus.oStalemate.menu->visible();
+    osDone &= !m_menus.oStalemate.update(osm);
+    bool wDone = m_menus.win.menu->visible();
+    wDone &= !m_menus.win.update(ocm);
 
-    if (cmDone || sDone) {
+    if (cmDone || sDone || osDone || wDone) {
       // The game is lost and the display screen has been
       // reached, so we can indicate it.
-      m_state.lost = true;
+      m_state.done = true;
     }
 
-    std::string st = (cm ? "Checkmate" : (cm ? "Check" : (sm ? "Stalemate" : "All good")));
+    std::string st = "All good";
+    if (cm) {
+      st = "Checkmate";
+    }
+    else if (sm) {
+      st = "Stalemate";
+    }
+    else if (ocm) {
+      st = "Victory !";
+    }
+    else if (osm) {
+      st = "Draw";
+    }
     m_menus.status->setText(st);
   }
 

@@ -93,6 +93,13 @@ namespace pge {
       visible() const noexcept;
 
       /**
+       * @brief - Return the background color for this menu.
+       * @return - the background color.
+       */
+      olc::Pixel
+      getBackgroundColor() const noexcept;
+
+      /**
        * @brief - Used to define whether this menu is visible.
        *          Changes will only be applied in the next
        *          call to `render` and the display should be

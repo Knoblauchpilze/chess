@@ -277,8 +277,9 @@ namespace pge {
         // termination request has been received.
         bool terminated;
 
-        // Whether or not the game has been lost.
-        bool lost;
+        // Whether or not the game has been finished, either
+        // with a win or a draw or a loss.
+        bool done;
       };
 
       /// @brief - Convenience structure allowing to group information
@@ -328,6 +329,12 @@ namespace pge {
 
         // Information about when the stalemate state was reached.
         TimedMenu stalemate;
+
+        // Information about whether the opponent is in stalemate.
+        TimedMenu oStalemate;
+
+        // Information about whether you won the game.
+        TimedMenu win;
 
         // The last moves.
         std::vector<MenuShPtr> moves;
