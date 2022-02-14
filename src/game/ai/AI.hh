@@ -27,8 +27,9 @@ namespace chess {
       /**
        * @brief - Plays a round with the specified color.
        * @param b - the board on which to play.
+       * @return - whether a valid move could be find.
        */
-      void
+      bool
       play(Board& b) noexcept;
 
     private:

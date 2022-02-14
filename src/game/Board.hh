@@ -126,6 +126,14 @@ namespace chess {
       at(const Coordinates& c) const;
 
       /**
+       * @brief - Used to return a copy of the internal board so that
+       *          we can manipulate it as desired.
+       * @return - the copy of the internal board.
+       */
+      std::vector<Piece>
+      copy() const noexcept;
+
+      /**
        * @brief - Attempts to move whatever piece might be located at the
        *          starting position to the end location.
        *          Also updates the board state based on this move.

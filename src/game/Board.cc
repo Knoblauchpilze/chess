@@ -168,6 +168,11 @@ namespace chess {
     return at(c.x(), c.y());
   }
 
+  std::vector<Piece>
+  Board::copy() const noexcept {
+    return m_board;
+  }
+
   bool
   Board::move(const Coordinates& start, const Coordinates& end) {
     // Check piece at the start and end location.
@@ -308,7 +313,7 @@ namespace chess {
   void
   Board::initializeBoard() noexcept {
     // Whites.
-# define ONLY_KING
+// # define ONLY_KING
 # ifndef ONLY_KING
     m_board[cells::A1] = Piece::generate(Type::Rook, Color::White);
     m_board[cells::B1] = Piece::generate(Type::Knight, Color::White);
