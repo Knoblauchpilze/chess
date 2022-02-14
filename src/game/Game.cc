@@ -550,19 +550,19 @@ namespace pge {
 
       for (unsigned id =  0u ; id < pieces.size() ; ++id) {
         // Accumulate pieces count.
-        if (pieces[id].pawn()) {
+        if (pieces[id].pawn() && cap.pawns > 0u) {
           --cap.pawns;
         }
-        if (pieces[id].knight()) {
+        if (pieces[id].knight() && cap.knights > 0u) {
           --cap.knights;
         }
-        if (pieces[id].bishop()) {
+        if (pieces[id].bishop() && cap.bishops > 0u) {
           --cap.bishops;
         }
-        if (pieces[id].rook()) {
+        if (pieces[id].rook() && cap.rooks > 0u) {
           --cap.rooks;
         }
-        if (pieces[id].queen()) {
+        if (pieces[id].queen() && cap.queens > 0u) {
           --cap.queens;
         }
       }
