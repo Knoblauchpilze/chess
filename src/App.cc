@@ -76,14 +76,21 @@ namespace chess {
 
     // Create the game and its state.
     m_game = std::make_shared<pge::Game>(m_board);
+    /// TODO: Deactivate it when the menu is Home.
+# ifdef TO_GAME
     m_game->togglePause();
+# endif
   }
 
   void
   App::loadMenuResources() {
     m_state = std::make_shared<pge::GameState>(
       olc::vi2d(ScreenWidth(), ScreenHeight()),
+# ifdef TO_GAME
       pge::Screen::Game
+# else
+      pge::Screen::Home
+# endif
     );
     m_menus = m_game->generateMenus(ScreenWidth(), ScreenHeight());
   }
@@ -95,8 +102,10 @@ namespace chess {
       return false;
     }
 
+    // Make the game evolve and display game over
+    // screen if needed.
     if (!m_game->step(fElapsed)) {
-      log("This is game over", utils::Level::Info);
+      m_state->setScreen(pge::Screen::GameOver);
     }
 
     return m_game->terminated();

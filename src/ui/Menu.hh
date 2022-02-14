@@ -86,6 +86,13 @@ namespace pge {
       ~Menu();
 
       /**
+       * @brief - Whether or not the menu is visible.
+       * @return - `true` if the menu is visible.
+       */
+      bool
+      visible() const noexcept;
+
+      /**
        * @brief - Used to define whether this menu is visible.
        *          Changes will only be applied in the next
        *          call to `render` and the display should be

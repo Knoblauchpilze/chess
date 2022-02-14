@@ -12,6 +12,12 @@ namespace pge {
   }
 
   inline
+  bool
+  Menu::visible() const noexcept {
+    return m_state.visible;
+  }
+
+  inline
   void
   Menu::setVisible(bool visible) noexcept {
     m_state.visible = visible;

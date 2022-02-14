@@ -3,7 +3,7 @@
 # include <cxxabi.h>
 # include "Menu.hh"
 
-# define ALERT_DURATION_MS 3000
+# define ALERT_DURATION_MS 500
 
 namespace {
 
@@ -63,6 +63,7 @@ namespace pge {
         true,  // paused
         true,  // disabled
         false, // terminated
+        false, // lost
       }
     ),
 
@@ -297,11 +298,20 @@ namespace pge {
 
     updateUI();
 
-    return true;
+    // Disable UI in case the game is lost.
+    if (m_state.lost) {
+      pause();
+      enable(!m_state.paused);
+    }
+
+    return !m_state.lost;
   }
 
   void
   Game::togglePause() {
+    // Call the correct method based on the current state
+    // and the desired one. This might mean not changing
+    // the state at all.
     if (m_state.paused) {
       resume();
     }
@@ -333,6 +343,15 @@ namespace pge {
     // Create the AI with the oppostie color as the player.
     m_ai = std::make_shared<chess::AI>(color == chess::Color::White ? chess::Color::Black : chess::Color::White);
     log("Player will be " + colorToString(color), utils::Level::Info);
+
+    // Reset the board.
+    m_board->initialize();
+
+    // Prevent the game from being lost from the start.
+    m_state.lost = false;
+
+    resume();
+    enable(!m_state.paused);
   }
 
   void
@@ -401,9 +420,9 @@ namespace pge {
     }
   }
 
-  void
+  bool
   Game::TimedMenu::update(bool active) noexcept {
-      // In case the menu should be active
+    // In case the menu should be active.
     if (active) {
       if (!wasActive) {
         // Make it active if it's the first time that
@@ -434,6 +453,8 @@ namespace pge {
       menu->setVisible(false);
       wasActive = false;
     }
+
+    return menu->visible();
   }
 
   void
@@ -446,9 +467,17 @@ namespace pge {
     bool c = m_board->isInCheck(p);
     bool sm = m_board->isInStalemate(p);
 
-    m_menus.checkmate.update(cm);
+    bool cmDone = m_menus.checkmate.menu->visible();
+    cmDone &= !m_menus.checkmate.update(cm);
     m_menus.check.update(c && !cm);
-    m_menus.stalemate.update(sm);
+    bool sDone = m_menus.stalemate.menu->visible();
+    sDone &= !m_menus.stalemate.update(sm);
+
+    if (cmDone || sDone) {
+      // The game is lost and the display screen has been
+      // reached, so we can indicate it.
+      m_state.lost = true;
+    }
 
     std::string st = (cm ? "Checkmate" : (cm ? "Check" : (sm ? "Stalemate" : "All good")));
     m_menus.status->setText(st);

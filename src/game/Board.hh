@@ -31,6 +31,12 @@ namespace chess {
       h() const noexcept;
 
       /**
+       * @brief - Initialize the board with a new game.
+       */
+      void
+      initialize() noexcept;
+
+      /**
        * @brief - Returns the current color playing the next
        *          round.
        * @return - the next color to play.
@@ -167,8 +173,11 @@ namespace chess {
 
     private:
 
+      /**
+       * @brief - Used to reset the board to its initial state.
+       */
       void
-      initialize() noexcept;
+      initializeBoard() noexcept;
 
       void
       initializeCustom() noexcept;

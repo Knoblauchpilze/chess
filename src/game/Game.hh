@@ -272,10 +272,13 @@ namespace pge {
         bool disabled;
 
         // Used to hold whether or not the game has been shut
-        // down. It usuallu indicates that no simulation will
+        // down. It usually indicates that no simulation will
         // be performed anymore and usually indicates that a
         // termination request has been received.
         bool terminated;
+
+        // Whether or not the game has been lost.
+        bool lost;
       };
 
       /// @brief - Convenience structure allowing to group information
@@ -299,8 +302,9 @@ namespace pge {
          *          be active or not.
          * @param active - `true` if the menu should still be
          *                 active.
+         * @return - `true` if the menu is still visible.
          */
-        void
+        bool
         update(bool active) noexcept;
       };
 

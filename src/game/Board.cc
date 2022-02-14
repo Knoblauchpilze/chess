@@ -41,6 +41,26 @@ namespace chess {
     return m_height;
   }
 
+  void
+  Board::initialize() noexcept {
+    // Initialize the board and any custom initialization.
+    m_board = std::vector<Piece>(w() * h(), Piece::generate());
+
+    initializeBoard();
+    initializeCustom();
+
+    // Reset rounds.
+    m_index = 0u;
+    m_current = Color::White;
+
+    m_state.dirty = false;
+    m_state.white = { false, false, false };
+    m_state.black = { false, false, false };
+
+    m_round = Round(m_index);
+    m_rounds.clear();
+  }
+
   Color
   Board::getPlayer() const noexcept {
     return m_current;
@@ -286,7 +306,7 @@ namespace chess {
   }
 
   void
-  Board::initialize() noexcept {
+  Board::initializeBoard() noexcept {
     // Whites.
 # define ONLY_KING
 # ifndef ONLY_KING
@@ -338,15 +358,14 @@ namespace chess {
     m_board[cells::G8] = Piece::generate(Type::Knight, Color::Black);
     m_board[cells::H8] = Piece::generate(Type::Rook, Color::Black);
 # endif
-
-    // Handle custom initialization.
-    initializeCustom();
   }
 
   void
   Board::initializeCustom() noexcept {
     // Insert custom logic to initialize the board.
     m_board[cells::A7] = Piece::generate(Type::Pawn, Color::White);
+    m_board[cells::B7] = Piece::generate(Type::Queen, Color::White);
+    m_board[cells::G7] = Piece::generate(Type::Queen, Color::White);
     m_board[cells::B2] = Piece::generate(Type::Pawn, Color::White);
     m_board[cells::C4] = Piece::generate(Type::Pawn, Color::White);
 
@@ -382,10 +401,10 @@ namespace chess {
       warn("Black is in check");
     }
 
-    bool bStalemate = computeStalemate(Color::White);
-    bool wStalemate = computeStalemate(Color::Black);
-    m_state.white.stalemate = !m_state.white.check && bStalemate;
-    m_state.black.stalemate = !m_state.black.check && wStalemate;
+    bool wStalemate = computeStalemate(Color::White);
+    bool bStalemate = computeStalemate(Color::Black);
+    m_state.white.stalemate = !m_state.white.check && wStalemate;
+    m_state.black.stalemate = !m_state.black.check && bStalemate;
 
     if (m_state.white.stalemate) {
       warn("White is in stalemate");
@@ -394,7 +413,7 @@ namespace chess {
       warn("Black is in stalemate");
     }
 
-    m_state.white.checkmate = m_state.white.check && bStalemate;
+    m_state.white.checkmate = m_state.white.check && wStalemate;
     m_state.black.checkmate = m_state.black.check && bStalemate;
 
     if (m_state.white.checkmate) {
