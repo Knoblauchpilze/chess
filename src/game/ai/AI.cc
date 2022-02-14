@@ -56,7 +56,21 @@ namespace chess {
     ai::Move best = moves[0];
     log("Picked move from " + best.start.toString() + " to " + best.end.toString() + " with weight " + std::to_string(best.weight), utils::Level::Info);
 
-    return b.move(best.start, best.end);
+    if (!b.move(best.start, best.end)) {
+      warn("Failed to apply move from " + best.start.toString() + " to " + best.end.toString() + " picked by AI");
+      return false;
+    }
+
+    // Handle pawn promotion.
+    if (best.end.y() == 0 || best.end.y() == b.h() - 1) {
+      const Piece& p = b.at(best.end);
+      if (p.pawn()) {
+        // For now, we always promote to a queen.
+        b.promote(best.end, Type::Queen);
+      }
+    }
+
+    return true;
   }
 
 }
