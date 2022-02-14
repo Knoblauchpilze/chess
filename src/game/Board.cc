@@ -143,7 +143,7 @@ namespace chess {
     std::vector<Piece> out;
 
     for (unsigned id = 0u ; id < m_board.size() ; ++id) {
-      if (m_board[id].color() == color) {
+      if (m_board[id].color() == color && m_board[id].valid()) {
         out.push_back(m_board[id]);
       }
     }
