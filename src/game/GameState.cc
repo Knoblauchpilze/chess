@@ -232,7 +232,7 @@ namespace pge {
     m = generateScreenOption(dims, "Restart", olc::VERY_DARK_MAGENTA, "restart", true);
     m->setSimpleAction(
       [this](Game& /*g*/) {
-        setScreen(Screen::Game);
+        setScreen(Screen::SideSelection);
       }
     );
     m_gameOver->addMenu(m);
