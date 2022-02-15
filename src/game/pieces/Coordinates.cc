@@ -398,6 +398,11 @@ namespace chess {
     }
   }
 
+  Coordinates::Coordinates() noexcept:
+    m_x(0),
+    m_y(0)
+  {}
+
   Coordinates::Coordinates(int x, int y) noexcept:
     m_x(x),
     m_y(y)

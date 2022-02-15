@@ -5,7 +5,7 @@
 # include <memory>
 # include <core_utils/CoreObject.hh>
 # include <core_utils/TimeUtils.hh>
-# include "Board.hh"
+# include "ChessGame.hh"
 # include "AI.hh"
 
 namespace pge {
@@ -22,7 +22,7 @@ namespace pge {
        * @brief - Create a new game with default parameters.
        * @param board - the board managed by this game.
        */
-      Game(chess::BoardShPtr board);
+      Game(chess::ChessGameShPtr board);
 
       ~Game();
 
@@ -363,7 +363,7 @@ namespace pge {
       /**
        * @brief - The board managed by this game.
        */
-      chess::BoardShPtr m_board;
+      chess::ChessGameShPtr m_board;
 
       /**
        * @brief - The first coordinate that was clicked on

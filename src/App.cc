@@ -45,7 +45,7 @@ namespace chess {
     m_packs(std::make_shared<pge::TexturePack>()),
     m_piecesPackID(),
 
-    m_board(std::make_shared<Board>())
+    m_board(std::make_shared<ChessGame>())
   {}
 
   void
@@ -299,10 +299,12 @@ namespace chess {
     sd.loc = pge::RelativePosition::Center;
     sd.radius = 0.9f;
 
+    const Board& b = (*m_board)();
+
     for (unsigned y = 0u ; y < 8u ; ++y) {
       for (unsigned x = 0u ; x < 8u ; ++x) {
         // Check if something is at this position.
-        const Piece& p = m_board->at(x, y);
+        const Piece& p = b.at(x, y);
         if (p.invalid()) {
           continue;
         }
@@ -332,13 +334,15 @@ namespace chess {
     sd.loc = pge::RelativePosition::Center;
     sd.radius = 1.0f;
 
+    const Board& b = (*m_board)();
+
     // Draw the overlay in case the mouse is over
     // a cell with a piece.
     olc::vi2d mp = GetMousePos();
     olc::vi2d mtp = res.cf.pixelCoordsToTiles(mp, nullptr);
-    if (mtp.x >= 0 && mtp.x < m_board->w() && mtp.y >= 0 && mtp.y < m_board->h()) {
-      unsigned x = std::clamp(mtp.x, 0, static_cast<int>(m_board->w()));
-      unsigned y = std::clamp(mtp.y, 0, static_cast<int>(m_board->h()));
+    if (mtp.x >= 0 && mtp.x < b.w() && mtp.y >= 0 && mtp.y < b.h()) {
+      unsigned x = std::clamp(mtp.x, 0, b.w());
+      unsigned y = std::clamp(mtp.y, 0, b.h());
 
       sd.x = 1.0f * x;
       sd.y = 1.0f * y;
@@ -405,7 +409,7 @@ namespace chess {
       drawRect(sd, res.cf);
 
       // Also, not the possible positions for this piece.
-      CoordinatesSet ps = m_board->availablePositions(*c);
+      CoordinatesSet ps = b.availablePositions(*c);
 
       for (CoordinatesSet::const_iterator it = ps.cbegin() ; it != ps.cend() ; ++it) {
         sd.x = 1.0f * it->x();

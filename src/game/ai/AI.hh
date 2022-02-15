@@ -3,7 +3,7 @@
 
 # include <memory>
 # include <core_utils/CoreObject.hh>
-# include "Board.hh"
+# include "ChessGame.hh"
 
 namespace chess {
 
@@ -30,7 +30,7 @@ namespace chess {
        * @return - whether a valid move could be find.
        */
       bool
-      play(Board& b) noexcept;
+      play(ChessGame& b) noexcept;
 
     private:
 

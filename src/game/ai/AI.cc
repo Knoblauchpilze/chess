@@ -19,7 +19,7 @@ namespace chess {
   }
 
   bool
-  AI::play(Board& b) noexcept {
+  AI::play(ChessGame& b) noexcept {
     // Make sure that the current player is the one
     // assigned to the player.
     Round r = b.getCurrentRound();
@@ -39,7 +39,7 @@ namespace chess {
 
     // Generate the list of moves available for all the
     // pieces of the color managed by the AI.
-    std::vector<ai::Move> moves = ai::generate(m_color, b);
+    std::vector<ai::Move> moves = ai::generate(m_color, b());
 
     // In case there's no valid move, do nothing.
     if (moves.empty()) {
@@ -51,7 +51,7 @@ namespace chess {
 
     // Prune the moves and evaluate all of them.
     ai::Strategy strat = ai::Strategy::Minimax;
-    ai::evaluate(moves, m_color, b, strat);
+    ai::evaluate(moves, m_color, b(), strat);
 
     ai::Move best = moves[0];
     log("Picked move from " + best.start.toString() + " to " + best.end.toString() + " with weight " + std::to_string(best.weight), utils::Level::Info);
@@ -62,8 +62,8 @@ namespace chess {
     }
 
     // Handle pawn promotion.
-    if (best.end.y() == 0 || best.end.y() == b.h() - 1) {
-      const Piece& p = b.at(best.end);
+    if (best.end.y() == 0 || best.end.y() == b().h() - 1) {
+      const Piece& p = b().at(best.end);
       if (p.pawn()) {
         // For now, we always promote to a queen.
         b.promote(best.end, Type::Queen);

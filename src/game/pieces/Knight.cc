@@ -35,10 +35,7 @@ namespace chess {
       };
 
       for (unsigned id = 0u ; id < coords.size() ; ++id) {
-        if (coords[id].x() < 0 || coords[id].x() >= b.w()) {
-          continue;
-        }
-        if (coords[id].y() < 0 || coords[id].y() >= b.h()) {
+        if (!b.validCoordinates(coords[id])) {
           continue;
         }
 

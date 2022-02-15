@@ -88,15 +88,7 @@ namespace chess {
             // In this case, use the previous move.
             // Note that this can only happen for black, as we
             // have the guarantee that the last round is valid.
-            Round r = (c == Color::White ? b.getLastRound() : b.getCurrentRound());
-            if (c == Color::Black && !r.whitePlayed()) {
-              r = b.getLastRound();
-            }
-
-            Coordinates slm = r.getMoveStart(oppositeColor(c));
-            Coordinates elm = r.getMoveEnd(oppositeColor(c));
-
-            if (std::abs(slm.y() - elm.y()) == 2 && elm == eptl) {
+            if (b.justMoved(eptl)) {
               // Make sure that the en passant cell is empty.
               Coordinates ep(p.x() - 1, p.y() + dy);
               const Piece& epce = b.at(ep);
@@ -114,15 +106,7 @@ namespace chess {
           const Piece& ce = b.at(eptr);
           if (ce.pawn() && ce.color() != c) {
             // Check that the pawn has just moved.
-            Round r = (c == Color::White ? b.getLastRound() : b.getCurrentRound());
-            if (c == Color::Black && !r.whitePlayed()) {
-              r = b.getLastRound();
-            }
-
-            Coordinates slm = r.getMoveStart(oppositeColor(c));
-            Coordinates elm = r.getMoveEnd(oppositeColor(c));
-
-            if (std::abs(slm.y() - elm.y()) == 2 && elm == eptr) {
+            if (b.justMoved(eptr)) {
               // Make sure that the en passant cell is empty.
               Coordinates ep(p.x() + 1, p.y() + dy);
               const Piece& epce = b.at(ep);

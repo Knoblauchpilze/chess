@@ -17,12 +17,9 @@ namespace chess {
       // position, ignoring invalid values and the
       // starting position.
       for (int y = p.y() - 1 ; y <= p.y() + 1 ; ++y) {
-        if (y < 0 || y >= b.h()) {
-          continue;
-        }
-
         for (int x = p.x() - 1 ; x <= p.x() + 1 ; ++x) {
-          if (x < 0 || x >= b.w()) {
+          Coordinates co(x, y);
+          if (!b.validCoordinates(co)) {
             continue;
           }
 
@@ -37,7 +34,7 @@ namespace chess {
             continue;
           }
 
-          out.insert(Coordinates(x, y));
+          out.insert(co);
         }
       }
 

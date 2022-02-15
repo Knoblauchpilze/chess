@@ -5,7 +5,7 @@
 # include "TexturePack.hh"
 # include "Menu.hh"
 # include "Game.hh"
-# include "Board.hh"
+# include "ChessGame.hh"
 # include "GameState.hh"
 
 namespace chess {
@@ -153,7 +153,7 @@ namespace chess {
       /**
        * @brief - The chess board.
        */
-      BoardShPtr m_board;
+      ChessGameShPtr m_board;
   };
 
 }

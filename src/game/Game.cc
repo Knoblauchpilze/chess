@@ -56,7 +56,7 @@ namespace {
 
 namespace pge {
 
-  Game::Game(chess::BoardShPtr board):
+  Game::Game(chess::ChessGameShPtr board):
     utils::CoreObject("game"),
 
     m_state(
@@ -247,7 +247,9 @@ namespace pge {
       return;
     }
 
-    chess::CoordinatesShPtr coords = convertCoords(x, y, 1.0f * m_board->w(), 1.0f * m_board->h(), getPlayer());
+    const chess::Board& b = (*m_board)();
+
+    chess::CoordinatesShPtr coords = convertCoords(x, y, 1.0f * b.w(), 1.0f * b.h(), getPlayer());
     if (coords == nullptr) {
       // Reset the current selected starting position for
       // a piece move.
@@ -265,7 +267,7 @@ namespace pge {
     // Two main possbilities: either we already have a valid
     // starting location, or we don't.
     if (!m_start) {
-      const chess::Piece& c = m_board->at(*coords);
+      const chess::Piece& c = b.at(*coords);
       if (c.invalid()) {
         return;
       }
@@ -295,8 +297,8 @@ namespace pge {
     }
 
     // Handle pawn promotion.
-    if (coords->y() == 0 || coords->y() == m_board->h() - 1) {
-      const chess::Piece& p = m_board->at(*coords);
+    if (coords->y() == 0 || coords->y() == b.h() - 1) {
+      const chess::Piece& p = b.at(*coords);
       if (p.pawn()) {
         if (p.color() == chess::Color::White) {
           m_menus.wPromotion->setVisible(true);
@@ -538,10 +540,10 @@ namespace pge {
   void
   Game::updateCapturedPieces() {
     // Fetch pieces for each color
-    std::vector<chess::Piece> wp = m_board->pieces(chess::Color::White);
-    std::vector<chess::Piece> bp = m_board->pieces(chess::Color::Black);
+    chess::Pieces wp = (*m_board)().pieces(chess::Color::White);
+    chess::Pieces bp = (*m_board)().pieces(chess::Color::Black);
 
-    auto count = [](const std::vector<chess::Piece>& pieces, Captured& cap) {
+    auto count = [](const chess::Pieces& pieces, Captured& cap) {
       cap.pawns = 8u;
       cap.knights = 2u;
       cap.bishops = 2u;
@@ -550,19 +552,19 @@ namespace pge {
 
       for (unsigned id =  0u ; id < pieces.size() ; ++id) {
         // Accumulate pieces count.
-        if (pieces[id].pawn() && cap.pawns > 0u) {
+        if (pieces[id].first.pawn() && cap.pawns > 0u) {
           --cap.pawns;
         }
-        if (pieces[id].knight() && cap.knights > 0u) {
+        if (pieces[id].first.knight() && cap.knights > 0u) {
           --cap.knights;
         }
-        if (pieces[id].bishop() && cap.bishops > 0u) {
+        if (pieces[id].first.bishop() && cap.bishops > 0u) {
           --cap.bishops;
         }
-        if (pieces[id].rook() && cap.rooks > 0u) {
+        if (pieces[id].first.rook() && cap.rooks > 0u) {
           --cap.rooks;
         }
-        if (pieces[id].queen() && cap.queens > 0u) {
+        if (pieces[id].first.queen() && cap.queens > 0u) {
           --cap.queens;
         }
       }

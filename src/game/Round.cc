@@ -9,8 +9,8 @@ namespace chess {
     m_id(id),
 
     m_valid(false),
-    m_white({Piece::generate(), Coordinates(0, 0), Coordinates(0, 0), false, false, false}),
-    m_black({Piece::generate(), Coordinates(0, 0), Coordinates(0, 0), false, false, false}),
+    m_white({Piece::generate(), Coordinates(), Coordinates(), false, false, false}),
+    m_black({Piece::generate(), Coordinates(), Coordinates(), false, false, false}),
 
     m_name()
   {

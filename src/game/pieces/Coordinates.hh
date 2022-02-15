@@ -92,6 +92,9 @@ namespace chess {
   class Coordinates {
     public:
 
+      explicit
+      Coordinates() noexcept;
+
       Coordinates(int x, int y) noexcept;
 
       Coordinates(const cells::Value& v) noexcept;

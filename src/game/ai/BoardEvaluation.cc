@@ -9,10 +9,10 @@
 namespace {
 
   float
-  evaluateBoard(unsigned start,
-                unsigned end,
+  evaluateBoard(chess::Coordinates start,
+                chess::Coordinates end,
                 const chess::Color& c,
-                const std::vector<chess::Piece>& pieces)
+                const chess::Board& b)
   {
     // Evaluation of a piece function.
     auto evaluate = [](const chess::Piece& p) {
@@ -43,28 +43,26 @@ namespace {
     float weight = 0.0f;
 
     // Traverse the board and evaluate it.
-    const chess::Piece& p = pieces[start];
+    const chess::Piece& p = b.at(start);
 
-    for (unsigned id = 0u ; id < pieces.size() ; ++id) {
-      // Ignore the starting coordinate and replace the
-      // ending coordinate with the starting position.
-      if (id == start) {
-        continue;
-      }
+    for (int y = 0 ; y < b.h() ; ++y) {
+      for (int x = 0 ; x < b.w() ; ++x) {
+        // Ignore the starting coordinate and replace the
+        // ending coordinate with the starting position.
+        if (start.x() == x && start.y() == y) {
+          continue;
+        }
 
-      float ev = 0.0f;
-      if (id == end) {
-        weight += evaluate(p);
-        continue;
-      }
+        float ev = 0.0f;
+        if (end.x() == x && end.y() == y) {
+          weight += evaluate(p);
+          continue;
+        }
 
-      ev = evaluate(pieces[id]);
+        const chess::Piece& p = b.at(x, y);
+        ev = evaluate(p);
 
-      if (pieces[id].color() == c) {
-        weight += ev;
-      }
-      else {
-        weight -= ev;
+        weight += (p.color() == c ? ev : -ev);
       }
     }
 
@@ -94,16 +92,10 @@ namespace chess {
                       const Color& side,
                       const Board& b) noexcept
     {
-      std::vector<Piece> pieces = b.copy();
-
       // For each available position, evaluate the
       // state of the board after making the move.
       for (unsigned id = 0u ; id < out.size() ; ++id) {
-        // Generate linear indices for the move.
-        unsigned st = out[id].start.y() * b.w() + out[id].start.x();
-        unsigned en = out[id].end.y() * b.w() + out[id].end.x();
-
-        out[id].weight = evaluateBoard(st, en, side, pieces);
+        out[id].weight = evaluateBoard(out[id].start, out[id].end, side, b);
       }
     }
 
