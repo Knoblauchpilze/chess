@@ -11,7 +11,7 @@
 
 /// @brief - The depth of the tree considered for the
 /// AI.
-# define AI_TREE_DEPTH 2u
+# define AI_TREE_DEPTH 3u
 
 namespace {
 
@@ -137,6 +137,12 @@ namespace pge {
     m_menus.stalemate.date = utils::TimeStamp();
     m_menus.stalemate.wasActive = false;
     m_menus.stalemate.duration = ALERT_DURATION_MS;
+    m_menus.oStalemate.date = utils::TimeStamp();
+    m_menus.oStalemate.wasActive = false;
+    m_menus.oStalemate.duration = ALERT_DURATION_MS;
+    m_menus.win.date = utils::TimeStamp();
+    m_menus.win.wasActive = false;
+    m_menus.win.duration = ALERT_DURATION_MS;
 
     // Generate the alert menu indicating that the player
     // is in check or checkmate.
@@ -170,15 +176,6 @@ namespace pge {
       true
     );
     m_menus.stalemate.menu->setVisible(false);
-
-    m_menus.oStalemate.menu = generateMessageBoxMenu(
-      olc::vi2d((width - 300.0f) / 2.0f, (height - 150.0f) / 2.0f),
-      olc::vi2d(300, 150),
-      "Your opponent is in stalemate !",
-      "oStalemate",
-      true
-    );
-    m_menus.oStalemate.menu->setVisible(false);
 
     m_menus.oStalemate.menu = generateMessageBoxMenu(
       olc::vi2d((width - 300.0f) / 2.0f, (height - 150.0f) / 2.0f),
@@ -238,6 +235,8 @@ namespace pge {
     menus.push_back(m_menus.check.menu);
     menus.push_back(m_menus.checkmate.menu);
     menus.push_back(m_menus.stalemate.menu);
+    menus.push_back(m_menus.oStalemate.menu);
+    menus.push_back(m_menus.win.menu);
 
     menus.push_back(taken);
 
@@ -502,7 +501,7 @@ namespace pge {
 
   void
   Game::updateStateMenu() noexcept {
-    chess::Color p = m_board->getPlayer();
+    chess::Color p = chess::oppositeColor(m_ai->side());
 
     // Start with checkmate as it's 'stronger' than
     // regular check.
