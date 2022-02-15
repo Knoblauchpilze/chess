@@ -32,6 +32,7 @@ namespace chess {
        * @param captured - whether the move resulted in a capture.
        * @param check - whether the move creates a check.
        * @param checkmate - whether the move creates a checkmate.
+       * @param stalemate - whether the move creates a stalemate.
        */
       void
       registerMove(Piece p,
@@ -39,7 +40,8 @@ namespace chess {
                    const Coordinates& end,
                    bool captured,
                    bool check,
-                   bool checkmate) noexcept;
+                   bool checkmate,
+                   bool stalemate) noexcept;
 
       /**
        * @brief - Wehether or not the information for the
@@ -133,9 +135,13 @@ namespace chess {
         /// check.
         bool check;
 
-        /// @brief - Whether this move put the enemy kind in
+        /// @brief - Whether this move put the enemy king in
         /// checkmate.
         bool checkmate;
+
+        /// @brief - Whether this move put the enemy king in
+        /// stalemate.
+        bool stalemate;
       };
 
       /**

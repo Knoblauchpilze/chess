@@ -9,8 +9,8 @@ namespace chess {
     m_id(id),
 
     m_valid(false),
-    m_white({Piece::generate(), Coordinates(), Coordinates(), false, false, false}),
-    m_black({Piece::generate(), Coordinates(), Coordinates(), false, false, false}),
+    m_white({Piece::generate(), Coordinates(), Coordinates(), false, false, false, false}),
+    m_black({Piece::generate(), Coordinates(), Coordinates(), false, false, false, false}),
 
     m_name()
   {
@@ -24,7 +24,8 @@ namespace chess {
                       const Coordinates& end,
                       bool captured,
                       bool check,
-                      bool checkmate) noexcept
+                      bool checkmate,
+                      bool stalemate) noexcept
   {
     Part* out = &m_white;
     if (p.color() == Color::Black) {
@@ -40,10 +41,9 @@ namespace chess {
 
     out->check = check;
     out->checkmate = checkmate;
+    out->stalemate = stalemate;
 
-    if (valid()) {
-      generateName();
-    }
+    generateName();
   }
 
   bool
@@ -129,7 +129,7 @@ namespace chess {
     // string.
     if (!valid()) {
       // Case of checkmate.
-      if (!m_white.checkmate) {
+      if (!m_white.checkmate && !m_white.stalemate) {
         m_name += " N/A";
         return;
       }
