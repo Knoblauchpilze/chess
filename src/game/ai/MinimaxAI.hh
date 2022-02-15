@@ -32,6 +32,23 @@ namespace chess {
 
     private:
 
+      /**
+       * @brief - Evaluate the best move for the current depth by
+       *          generating more moves if needed and aggregating
+       *          the result.
+       * @param depth - the depth available to analyze moves.
+       * @param c - the color for which the move should be found.
+       * @param b - the current state of the board.
+       * @return - the evaluation of the current state of the board
+       *           after all possible moves up until the input depth.
+       */
+      float
+      evaluate(unsigned depth,
+               const Color& c,
+               const Board& b) const noexcept;
+
+    private:
+
       /***
        * @brief - The depth to consider when generating possible moves.
        */

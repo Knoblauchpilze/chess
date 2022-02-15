@@ -31,8 +31,8 @@ namespace {
   }
 
   float
-  evaluate(const chess::Color& c,
-           const chess::Board& b) noexcept
+  evaluateBoard(const chess::Color& c,
+                const chess::Board& b) noexcept
   {
     float weight = 0.0f;
 
@@ -61,18 +61,69 @@ namespace chess {
 
   std::vector<ai::Move>
   MinimaxAI::generateMoves(const Board& b) noexcept {
+    // The algorithm behind what is done here has been taken
+    // from the following link:
+    // https://www.freecodecamp.org/news/simple-chess-ai-step-by-step-1d55a9266977/
+
     // Generate moves.
     std::vector<ai::Move> moves = ai::generate(m_color, b);
 
     // For each available position, evaluate the
     // state of the board after making the move.
     for (unsigned id = 0u ; id < moves.size() ; ++id) {
-      /// TODO: Handle the move.
-      moves[id].weight = evaluate(m_color, b);
+      // Apply the move.
+      Board cb(b);
+      cb.move(moves[id].start, moves[id].end);
+
+      log("Evaluating move of " + colorToString(cb.at(moves[id].end).color()) + " " + cb.at(moves[id].end).name() + " from " + moves[id].start.toString() + " to " + moves[id].end.toString() + " for " + colorToString(m_color) + " at depth " + std::to_string(m_depth), utils::Level::Notice);
+      moves[id].weight = evaluate(m_depth - 1u, m_color, cb);
     }
 
     return moves;
 
+  }
+
+  float
+  MinimaxAI::evaluate(unsigned depth,
+                      const Color& c,
+                      const Board& b) const noexcept
+  {
+    // In case the depth is `0`, evaluate the board.
+    if (depth == 0u) {
+      float w = evaluateBoard(c, b);
+      log("Evaluated board to " + std::to_string(w) + " for " + colorToString(c) + " at depth " + std::to_string(depth), utils::Level::Info);
+      return w;
+    }
+
+    // Generate moves.
+    std::vector<ai::Move> moves = ai::generate(oppositeColor(c), b);
+
+    // For each available position, evaluate the
+    // state of the board after making the move.
+    for (unsigned id = 0u ; id < moves.size() ; ++id) {
+      Board cb(b);
+      cb.move(moves[id].start, moves[id].end);
+
+      // log("Evaluating move of " + colorToString(cb.at(moves[id].end).color()) + " " + cb.at(moves[id].end).name() + " from " + moves[id].start.toString() + " to " + moves[id].end.toString() + " for " + colorToString(oppositeColor(c)) + " at depth " + std::to_string(depth));
+      moves[id].weight = evaluate(depth - 1u, oppositeColor(c), cb);
+    }
+
+    // Sort moves based on how favourable they are.
+    std::sort(
+      moves.begin(),
+      moves.end(),
+      [](const ai::Move& lhs, const ai::Move& rhs) {
+        return lhs.weight > rhs.weight;
+      }
+    );
+
+    std::string score = "N/A";
+    if (!moves.empty()) {
+      score = std::to_string(moves[0].weight);
+    }
+    log("Found " + std::to_string(moves.size()) + " in depth " + std::to_string(depth) + " for " + colorToString(c) + ", best score is " + score, utils::Level::Debug);
+
+    return moves[0].weight;
   }
 
 }

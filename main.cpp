@@ -13,8 +13,8 @@
 # include "App.hh"
 
 /// TODO: Handle the load/save of games.
-/// https://www.freecodecamp.org/news/simple-chess-ai-step-by-step-1d55a9266977/
 /// TODO: Resign button.
+/// TODO: Refine README.
 
 /// @brief - Size of the tiles.
 # define TILE_SIZE 170
