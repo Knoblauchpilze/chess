@@ -2,8 +2,16 @@
 # include "Game.hh"
 # include <cxxabi.h>
 # include "Menu.hh"
+# include "MinimaxAI.hh"
 
+/// @brief - The duration of the alert prompting that
+/// the current player is in check, in stalemate or
+/// won/lost.
 # define ALERT_DURATION_MS 3000
+
+/// @brief - The depth of the tree considered for the
+/// AI.
+# define AI_TREE_DEPTH 2u
 
 namespace {
 
@@ -71,7 +79,7 @@ namespace pge {
     m_board(board),
     m_start(nullptr),
     m_promote(nullptr),
-    m_ai(std::make_shared<chess::AI>(chess::Color::Black)),
+    m_ai(std::make_shared<chess::MinimaxAI>(chess::Color::Black, AI_TREE_DEPTH)),
     m_menus()
   {
     setService("game");
@@ -374,7 +382,7 @@ namespace pge {
   void
   Game::setPlayer(const chess::Color& color) noexcept {
     // Create the AI with the oppostie color as the player.
-    m_ai = std::make_shared<chess::AI>(color == chess::Color::White ? chess::Color::Black : chess::Color::White);
+    m_ai = std::make_shared<chess::MinimaxAI>(oppositeColor(color), AI_TREE_DEPTH);
     log("Player will be " + colorToString(color), utils::Level::Info);
 
     // Reset the board.

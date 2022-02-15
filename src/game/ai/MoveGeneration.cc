@@ -7,23 +7,9 @@ namespace chess {
 
     std::vector<Move>
     generate(const Color& side, const Board& b) noexcept {
-      std::vector<std::pair<Piece, Coordinates>> pieces;
-
-      // Gather all the pieces of the input color.
-      for (int y = 0 ; y < b.h() ; ++y) {
-        for (int x = 0 ; x < b.w() ; ++x) {
-          const Piece& p = b.at(x, y);
-
-          // Ignore empty cells and pieces of our opponent.
-          if (!p.valid() || p.color() != side) {
-            continue;
-          }
-
-          pieces.push_back(std::make_pair(p, Coordinates(x, y)));
-        }
-      }
-
-      // Generate all possible moves.
+      // Gather the list of pieces and generate all possible
+      // moves with a default weight.
+      Pieces pieces = b.pieces(side);
       std::vector<Move> out;
 
       for (unsigned id = 0u ; id < pieces.size() ; ++id) {

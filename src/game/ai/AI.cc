@@ -1,16 +1,16 @@
 
 # include "AI.hh"
 # include "MoveGeneration.hh"
-# include "BoardEvaluation.hh"
 
 namespace chess {
 
-  AI::AI(const Color& color):
-    utils::CoreObject("ai"),
+  AI::AI(const Color& color,
+         const std::string& name):
+    utils::CoreObject(name),
 
     m_color(color)
   {
-    setService("chess");
+    setService("ai");
   }
 
   Color
@@ -37,11 +37,8 @@ namespace chess {
       return false;
     }
 
-    // Generate the list of moves available for all the
-    // pieces of the color managed by the AI.
-    std::vector<ai::Move> moves = ai::generate(m_color, b());
-
-    // In case there's no valid move, do nothing.
+    // Generate the best move using the interface method.
+    std::vector<ai::Move> moves = generateMoves(b());
     if (moves.empty()) {
       log("No legal moves for " + colorToString(m_color));
       return false;
@@ -49,9 +46,14 @@ namespace chess {
 
     log("Generated " + std::to_string(moves.size()) + " move(s) for " + colorToString(m_color));
 
-    // Prune the moves and evaluate all of them.
-    ai::Strategy strat = ai::Strategy::Minimax;
-    ai::evaluate(moves, m_color, b(), strat);
+    // Sort moves based on how favourable they are.
+    std::sort(
+      moves.begin(),
+      moves.end(),
+      [](const ai::Move& lhs, const ai::Move& rhs) {
+        return lhs.weight > rhs.weight;
+      }
+    );
 
     ai::Move best = moves[0];
     log("Picked move from " + best.start.toString() + " to " + best.end.toString() + " with weight " + std::to_string(best.weight), utils::Level::Info);
