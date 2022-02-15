@@ -180,10 +180,22 @@ namespace chess {
     Piece sp = m_board.at(start);
     Piece e = m_board.at(end);
 
-    // Register the move.
-    m_round.registerMove(sp, start, end, e.valid(), false, false);
+    // Move the piece.
+    m_board.move(start, end);
 
-    if (m_round.valid()) {
+    // Invalidate cached data and update internal states.
+    m_state.dirty = true;
+    updateState();
+
+    // Register the move.
+    bool check = sp.color() == Color::White ? m_state.black.check : m_state.white.check;
+    bool checkmate = sp.color() == Color::White ? m_state.black.checkmate : m_state.white.checkmate;
+    bool stalemate = sp.color() == Color::White ? m_state.black.stalemate : m_state.white.stalemate;
+    /// TODO: Handle promoting.
+    m_round.registerMove(sp, start, end, e.valid(), check, checkmate, stalemate);
+
+    // Update the round's data.
+    if (m_round.valid() || checkmate || stalemate) {
       m_rounds.push_back(m_round);
       ++m_index;
       m_round = Round(m_index);
@@ -191,12 +203,11 @@ namespace chess {
       log("Adding round " + m_rounds.back().toString(), utils::Level::Info);
     }
 
-    m_current = (m_current == Color::White ? Color::Black : Color::White);
-
-    m_board.move(start, end);
-
-    // Invalidate cached data.
-    m_state.dirty = true;
+    // Move to the next player if the other player
+    // is not in checkmate.
+    if (!checkmate && !stalemate) {
+      m_current = (m_current == Color::White ? Color::Black : Color::White);
+    }
   }
 
 }
