@@ -51,6 +51,11 @@ namespace {
 
 }
 
+# define ROOT_LOG
+# define EVALUATE_LOG
+# define EXPLORE_LOG
+# define SUMMARY_LOG
+
 namespace chess {
 
   MinimaxAI::MinimaxAI(const Color& color,
@@ -75,8 +80,26 @@ namespace chess {
       Board cb(b);
       cb.move(moves[id].start, moves[id].end);
 
-      log("Evaluating move of " + colorToString(cb.at(moves[id].end).color()) + " " + cb.at(moves[id].end).name() + " from " + moves[id].start.toString() + " to " + moves[id].end.toString() + " for " + colorToString(m_color) + " at depth " + std::to_string(m_depth), utils::Level::Notice);
+# ifdef ROOT_LOG
+      log(
+        "[" + std::to_string(id) + "][" + std::to_string(m_depth) + "]"
+        " Evaluating " + colorToString(cb.at(moves[id].end).color()) + " " + cb.at(moves[id].end).name() +
+        " from " + moves[id].start.toString() + " to " + moves[id].end.toString() +
+        " for " + colorToString(m_color),
+        utils::Level::Notice
+      );
+# endif
       moves[id].weight = evaluate(m_depth - 1u, m_color, cb);
+# ifdef ROOT_LOG
+      log(
+        "[" + std::to_string(id) + "][" + std::to_string(m_depth) + "]"
+        " Evaluated " + colorToString(cb.at(moves[id].end).color()) + " " + cb.at(moves[id].end).name() +
+        " from " + moves[id].start.toString() + " to " + moves[id].end.toString() +
+        " for " + colorToString(m_color) +
+        " to " + std::to_string(moves[id].weight),
+        utils::Level::Notice
+      );
+# endif
     }
 
     return moves;
@@ -84,15 +107,28 @@ namespace chess {
   }
 
   float
-  MinimaxAI::evaluate(unsigned depth,
+  MinimaxAI::evaluate(std::string uuid,
+                      unsigned logDepth,
+                      unsigned depth,
                       const Color& c,
                       const Board& b) const noexcept
   {
+    bool opponent = (c != m_color);
     // In case the depth is `0`, evaluate the board.
     if (depth == 0u) {
       float w = evaluateBoard(c, b);
-      log("Evaluated board to " + std::to_string(w) + " for " + colorToString(c) + " at depth " + std::to_string(depth), utils::Level::Info);
-      return w;
+# ifdef EVALUATE_LOG
+      if (depth >= logDepth) {
+        log(
+          "[" + uuid + "][" + std::to_string(depth) + "] " +
+          "Board has a value of " + std::to_string(opponent ? -w : w) +
+          " for " + colorToString(c),
+          utils::Level::Info
+        );
+      }
+# endif
+
+      return (opponent ? -w : w);
     }
 
     // Generate moves.
@@ -104,16 +140,38 @@ namespace chess {
       Board cb(b);
       cb.move(moves[id].start, moves[id].end);
 
-      // log("Evaluating move of " + colorToString(cb.at(moves[id].end).color()) + " " + cb.at(moves[id].end).name() + " from " + moves[id].start.toString() + " to " + moves[id].end.toString() + " for " + colorToString(oppositeColor(c)) + " at depth " + std::to_string(depth));
+# ifdef EXPLORE_LOG
+      if (depth >= logDepth) {
+        log(
+          "[" + uuid + "][" + std::to_string(depth) + "] " +
+          "Evaluating " + colorToString(cb.at(moves[id].end).color()) + " " + cb.at(moves[id].end).name() +
+          " from " + moves[id].start.toString() + " to " + moves[id].end.toString() +
+          " for " + colorToString(c),
+          utils::Level::Notice
+        );
+      }
+# endif
       moves[id].weight = evaluate(depth - 1u, oppositeColor(c), cb);
+# ifdef EXPLORE_LOG
+      if (depth >= logDepth) {
+        log(
+          "[" + uuid + "][" + std::to_string(depth) + "] " +
+          "Evaluated " + colorToString(cb.at(moves[id].end).color()) + " " + cb.at(moves[id].end).name() +
+          " from " + moves[id].start.toString() + " to " + moves[id].end.toString() +
+          " for " + colorToString(c) +
+          " to " + std::to_string(moves[id].weight),
+          utils::Level::Info
+        );
+      }
+# endif
     }
 
     // Sort moves based on how favourable they are.
     std::sort(
       moves.begin(),
       moves.end(),
-      [](const ai::Move& lhs, const ai::Move& rhs) {
-        return lhs.weight > rhs.weight;
+      [opponent](const ai::Move& lhs, const ai::Move& rhs) {
+        return (opponent ? lhs.weight > rhs.weight : lhs.weight < rhs.weight);
       }
     );
 
@@ -121,7 +179,33 @@ namespace chess {
     if (!moves.empty()) {
       score = std::to_string(moves[0].weight);
     }
-    log("Found " + std::to_string(moves.size()) + " in depth " + std::to_string(depth) + " for " + colorToString(c) + ", best score is " + score, utils::Level::Debug);
+
+# ifdef SUMMARY_LOG
+    if (depth >= logDepth) {
+      log(
+        "[" + uuid + "][" + std::to_string(depth) + "] " +
+        "Board has a value of " + score +
+        " for " + colorToString(c) +
+        " out of " + std::to_string(moves.size()) + " move(s)",
+        utils::Level::Info
+      );
+    }
+# endif
+
+    // In case we don't have any legal moves, it means
+    // that we're either in stalemate or we can't get
+    // out of check.
+    if (moves.empty()) {
+      warn(
+        "[" + uuid + "][" + std::to_string(depth) + "] " +
+        "Board has no legal move for " + colorToString(c) +
+        " (check: " + std::to_string(b.computeCheck(c)) +
+        ", stalemate: " + std::to_string(b.computeStalemate(c)) + ")"
+      );
+
+      /// TODO: Handle end of game weights.
+      return 0.0f;
+    }
 
     return moves[0].weight;
   }
