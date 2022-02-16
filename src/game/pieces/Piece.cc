@@ -32,6 +32,28 @@ namespace chess {
     }
   }
 
+  std::string
+  pieceToAlgebraic(const Type& p) noexcept {
+    switch (p) {
+      case Type::Pawn:
+        // Empty string for a pawn.
+        return "";
+      case Type::Knight:
+        return "N";
+      case Type::Bishop:
+        return "B";
+      case Type::Rook:
+        return "R";
+      case Type::Queen:
+        return "Q";
+      case Type::King:
+        return "K";
+      case Type::None:
+      default:
+        return "?";
+    }
+  }
+
   Piece::Piece() noexcept:
     utils::CoreObject("chess"),
 
@@ -76,24 +98,7 @@ namespace chess {
 
   std::string
   Piece::algebraic() const noexcept {
-    switch (m_type) {
-      case Type::Pawn:
-        // Empty string for a pawn.
-        return "";
-      case Type::Knight:
-        return "N";
-      case Type::Bishop:
-        return "B";
-      case Type::Rook:
-        return "R";
-      case Type::Queen:
-        return "Q";
-      case Type::King:
-        return "K";
-      case Type::None:
-      default:
-        return "?";
-    }
+    return pieceToAlgebraic(m_type);
   }
 
   Color

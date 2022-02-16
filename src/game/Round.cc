@@ -9,8 +9,8 @@ namespace chess {
     m_id(id),
 
     m_valid(false),
-    m_white({Piece::generate(), Coordinates(), Coordinates(), false, false, false, false}),
-    m_black({Piece::generate(), Coordinates(), Coordinates(), false, false, false, false}),
+    m_white({Piece::generate(), Coordinates(), Coordinates(), Type::None, false, false, false, false}),
+    m_black({Piece::generate(), Coordinates(), Coordinates(), Type::None, false, false, false, false}),
 
     m_name()
   {
@@ -44,6 +44,18 @@ namespace chess {
     out->stalemate = stalemate;
 
     generateName();
+  }
+
+  void
+  Round::promote(const Color& c, const Type& t) noexcept {
+    Part* out = &m_white;
+    if (c == Color::Black) {
+      out = &m_black;
+    }
+
+    out->promotion = t;
+
+    log("promotion: " + pieceToString(m_black.promotion));
   }
 
   bool
@@ -159,6 +171,10 @@ namespace chess {
         out += "x";
       }
       out += cells::toString(p.end.asValue());
+
+      if (p.promotion != Type::None) {
+        out += pieceToAlgebraic(p.promotion);
+      }
 
       if (p.piece.pawn() && !p.captured && p.start.x() != p.end.x()) {
         out += " e.p.";

@@ -453,6 +453,7 @@ namespace pge {
     // Update captured pieces.
     updateCapturedPieces();
 
+    /// TODO: Handle update of menus after promotion.
     if (m.id() != m_menus.move && m.valid()) {
       unsigned pos = m.id() % m_menus.moves.size();
       m_menus.moves[pos]->setText(m.toString());

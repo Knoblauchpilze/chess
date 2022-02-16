@@ -128,6 +128,26 @@ namespace chess {
   ChessGame::promote(const Coordinates& p, const Type& promote) {
     m_board.promote(p, promote);
 
+    // We need to update the round with the promotion.
+    const Piece& pi = m_board.at(p);
+    Round* r = &m_round;
+    if (pi.color() == Color::Black) {
+      // Update the last round.
+      if (m_rounds.empty()) {
+        warn(
+          "Can't handle promotion of " + pi.fullName() + " at " + p.toString() + " to " + pieceToString(promote),
+          "Invalid last round"
+        );
+
+        r = nullptr;
+      }
+      else {
+        r = &m_rounds[m_rounds.size() - 1];
+      }
+    }
+
+    r->promote(pi.color(), promote);
+
     // Dirty the check state.
     m_state.dirty = true;
   }
@@ -191,7 +211,7 @@ namespace chess {
     bool check = sp.color() == Color::White ? m_state.black.check : m_state.white.check;
     bool checkmate = sp.color() == Color::White ? m_state.black.checkmate : m_state.white.checkmate;
     bool stalemate = sp.color() == Color::White ? m_state.black.stalemate : m_state.white.stalemate;
-    /// TODO: Handle promoting.
+
     m_round.registerMove(sp, start, end, e.valid(), check, checkmate, stalemate);
 
     // Update the round's data.

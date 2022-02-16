@@ -26,10 +26,6 @@ The application is structured in various screens:
 
 Each screen serves a purpose and they can be reached starting from one to the other. The general idea is to select a game (either loading it from an existing save or creating a new one), then pick a side and finally play the game.
 
-# Load a game
-
-TODO: Add that in case it is implemented.
-
 # Select a side
 
 When creating a new game, the user can pick on of the side. The other will be played by an AI, which will automatically play as soon as the player does so. The rest of the processes should be adaptative to whatever side is picked.

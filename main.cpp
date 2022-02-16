@@ -12,7 +12,7 @@
 # include "TopViewFrame.hh"
 # include "App.hh"
 
-/// TODO: Handle the load/save of games.
+/// TODO: Handle the load/save of games, also in the README.
 /// TODO: Resign button.
 /// TODO: Profiling seems to indicate that the computeCheck is slow.
 

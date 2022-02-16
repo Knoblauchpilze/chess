@@ -44,6 +44,15 @@ namespace chess {
                    bool stalemate) noexcept;
 
       /**
+       * @brief - Register a promotion for the color with the
+       *          specified type.
+       * @param c - the color that gets promoted.
+       * @param t - the type of the promotion.
+       */
+      void
+      promote(const Color& c, const Type& t) noexcept;
+
+      /**
        * @brief - Wehether or not the information for the
        *          white move is registered already.
        * @return - `true` if the white move is available.
@@ -126,6 +135,12 @@ namespace chess {
         /// @brief - The end position of the piece that was
         /// moved.
         Coordinates end;
+
+        /// @brief - The promotion associated with the move.
+        /// This is only filled in a second time as we need
+        /// to let the promotion time to happen.
+        /// Set to none in case no promotion happened.
+        Type promotion;
 
         /// @brief - Whether or not the move resulted in a
         /// capture of a piece.

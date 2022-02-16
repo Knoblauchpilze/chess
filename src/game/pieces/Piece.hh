@@ -26,6 +26,15 @@ namespace chess {
   std::string
   pieceToString(const Type& p) noexcept;
 
+  /**
+   * @brief - Returns a string describing the algebraic
+   *          notation for the piece.
+   * @param p - the piece whose name should be retrieved.
+   * @return - the corresponding string.
+   */
+  std::string
+  pieceToAlgebraic(const Type& p) noexcept;
+
   /// @brief - Forward declaration of a board to be used
   /// in the definition of methods.
   class Board;
