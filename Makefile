@@ -16,7 +16,6 @@ copyRelease:
 copyDebug:
 	rsync -avH build/Debug/lib build/Debug/bin sandbox/
 
-
 copy:
 	mkdir -p sandbox/
 	rsync -avH data sandbox/
@@ -34,4 +33,7 @@ drun: sandboxDebug
 
 v: sandboxDebug
 	cd sandbox && ./valgrind.sh local
+
+profile: sandboxDebug
+	cd sandbox && ./profile.sh local
 
