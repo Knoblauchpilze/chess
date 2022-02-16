@@ -14,7 +14,8 @@
 
 /// TODO: Handle the load/save of games.
 /// TODO: Resign button.
-/// TODO: Refine README.
+/// TODO: Profiling seems to indicate that the computeCheck is slow.
+/// TODO: Bug with check/checkmate.
 
 /// @brief - Size of the tiles.
 # define TILE_SIZE 170
