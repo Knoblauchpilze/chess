@@ -11,7 +11,7 @@
 
 /// @brief - The depth of the tree considered for the
 /// AI.
-# define AI_TREE_DEPTH 3u
+# define AI_TREE_DEPTH 4u
 
 namespace {
 
@@ -540,6 +540,9 @@ namespace pge {
     }
     else if (osm) {
       st = "Draw";
+    }
+    else if (c) {
+      st = "Check";
     }
     m_menus.status->setText(st);
   }
