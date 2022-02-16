@@ -167,6 +167,12 @@ namespace chess {
       move(const Coordinates& start, const Coordinates& end);
 
       /**
+       * @brief - Attempt to cancel the last move done.
+       */
+      void
+      undo() noexcept;
+
+      /**
        * @brief - Attempts to promote the piece at the position in
        *          input to the desired value.
        *          Raises an error if the piece is not valid.
@@ -196,6 +202,24 @@ namespace chess {
         bool moved;
       };
 
+      /// @brief - Convenience structure keeping track of the
+      /// last move's data.
+      struct LastMove {
+        // The coordinates of the starting piece.
+        Coordinates origin;
+
+        // The coordinates of the ending piece.
+        Coordinates end;
+
+        // The captured piece if any.
+        PieceData captured;
+
+        // The initial type of the piece sitting at the starting
+        // position. This value is used in case a promotion is
+        // added to the piece that just moved.
+        PieceData raw;
+      };
+
       /**
        * @brief - The width of the board.
        */
@@ -212,11 +236,9 @@ namespace chess {
       mutable std::vector<PieceData> m_board;
 
       /**
-       * @brief - The coordinates of the last piece that was
-       *          moved. It holds the ending position of the
-       *          last move.
+       * @brief - The information about the last move.
        */
-      Coordinates m_last;
+      LastMove m_last;
   };
 
   using BoardShPtr = std::shared_ptr<Board>;

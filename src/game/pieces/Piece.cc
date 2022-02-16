@@ -106,6 +106,11 @@ namespace chess {
     return pieceToString(m_type);
   }
 
+  std::string
+  Piece::fullName() const noexcept {
+    return colorToString(color()) + " " + name();
+  }
+
   bool
   Piece::pawn() const noexcept {
     return m_type == Type::Pawn;

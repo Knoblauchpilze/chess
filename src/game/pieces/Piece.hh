@@ -94,6 +94,14 @@ namespace chess {
       name() const noexcept;
 
       /**
+       * @brief - The full name of the piece, including its
+       *          color.
+       * @return - the full name of the piece.
+       */
+      std::string
+      fullName() const noexcept;
+
+      /**
        * @brief - Whether or not this piece is a pawn.
        */
       bool

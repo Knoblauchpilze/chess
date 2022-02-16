@@ -64,6 +64,7 @@ namespace chess {
     }
 
     // Handle pawn promotion.
+    /// TODO: Move that to the AI as well.
     if (best.end.y() == 0 || best.end.y() == b().h() - 1) {
       const Piece& p = b().at(best.end);
       if (p.pawn()) {
