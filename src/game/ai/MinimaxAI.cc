@@ -1,5 +1,6 @@
 
 # include "MinimaxAI.hh"
+# include <core_utils/Chrono.hh>
 # include "MoveGeneration.hh"
 
 namespace {
@@ -72,34 +73,65 @@ namespace chess {
 
     // Generate moves.
     std::vector<ai::Move> moves = ai::generate(m_color, b);
+    unsigned nodes = 0u;
 
     // For each available position, evaluate the
     // state of the board after making the move.
-    for (unsigned id = 0u ; id < moves.size() ; ++id) {
-      // Apply the move.
-      Board cb(b);
-      cb.move(moves[id].start, moves[id].end);
+    {
+      utils::Chrono<> clock("Evaluation of " + std::to_string(moves.size()), "moves");
+
+      float alpha = std::numeric_limits<float>::lowest();
+      float beta = std::numeric_limits<float>::max();
+
+      for (unsigned id = 0u ; id < moves.size() ; ++id) {
+        // Apply the move.
+        Board cb(b);
+        cb.move(moves[id].start, moves[id].end);
 
 # ifdef ROOT_LOG
-      log(
-        "[" + std::to_string(id) + "][" + std::to_string(m_depth) + "]"
-        " Evaluating " + colorToString(cb.at(moves[id].end).color()) + " " + cb.at(moves[id].end).name() +
-        " from " + moves[id].start.toString() + " to " + moves[id].end.toString() +
-        " for " + colorToString(m_color),
-        utils::Level::Notice
-      );
+        std::string msg = "Evaluating ";
+        msg += colorToString(cb.at(moves[id].end).color());
+        msg += " ";
+        msg += cb.at(moves[id].end).name();
+        msg += " from ";
+        msg += moves[id].start.toString();
+        msg += " to ";
+        msg += moves[id].end.toString();
+
+        // log("[0] " + colorToString(m_color) + " " + msg, utils::Level::Notice);
 # endif
-      moves[id].weight = evaluate(m_depth - 1u, m_color, cb);
+
+        // The idea of the alpha-beta pruning is described
+        // in the following link:
+        // https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning#Pseudocode
+        unsigned logDepth = 0u;
+
+        unsigned visited = 0u;
+        moves[id].weight = -evaluate(oppositeColor(m_color), cb, false, -beta, -alpha, 1u, &visited, logDepth);
+        nodes += visited;
+
 # ifdef ROOT_LOG
-      log(
-        "[" + std::to_string(id) + "][" + std::to_string(m_depth) + "]"
-        " Evaluated " + colorToString(cb.at(moves[id].end).color()) + " " + cb.at(moves[id].end).name() +
-        " from " + moves[id].start.toString() + " to " + moves[id].end.toString() +
-        " for " + colorToString(m_color) +
-        " to " + std::to_string(moves[id].weight),
-        utils::Level::Notice
-      );
+        msg = "Evaluated ";
+        msg += colorToString(cb.at(moves[id].end).color());
+        msg += " ";
+        msg += cb.at(moves[id].end).name();
+        msg += " from ";
+        msg += moves[id].start.toString();
+        msg += " to ";
+        msg += moves[id].end.toString();
+        msg += " to ";
+        msg += std::to_string(moves[id].weight);
+        msg += " (nodes: ";
+        msg += std::to_string(visited);
+        msg += ")";
+
+        log("[0] " + colorToString(m_color) + " " + msg, utils::Level::Notice);
 # endif
+        // Handle alpha-beta pruning.
+        alpha = std::max(alpha, moves[id].weight);
+      }
+
+      log("Visited " + std::to_string(nodes) + " node(s) to analyze " + std::to_string(moves.size()) + " move(s)");
     }
 
     return moves;
@@ -107,32 +139,49 @@ namespace chess {
   }
 
   float
-  MinimaxAI::evaluate(std::string uuid,
-                      unsigned logDepth,
+  MinimaxAI::evaluate(const Color& c,
+                      const Board& b,
+                      bool maximizing,
+                      float alpha,
+                      float beta,
                       unsigned depth,
-                      const Color& c,
-                      const Board& b) const noexcept
+                      unsigned* nodes,
+                      unsigned logDepth) const noexcept
   {
-    bool opponent = (c != m_color);
-    // In case the depth is `0`, evaluate the board.
-    if (depth == 0u) {
-      float w = evaluateBoard(c, b);
-# ifdef EVALUATE_LOG
-      if (depth >= logDepth) {
+    auto indent = [](unsigned depth) {
+      return std::string(2u * depth, ' ');
+    };
+
+    auto print = [this, &depth, &logDepth, &indent, &c](const std::string msg, const utils::Level& level) {
+      if (depth <= logDepth) {
         log(
-          "[" + uuid + "][" + std::to_string(depth) + "] " +
-          "Board has a value of " + std::to_string(opponent ? -w : w) +
-          " for " + colorToString(c),
-          utils::Level::Info
+          "[" + std::to_string(depth) + "] " + indent(depth) +
+          colorToString(c) + " " + msg,
+          level
         );
       }
+    };
+
+    // Color represents the player that just moved and
+    // led to this state of the board.
+    // We want this person to be maximizing the score.
+    // Hence the opposite color is the minimizing player.
+    if (depth >= m_depth) {
+      // We reached the terminal evaluation, evaluate
+      // the board for the player that requested the
+      // call.
+      float w = evaluateBoard(c, b);
+# ifdef EVALUATE_LOG
+      print("board: " + std::to_string(w), utils::Level::Notice);
 # endif
 
-      return (opponent ? -w : w);
+      *nodes = 1u;
+
+      return w;
     }
 
-    // Generate moves.
-    std::vector<ai::Move> moves = ai::generate(oppositeColor(c), b);
+    // Generate moves for the current color.
+    std::vector<ai::Move> moves = ai::generate(c, b);
 
     // For each available position, evaluate the
     // state of the board after making the move.
@@ -141,71 +190,88 @@ namespace chess {
       cb.move(moves[id].start, moves[id].end);
 
 # ifdef EXPLORE_LOG
-      if (depth >= logDepth) {
-        log(
-          "[" + uuid + "][" + std::to_string(depth) + "] " +
-          "Evaluating " + colorToString(cb.at(moves[id].end).color()) + " " + cb.at(moves[id].end).name() +
-          " from " + moves[id].start.toString() + " to " + moves[id].end.toString() +
-          " for " + colorToString(c),
-          utils::Level::Notice
-        );
-      }
+      std::string msg = "Evaluating ";
+      msg += colorToString(cb.at(moves[id].end).color());
+      msg += " ";
+      msg += cb.at(moves[id].end).name();
+      msg += " from ";
+      msg += moves[id].start.toString();
+      msg += " to ";
+      msg += moves[id].end.toString();
+      print(msg, utils::Level::Notice);
 # endif
-      moves[id].weight = evaluate(depth - 1u, oppositeColor(c), cb);
+
+      unsigned visited = 0u;
+
+      // The returned value represents the evaluation of the
+      // board and the best moves for the opponent. To obtain
+      // the valuation for us, we need to negate it. This is
+      // controlled by the maximizing value.
+      moves[id].weight = -evaluate(oppositeColor(c), cb, !maximizing, -beta, -alpha, depth + 1u, &visited, logDepth);
+      *nodes += visited;
+
 # ifdef EXPLORE_LOG
-      if (depth >= logDepth) {
-        log(
-          "[" + uuid + "][" + std::to_string(depth) + "] " +
-          "Evaluated " + colorToString(cb.at(moves[id].end).color()) + " " + cb.at(moves[id].end).name() +
-          " from " + moves[id].start.toString() + " to " + moves[id].end.toString() +
-          " for " + colorToString(c) +
-          " to " + std::to_string(moves[id].weight),
-          utils::Level::Info
-        );
-      }
+      msg = "Evaluated ";
+      msg += colorToString(cb.at(moves[id].end).color());
+      msg += " ";
+      msg += cb.at(moves[id].end).name();
+      msg += " from ";
+      msg += moves[id].start.toString();
+      msg += " to ";
+      msg += moves[id].end.toString();
+      msg += " to ";
+      msg += std::to_string(moves[id].weight);
+      msg += " (nodes: ";
+      msg += std::to_string(visited);
+      msg += ")";
+      print(msg, utils::Level::Notice);
 # endif
+
+      // Handle alpha-beta pruning.
+      alpha = std::max(alpha, moves[id].weight);
+      if (alpha >= beta) {
+        break;
+      }
     }
 
-    // Sort moves based on how favourable they are.
+    // Sort the move in ascending or descending order
+    // based on whether we should minimize or maximize
+    // the score.
     std::sort(
       moves.begin(),
       moves.end(),
-      [opponent](const ai::Move& lhs, const ai::Move& rhs) {
-        return (opponent ? lhs.weight > rhs.weight : lhs.weight < rhs.weight);
+      [](const ai::Move& lhs, const ai::Move& rhs) {
+        return lhs.weight > rhs.weight;
       }
     );
-
-    std::string score = "N/A";
-    if (!moves.empty()) {
-      score = std::to_string(moves[0].weight);
-    }
-
-# ifdef SUMMARY_LOG
-    if (depth >= logDepth) {
-      log(
-        "[" + uuid + "][" + std::to_string(depth) + "] " +
-        "Board has a value of " + score +
-        " for " + colorToString(c) +
-        " out of " + std::to_string(moves.size()) + " move(s)",
-        utils::Level::Info
-      );
-    }
-# endif
 
     // In case we don't have any legal moves, it means
     // that we're either in stalemate or we can't get
     // out of check.
     if (moves.empty()) {
       warn(
-        "[" + uuid + "][" + std::to_string(depth) + "] " +
-        "Board has no legal move for " + colorToString(c) +
-        " (check: " + std::to_string(b.computeCheck(c)) +
+        colorToString(c) + " has no legal move (check: " +
+        std::to_string(b.computeCheck(c)) +
         ", stalemate: " + std::to_string(b.computeStalemate(c)) + ")"
       );
 
       /// TODO: Handle end of game weights.
-      return 0.0f;
+      return maximizing ? std::numeric_limits<float>::lowest() : std::numeric_limits<float>::max();
     }
+
+# ifdef SUMMARY_LOG
+    std::string msg = "Analyzed ";
+    msg += std::to_string(moves.size());
+    msg += " move(s)";
+    msg += ", after ";
+    msg += (maximizing ? "maximizing" : "minimizing");
+    msg += " best: ";
+    msg += std::to_string(moves[0].weight);
+    msg += " (nodes: ";
+    msg += std::to_string(*nodes);
+    msg += ")";
+    print(msg, utils::Level::Notice);
+# endif
 
     return moves[0].weight;
   }

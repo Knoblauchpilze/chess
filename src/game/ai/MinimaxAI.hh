@@ -36,16 +36,33 @@ namespace chess {
        * @brief - Evaluate the best move for the current depth by
        *          generating more moves if needed and aggregating
        *          the result.
-       * @param depth - the depth available to analyze moves.
+       *          We use a minimax approach with a alpha-beta to
+       *          prune suboptimal results.
        * @param c - the color for which the move should be found.
        * @param b - the current state of the board.
+       * @param maximizing - defines whether we should try to find
+       *                     the maximum or minimum score for this
+       *                     iteration.
+       * @param alpha - used for alpha-beta pruning, characterizes the
+       *                minimum score that the maximizing player is
+       *                assured of.
+       * @param beta - used for alpha beta pruning. Defines the
+       *               maximum score that the minimizing player is
+       *               assured of.
+       * @param depth - the current depth of the evaluation.
+       * @param nodes - information about how many nodes where visited.
        * @return - the evaluation of the current state of the board
        *           after all possible moves up until the input depth.
        */
       float
-      evaluate(unsigned depth,
-               const Color& c,
-               const Board& b) const noexcept;
+      evaluate(const Color& c,
+               const Board& b,
+               bool maximizing,
+               float alpha,
+               float beta,
+               unsigned depth,
+               unsigned* nodes,
+               unsigned logDepth) const noexcept;
 
     private:
 
