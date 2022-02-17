@@ -51,18 +51,19 @@ namespace chess {
        *               assured of.
        * @param depth - the current depth of the evaluation.
        * @param nodes - information about how many nodes where visited.
+       * @param pruned - defines how many nodes where pruned.
        * @return - the evaluation of the current state of the board
        *           after all possible moves up until the input depth.
        */
-      float
+      int
       evaluate(const Color& c,
                const Board& b,
                bool maximizing,
-               float alpha,
-               float beta,
+               int alpha,
+               int beta,
                unsigned depth,
                unsigned* nodes,
-               unsigned logDepth) const noexcept;
+               unsigned* pruned) const noexcept;
 
     private:
 

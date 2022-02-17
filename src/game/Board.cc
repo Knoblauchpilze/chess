@@ -56,48 +56,42 @@ namespace chess {
     m_board = std::vector<PieceData>(w() * h(), {Piece::generate(), false});
 
     // Whites.
-    // m_board[cells::A1] = {Piece::generate(Type::Rook, Color::White), false};
-    // m_board[cells::B1] = {Piece::generate(Type::Knight, Color::White), false};
-    // m_board[cells::C1] = {Piece::generate(Type::Bishop, Color::White), false};
-    // m_board[cells::D1] = {Piece::generate(Type::Queen, Color::White), false};
+    m_board[cells::A1] = {Piece::generate(Type::Rook, Color::White), false};
+    m_board[cells::B1] = {Piece::generate(Type::Knight, Color::White), false};
+    m_board[cells::C1] = {Piece::generate(Type::Bishop, Color::White), false};
+    m_board[cells::D1] = {Piece::generate(Type::Queen, Color::White), false};
     m_board[cells::E1] = {Piece::generate(Type::King, Color::White), false};
-    // m_board[cells::F1] = {Piece::generate(Type::Bishop, Color::White), false};
-    // m_board[cells::G1] = {Piece::generate(Type::Knight, Color::White), false};
-    // m_board[cells::H1] = {Piece::generate(Type::Rook, Color::White), false};
+    m_board[cells::F1] = {Piece::generate(Type::Bishop, Color::White), false};
+    m_board[cells::G1] = {Piece::generate(Type::Knight, Color::White), false};
+    m_board[cells::H1] = {Piece::generate(Type::Rook, Color::White), false};
 
-    // m_board[cells::A2] = {Piece::generate(Type::Pawn, Color::White), false};
-    // m_board[cells::B2] = {Piece::generate(Type::Pawn, Color::White), false};
-    // m_board[cells::C2] = {Piece::generate(Type::Pawn, Color::White), false};
-    // m_board[cells::D2] = {Piece::generate(Type::Pawn, Color::White), false};
-    // m_board[cells::E2] = {Piece::generate(Type::Pawn, Color::White), false};
-    // m_board[cells::F2] = {Piece::generate(Type::Pawn, Color::White), false};
-    // m_board[cells::G2] = {Piece::generate(Type::Pawn, Color::White), false};
-    // m_board[cells::H2] = {Piece::generate(Type::Pawn, Color::White), false};
+    m_board[cells::A2] = {Piece::generate(Type::Pawn, Color::White), false};
+    m_board[cells::B2] = {Piece::generate(Type::Pawn, Color::White), false};
+    m_board[cells::C2] = {Piece::generate(Type::Pawn, Color::White), false};
+    m_board[cells::D2] = {Piece::generate(Type::Pawn, Color::White), false};
+    m_board[cells::E2] = {Piece::generate(Type::Pawn, Color::White), false};
+    m_board[cells::F2] = {Piece::generate(Type::Pawn, Color::White), false};
+    m_board[cells::G2] = {Piece::generate(Type::Pawn, Color::White), false};
+    m_board[cells::H2] = {Piece::generate(Type::Pawn, Color::White), false};
 
     // Blacks.
-    // m_board[cells::A7] = {Piece::generate(Type::Pawn, Color::Black), false};
-    // m_board[cells::B7] = {Piece::generate(Type::Pawn, Color::Black), false};
-    // m_board[cells::C7] = {Piece::generate(Type::Pawn, Color::Black), false};
-    // m_board[cells::D7] = {Piece::generate(Type::Pawn, Color::Black), false};
-    // m_board[cells::E7] = {Piece::generate(Type::Pawn, Color::Black), false};
-    // m_board[cells::F7] = {Piece::generate(Type::Pawn, Color::Black), false};
-    // m_board[cells::G7] = {Piece::generate(Type::Pawn, Color::Black), false};
-    // m_board[cells::H7] = {Piece::generate(Type::Pawn, Color::Black), false};
+    m_board[cells::A7] = {Piece::generate(Type::Pawn, Color::Black), false};
+    m_board[cells::B7] = {Piece::generate(Type::Pawn, Color::Black), false};
+    m_board[cells::C7] = {Piece::generate(Type::Pawn, Color::Black), false};
+    m_board[cells::D7] = {Piece::generate(Type::Pawn, Color::Black), false};
+    m_board[cells::E7] = {Piece::generate(Type::Pawn, Color::Black), false};
+    m_board[cells::F7] = {Piece::generate(Type::Pawn, Color::Black), false};
+    m_board[cells::G7] = {Piece::generate(Type::Pawn, Color::Black), false};
+    m_board[cells::H7] = {Piece::generate(Type::Pawn, Color::Black), false};
 
     m_board[cells::A8] = {Piece::generate(Type::Rook, Color::Black), false};
-    // m_board[cells::B8] = {Piece::generate(Type::Knight, Color::Black), false};
+    m_board[cells::B8] = {Piece::generate(Type::Knight, Color::Black), false};
     m_board[cells::C8] = {Piece::generate(Type::Bishop, Color::Black), false};
-    // m_board[cells::D8] = {Piece::generate(Type::Queen, Color::Black), false};
+    m_board[cells::D8] = {Piece::generate(Type::Queen, Color::Black), false};
     m_board[cells::E8] = {Piece::generate(Type::King, Color::Black), false};
-    // m_board[cells::F8] = {Piece::generate(Type::Bishop, Color::Black), false};
-    // m_board[cells::G8] = {Piece::generate(Type::Knight, Color::Black), false};
-    // m_board[cells::H8] = {Piece::generate(Type::Rook, Color::Black), false};
-
-    m_board[cells::H2] = {Piece::generate(Type::Pawn, Color::Black), false};
-    m_board[cells::B2] = {Piece::generate(Type::Queen, Color::Black), false};
-    m_board[cells::B3] = {Piece::generate(Type::Queen, Color::Black), false};
-    m_board[cells::B6] = {Piece::generate(Type::Queen, Color::Black), false};
-    m_board[cells::B7] = {Piece::generate(Type::Queen, Color::Black), false};
+    m_board[cells::F8] = {Piece::generate(Type::Bishop, Color::Black), false};
+    m_board[cells::G8] = {Piece::generate(Type::Knight, Color::Black), false};
+    m_board[cells::H8] = {Piece::generate(Type::Rook, Color::Black), false};
   }
 
   const Piece&

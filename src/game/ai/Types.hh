@@ -23,7 +23,7 @@ namespace chess {
       // An information of the weight of this move, which
       // describe how favorable it is for the side playing
       // it.
-      float weight;
+      int weight;
     };
 
   }

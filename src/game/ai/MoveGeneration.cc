@@ -24,7 +24,7 @@ namespace chess {
           Move m = {
             pieces[id].second, // Starting position.
             *it,               // End position.
-            0.0f               // Weight.
+            0                  // Weight.
           };
 
           out.push_back(m);

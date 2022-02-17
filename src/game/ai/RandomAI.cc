@@ -17,7 +17,7 @@ namespace chess {
     // Randomly classify moves.
     std::random_device rd;
     std::mt19937 rng(rd());
-    std::uniform_real_distribution<float> distr(0.0f, 1.0f);
+    std::uniform_int_distribution<> distr(0, moves.size());
 
     // Assign a random evaluation to each move.
     for (unsigned id = 0u ; id < moves.size() ; ++id) {
