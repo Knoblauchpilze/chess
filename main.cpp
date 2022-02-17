@@ -12,8 +12,6 @@
 # include "TopViewFrame.hh"
 # include "App.hh"
 
-/// TODO: Profiling seems to indicate that the computeCheck is slow.
-
 /// @brief - Size of the tiles.
 # define TILE_SIZE 170
 
