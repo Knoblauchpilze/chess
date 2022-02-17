@@ -9,6 +9,10 @@
 /// won/lost.
 # define ALERT_DURATION_MS 3000
 
+/// @brief - Defines the number of moves displayed in
+/// the history.
+# define MOVES_COUNT 4u
+
 /// @brief - The depth of the tree considered for the
 /// AI.
 # define AI_TREE_DEPTH 4u
@@ -94,14 +98,13 @@ namespace pge {
     // Generate the main menu.
     pge::MenuShPtr status = generateMenu(olc::vi2d(), olc::vi2d(width, 50), "", "root");
 
-    static const unsigned sk_lastMoves = 5u;
     // And additional menus: we will display 3 menus
     // and the number of moves. The percentage are
     // arbitrary.
     int wRound = static_cast<int>(width * 0.1f);
     int wPlayer = static_cast<int>(width * 0.2f);
     int wStatus = static_cast<int>(width * 0.2f);
-    int wMove = static_cast<int>(width * 0.5f / sk_lastMoves);
+    int wMove = static_cast<int>(width * 0.5f / MOVES_COUNT);
 
     int mHeight = 30;
 
@@ -109,7 +112,7 @@ namespace pge {
     m_menus.player = generateMenu(olc::vi2d(), olc::vi2d(wPlayer, mHeight), "White", "player");
     m_menus.status = generateMenu(olc::vi2d(), olc::vi2d(wStatus, mHeight), "All good", "status");
 
-    for (unsigned id = 0u ; id < sk_lastMoves ; ++id) {
+    for (unsigned id = 0u ; id < MOVES_COUNT ; ++id) {
       m_menus.moves.push_back(
         generateMenu(olc::vi2d(), olc::vi2d(wMove, mHeight), "", "move_" + std::to_string(id))
       );
@@ -120,14 +123,13 @@ namespace pge {
     status->addMenu(m_menus.player);
     status->addMenu(m_menus.status);
 
-    for (unsigned id = 0u ; id < sk_lastMoves ; ++id) {
+    for (unsigned id = 0u ; id < MOVES_COUNT ; ++id) {
       status->addMenu(m_menus.moves[id]);
     }
 
     // Initialize the current move at one minus the
     // maximum number of move so that the first move
     // can actually be registered.
-    m_menus.move = sk_lastMoves - 1u;
     m_menus.check.date = utils::TimeStamp();
     m_menus.check.wasActive = false;
     m_menus.check.duration = ALERT_DURATION_MS;
@@ -405,8 +407,6 @@ namespace pge {
       return;
     }
 
-    log("Promoting for " + chess::colorToString(c));
-
     // Handle promoting.
     m_board->promote(*m_promote, promotion);
     m_promote.reset();
@@ -442,7 +442,7 @@ namespace pge {
     // Fetch properties to update.
     chess::Color p = m_board->getPlayer();
     chess::Round r = m_board->getCurrentRound();
-    chess::Round m = m_board->getLastRound();
+    chess::Round m = getLastRound();
 
     m_menus.round->setText("Round: " + std::to_string(r.id() + 1u));
     m_menus.player->setText(chess::colorToString(p));
@@ -453,11 +453,20 @@ namespace pge {
     // Update captured pieces.
     updateCapturedPieces();
 
-    /// TODO: Handle update of menus after promotion.
-    if (m.id() != m_menus.move && m.valid()) {
-      unsigned pos = m.id() % m_menus.moves.size();
-      m_menus.moves[pos]->setText(m.toString());
-      m_menus.move = m.id();
+    chess::Rounds rs = m_board->getRounds();
+    unsigned id = 0u;
+    if (rs.size() > MOVES_COUNT) {
+      id = rs.size() - MOVES_COUNT;
+    }
+
+    unsigned lid = 0u;
+    while (id < rs.size()) {
+      if (rs[id].valid()) {
+        m_menus.moves[lid]->setText(rs[id].toString());
+        ++lid;
+      }
+
+      ++id;
     }
   }
 

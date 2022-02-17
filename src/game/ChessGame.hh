@@ -11,6 +11,9 @@
 
 namespace chess {
 
+  /// @brief - Forward declaration of a list of rounds.
+  using Rounds = std::vector<Round>;
+
   class ChessGame: public utils::CoreObject {
     public:
 
@@ -46,11 +49,11 @@ namespace chess {
       getCurrentRound() const noexcept;
 
       /**
-       * @brief - Returns the last round played.
-       * @return - the last round played.
+       * @brief - Returns the list of completed rounds.
+       * @return - the list of rounds played.
        */
-      Round
-      getLastRound() const noexcept;
+      Rounds
+      getRounds() const noexcept;
 
       /**
        * @brief - Determines whether the king of the input color is
@@ -182,7 +185,7 @@ namespace chess {
       /**
        * @brief - The list of rounds.
        */
-      std::vector<Round> m_rounds;
+      Rounds m_rounds;
   };
 
   using ChessGameShPtr = std::shared_ptr<ChessGame>;

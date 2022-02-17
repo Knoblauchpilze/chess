@@ -339,9 +339,6 @@ namespace pge {
         // The last moves.
         std::vector<MenuShPtr> moves;
 
-        // The current menu to update for the next move.
-        unsigned move;
-
         // The captured piece for whites.
         Captured wCaptured;
 

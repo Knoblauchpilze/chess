@@ -55,7 +55,8 @@ namespace chess {
 
     out->promotion = t;
 
-    log("promotion: " + pieceToString(m_black.promotion));
+    // Regenerate the name with the promotion.
+    generateName();
   }
 
   bool

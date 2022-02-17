@@ -60,13 +60,13 @@ namespace chess {
     return m_round;
   }
 
-  Round
-  ChessGame::getLastRound() const noexcept {
+  Rounds
+  ChessGame::getRounds() const noexcept {
     if (m_rounds.empty()) {
-      return m_round;
+      return Rounds{m_round};
     }
 
-    return m_rounds.back();
+    return m_rounds;
   }
 
   bool

@@ -45,7 +45,12 @@ namespace pge {
   inline
   chess::Round
   Game::getLastRound() const noexcept {
-    return m_board->getLastRound();
+    chess::Rounds rs = m_board->getRounds();
+    if (rs.empty()) {
+      return m_board->getCurrentRound();
+    }
+
+    return rs.back();
   }
 
   inline
