@@ -11,7 +11,7 @@
 
 /// @brief - Defines the number of moves displayed in
 /// the history.
-# define MOVES_COUNT 4u
+# define MOVES_COUNT 3u
 
 /// @brief - The depth of the tree considered for the
 /// AI.
@@ -23,10 +23,12 @@ namespace {
   generateMenu(const olc::vi2d& pos,
                const olc::vi2d& size,
                const std::string& text,
-               const std::string& name)
+               const std::string& name,
+               bool clickable = false)
   {
     pge::menu::MenuContentDesc fd = pge::menu::newMenuContent(text, "", size);
     fd.color = olc::WHITE;
+    fd.hColor = olc::BLACK;
     fd.align = pge::menu::Alignment::Center;
 
     return std::make_shared<pge::Menu>(
@@ -36,7 +38,7 @@ namespace {
       pge::menu::newColoredBackground(olc::VERY_DARK_GREEN),
       fd,
       pge::menu::Layout::Horizontal,
-      false,
+      clickable,
       false
     );
   }
@@ -76,6 +78,7 @@ namespace pge {
         true,  // paused
         true,  // disabled
         false, // terminated
+        false, // resigned
         false, // lost
       }
     ),
@@ -102,9 +105,10 @@ namespace pge {
     // and the number of moves. The percentage are
     // arbitrary.
     int wRound = static_cast<int>(width * 0.1f);
-    int wPlayer = static_cast<int>(width * 0.2f);
-    int wStatus = static_cast<int>(width * 0.2f);
+    int wPlayer = static_cast<int>(width * 0.15f);
+    int wStatus = static_cast<int>(width * 0.15f);
     int wMove = static_cast<int>(width * 0.5f / MOVES_COUNT);
+    int wResign = static_cast<int>(width * 0.1f / MOVES_COUNT);
 
     int mHeight = 30;
 
@@ -118,6 +122,13 @@ namespace pge {
       );
     }
 
+    m_menus.resign = generateMenu(olc::vi2d(), olc::vi2d(wResign, mHeight), "Resign", "resign", true);
+    m_menus.resign->setSimpleAction(
+      [this](Game& g) {
+        g.resign();
+      }
+    );
+
     // Register the menu in the parent one.
     status->addMenu(m_menus.round);
     status->addMenu(m_menus.player);
@@ -126,6 +137,8 @@ namespace pge {
     for (unsigned id = 0u ; id < MOVES_COUNT ; ++id) {
       status->addMenu(m_menus.moves[id]);
     }
+
+    status->addMenu(m_menus.resign);
 
     // Initialize the current move at one minus the
     // maximum number of move so that the first move
@@ -145,6 +158,9 @@ namespace pge {
     m_menus.win.date = utils::TimeStamp();
     m_menus.win.wasActive = false;
     m_menus.win.duration = ALERT_DURATION_MS;
+    m_menus.resigned.date = utils::TimeStamp();
+    m_menus.resigned.wasActive = false;
+    m_menus.resigned.duration = ALERT_DURATION_MS;
 
     // Generate the alert menu indicating that the player
     // is in check or checkmate.
@@ -197,6 +213,15 @@ namespace pge {
     );
     m_menus.win.menu->setVisible(false);
 
+    m_menus.resigned.menu = generateMessageBoxMenu(
+      olc::vi2d((width - 300.0f) / 2.0f, (height - 150.0f) / 2.0f),
+      olc::vi2d(300, 150),
+      "You resigned !",
+      "resign",
+      true
+    );
+    m_menus.resigned.menu->setVisible(false);
+
     // Generate the menu indicating the pieces that
     // were taken during the game.
     pge::MenuShPtr taken = generateMenu(olc::vi2d(0, height - 50), olc::vi2d(width, 50), "", "taken_title");
@@ -239,6 +264,7 @@ namespace pge {
     menus.push_back(m_menus.stalemate.menu);
     menus.push_back(m_menus.oStalemate.menu);
     menus.push_back(m_menus.win.menu);
+    menus.push_back(m_menus.resigned.menu);
 
     menus.push_back(taken);
 
@@ -253,6 +279,12 @@ namespace pge {
     // Only handle actions when the game is not disabled.
     if (m_state.disabled) {
       log("Ignoring action while menu is disabled");
+      return;
+    }
+
+    // Also prevent action in case the player resigned.
+    if (m_state.resigned) {
+      log("Ignoring action while player resigned");
       return;
     }
 
@@ -426,6 +458,14 @@ namespace pge {
   }
 
   void
+  Game::resign() noexcept {
+    chess::Color p = chess::oppositeColor(m_ai->side());
+    log(colorToString(p) + " resigned", utils::Level::Info);
+
+    m_state.resigned = true;
+  }
+
+  void
   Game::enable(bool enable) {
     m_state.disabled = !enable;
 
@@ -531,8 +571,10 @@ namespace pge {
     osDone &= !m_menus.oStalemate.update(osm);
     bool wDone = m_menus.win.menu->visible();
     wDone &= !m_menus.win.update(ocm);
+    bool rDone = m_menus.resigned.menu->visible();
+    rDone &= !m_menus.resigned.update(m_state.resigned);
 
-    if (cmDone || sDone || osDone || wDone) {
+    if (cmDone || sDone || osDone || wDone || rDone) {
       // The game is lost and the display screen has been
       // reached, so we can indicate it.
       m_state.done = true;

@@ -159,6 +159,13 @@ namespace pge {
       void
       setPromotion(const chess::Type& promotion, const chess::Color& c) noexcept;
 
+      /**
+       * @brief - Indicates that the main player is resigning
+       *          from the game.
+       */
+      void
+      resign() noexcept;
+
     private:
 
       /// @brief - Convenience structure which allows to group
@@ -277,6 +284,10 @@ namespace pge {
         // termination request has been received.
         bool terminated;
 
+        // Whether or not the game has been resigned by the
+        // active player.
+        bool resigned;
+
         // Whether or not the game has been finished, either
         // with a win or a draw or a loss.
         bool done;
@@ -336,8 +347,14 @@ namespace pge {
         // Information about whether you won the game.
         TimedMenu win;
 
+        // The resign alert.
+        TimedMenu resigned;
+
         // The last moves.
         std::vector<MenuShPtr> moves;
+
+        // The resign button.
+        MenuShPtr resign;
 
         // The captured piece for whites.
         Captured wCaptured;
