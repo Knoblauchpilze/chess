@@ -96,13 +96,13 @@ namespace chess {
         msg += " to ";
         msg += moves[id].end.toString();
 
-        // log("[0] " + colorToString(m_color) + " " + msg, utils::Level::Notice);
+        log("[0] " + colorToString(m_color) + " " + msg, utils::Level::Notice);
 # endif
 
         // The idea of the alpha-beta pruning is described
         // in the following link:
         // https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning#Pseudocode
-        unsigned logDepth = 0u;
+        unsigned logDepth = m_depth;
 
         unsigned visited = 0u;
         moves[id].weight = -evaluate(oppositeColor(m_color), cb, false, -beta, -alpha, 1u, &visited, logDepth);
@@ -242,14 +242,21 @@ namespace chess {
     // that we're either in stalemate or we can't get
     // out of check.
     if (moves.empty()) {
-      warn(
-        colorToString(c) + " has no legal move (check: " +
-        std::to_string(b.computeCheck(c)) +
-        ", stalemate: " + std::to_string(b.computeStalemate(c)) + ")"
-      );
+      bool check = b.computeCheck(c);
+      bool stalemate = b.computeStalemate(c);
 
-      /// TODO: Handle end of game weights.
-      return maximizing ? std::numeric_limits<float>::lowest() : std::numeric_limits<float>::max();
+      // We want to value checkmate with a very high
+      // value, but stalemate not that much. It also
+      // depends on whether we want to maximize or
+      // to minimize the baord evaluation.
+      float w = maximizing ? std::numeric_limits<float>::lowest() : std::numeric_limits<float>::max();
+
+      // In case of checkmate, reverse the values.
+      if (check && stalemate) {
+        w = -w;
+      }
+
+      return w;
     }
 
 # ifdef SUMMARY_LOG
