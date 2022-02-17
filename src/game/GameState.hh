@@ -13,7 +13,6 @@ namespace pge {
   /// to a distinct menu in the application.
   enum class Screen {
     Home,
-    LoadGame,
     SideSelection,
     Game,
     GameOver,
@@ -78,9 +77,6 @@ namespace pge {
       generateHomeScreen(const olc::vi2d& dims);
 
       void
-      generateLoadGameScreen(const olc::vi2d& dims);
-
-      void
       generateSideSelectionScreen(const olc::vi2d& dims);
 
       void
@@ -100,12 +96,6 @@ namespace pge {
        *          on the home screen.
        */
       MenuShPtr m_home;
-
-      /**
-       * @brief - Defines the screen to display when the game is
-       *          on the loading game screen.
-       */
-      MenuShPtr m_loadGame;
 
       /**
        * @brief - Defines the screen to choose a side.

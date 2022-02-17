@@ -70,14 +70,12 @@ namespace pge {
     m_screen(screen == Screen::Home ? Screen::Exit : Screen::Home),
 
     m_home(nullptr),
-    m_loadGame(nullptr),
     m_side(nullptr),
     m_gameOver(nullptr)
   {
     setService("chess");
 
     generateHomeScreen(dims);
-    generateLoadGameScreen(dims);
     generateSideSelectionScreen(dims);
     generateGameOverScreen(dims);
 
@@ -102,7 +100,6 @@ namespace pge {
 
     // Update screens' visibility.
     m_home->setVisible(m_screen == Screen::Home);
-    m_loadGame->setVisible(m_screen == Screen::LoadGame);
     m_side->setVisible(m_screen == Screen::SideSelection);
     m_gameOver->setVisible(m_screen == Screen::GameOver);
   }
@@ -110,7 +107,6 @@ namespace pge {
   void
   GameState::render(olc::PixelGameEngine* pge) const {
     m_home->render(pge);
-    m_loadGame->render(pge);
     m_side->render(pge);
     m_gameOver->render(pge);
   }
@@ -123,10 +119,6 @@ namespace pge {
 
     // Propagate the user input to each screen.
     menu::InputHandle cur = m_home->processUserInput(c, actions);
-    res.relevant = (res.relevant || cur.relevant);
-    res.selected = (res.selected || cur.selected);
-
-    cur = m_loadGame->processUserInput(c, actions);
     res.relevant = (res.relevant || cur.relevant);
     res.selected = (res.selected || cur.selected);
 
@@ -155,14 +147,6 @@ namespace pge {
     );
     m_home->addMenu(m);
 
-    m = generateScreenOption(dims, "Load game", olc::VERY_DARK_PINK, "load_game", true);
-    m->setSimpleAction(
-      [this](Game& /*g*/) {
-        setScreen(Screen::LoadGame);
-      }
-    );
-    m_home->addMenu(m);
-
     m = generateScreenOption(dims, "Quit", olc::VERY_DARK_PINK, "quit", true);
     m->setSimpleAction(
       [this](Game& g) {
@@ -171,24 +155,6 @@ namespace pge {
       }
     );
     m_home->addMenu(m);
-  }
-
-  void
-  GameState::generateLoadGameScreen(const olc::vi2d& dims) {
-    // Generate the main screen.
-    m_loadGame = generateDefaultScreen(dims, olc::DARK_ORANGE);
-
-    // Add each option to the screen.
-    MenuShPtr m = generateScreenOption(dims, "Saved games:", olc::VERY_DARK_ORANGE, "saved_games", false);
-    m_loadGame->addMenu(m);
-
-    m = generateScreenOption(dims, "Back to main screen", olc::VERY_DARK_ORANGE, "back_to_main", true);
-    m->setSimpleAction(
-      [this](Game& /*g*/) {
-        setScreen(Screen::Home);
-      }
-    );
-    m_loadGame->addMenu(m);
   }
 
   void

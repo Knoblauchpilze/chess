@@ -12,7 +12,6 @@
 # include "TopViewFrame.hh"
 # include "App.hh"
 
-/// TODO: Handle the load/save of games, also in the README.
 /// TODO: Profiling seems to indicate that the computeCheck is slow.
 
 /// @brief - Size of the tiles.
