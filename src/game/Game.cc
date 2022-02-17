@@ -15,7 +15,7 @@
 
 /// @brief - The depth of the tree considered for the
 /// AI.
-# define AI_TREE_DEPTH 4u
+# define AI_TREE_DEPTH 2u
 
 namespace {
 
@@ -578,6 +578,11 @@ namespace pge {
       // The game is lost and the display screen has been
       // reached, so we can indicate it.
       m_state.done = true;
+    }
+
+    // Disable the UI in case we reached the end of the game.
+    if (cm || sm || osm || ocm) {
+      enable(false);
     }
 
     std::string st = "All good";
