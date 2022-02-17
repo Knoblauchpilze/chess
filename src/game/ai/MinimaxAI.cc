@@ -52,6 +52,7 @@ namespace {
 
 }
 
+// # define PRE_ROOT_LOG
 # define ROOT_LOG
 # define EVALUATE_LOG
 # define EXPLORE_LOG
@@ -88,7 +89,7 @@ namespace chess {
         Board cb(b);
         cb.move(moves[id].start, moves[id].end, true, Type::Queen);
 
-# ifdef ROOT_LOG
+# ifdef PRE_ROOT_LOG
         std::string msg = "Evaluating ";
         msg += cb.at(moves[id].end).fullName();
         msg += " from ";
@@ -102,14 +103,18 @@ namespace chess {
         // The idea of the alpha-beta pruning is described
         // in the following link:
         // https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning#Pseudocode
-        unsigned logDepth = m_depth;
+        unsigned logDepth = 0u;
 
         unsigned visited = 0u;
         moves[id].weight = -evaluate(oppositeColor(m_color), cb, false, -beta, -alpha, 1u, &visited, logDepth);
         nodes += visited;
 
 # ifdef ROOT_LOG
+#  ifdef PRE_ROOT_LOG
         msg = "Evaluated ";
+#  else
+        std::string msg = "Evaluated";
+#  endif
         msg += cb.at(moves[id].end).fullName();
         msg += " from ";
         msg += moves[id].start.toString();
@@ -127,7 +132,7 @@ namespace chess {
         alpha = std::max(alpha, moves[id].weight);
       }
 
-      log("Visited " + std::to_string(nodes) + " node(s) to analyze " + std::to_string(moves.size()) + " move(s)", utils::Level::Verbose);
+      log("Visited " + std::to_string(nodes) + " node(s) to analyze " + std::to_string(moves.size()) + " move(s)", utils::Level::Info);
     }
 
     return moves;
