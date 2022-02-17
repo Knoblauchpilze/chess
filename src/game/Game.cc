@@ -15,7 +15,7 @@
 
 /// @brief - The depth of the tree considered for the
 /// AI.
-# define AI_TREE_DEPTH 2u
+# define AI_TREE_DEPTH 5u
 
 namespace {
 

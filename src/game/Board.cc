@@ -61,9 +61,9 @@ namespace chess {
     // m_board[cells::C1] = {Piece::generate(Type::Bishop, Color::White), false};
     // m_board[cells::D1] = {Piece::generate(Type::Queen, Color::White), false};
     m_board[cells::E1] = {Piece::generate(Type::King, Color::White), false};
-    m_board[cells::F1] = {Piece::generate(Type::Bishop, Color::White), false};
+    // m_board[cells::F1] = {Piece::generate(Type::Bishop, Color::White), false};
     // m_board[cells::G1] = {Piece::generate(Type::Knight, Color::White), false};
-    m_board[cells::H1] = {Piece::generate(Type::Rook, Color::White), false};
+    // m_board[cells::H1] = {Piece::generate(Type::Rook, Color::White), false};
 
     // m_board[cells::A2] = {Piece::generate(Type::Pawn, Color::White), false};
     // m_board[cells::B2] = {Piece::generate(Type::Pawn, Color::White), false};
@@ -92,6 +92,12 @@ namespace chess {
     // m_board[cells::F8] = {Piece::generate(Type::Bishop, Color::Black), false};
     // m_board[cells::G8] = {Piece::generate(Type::Knight, Color::Black), false};
     // m_board[cells::H8] = {Piece::generate(Type::Rook, Color::Black), false};
+
+    m_board[cells::H2] = {Piece::generate(Type::Pawn, Color::Black), false};
+    m_board[cells::B2] = {Piece::generate(Type::Queen, Color::Black), false};
+    m_board[cells::B3] = {Piece::generate(Type::Queen, Color::Black), false};
+    m_board[cells::B6] = {Piece::generate(Type::Queen, Color::Black), false};
+    m_board[cells::B7] = {Piece::generate(Type::Queen, Color::Black), false};
   }
 
   const Piece&
