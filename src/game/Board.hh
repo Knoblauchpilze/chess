@@ -162,15 +162,15 @@ namespace chess {
        *          to the end position.
        * @param start - the start location to move from.
        * @param end - the end location to move to.
+       * @param autoPromote - whether or not any pawn moved to the last rank
+       *                      should automatically be promoted or not.
+       * @param promotion - in case of auto promotion, the type to promote to.
        */
       void
-      move(const Coordinates& start, const Coordinates& end);
-
-      /**
-       * @brief - Attempt to cancel the last move done.
-       */
-      void
-      undo() noexcept;
+      move(const Coordinates& start,
+           const Coordinates& end,
+           bool autoPromote = false,
+           const Type& promotion = Type::Queen);
 
       /**
        * @brief - Attempts to promote the piece at the position in

@@ -78,21 +78,19 @@ namespace chess {
     // For each available position, evaluate the
     // state of the board after making the move.
     {
-      utils::Chrono<> clock("Evaluation of " + std::to_string(moves.size()), "moves");
+      utils::Chrono<> clock("Evaluation of " + std::to_string(moves.size()) + " move(s)", "moves", utils::Level::Info);
 
       float alpha = std::numeric_limits<float>::lowest();
       float beta = std::numeric_limits<float>::max();
 
       for (unsigned id = 0u ; id < moves.size() ; ++id) {
-        // Apply the move.
+        // Apply the move and auto-promote to queen.
         Board cb(b);
-        cb.move(moves[id].start, moves[id].end);
+        cb.move(moves[id].start, moves[id].end, true, Type::Queen);
 
 # ifdef ROOT_LOG
         std::string msg = "Evaluating ";
-        msg += colorToString(cb.at(moves[id].end).color());
-        msg += " ";
-        msg += cb.at(moves[id].end).name();
+        msg += cb.at(moves[id].end).fullName();
         msg += " from ";
         msg += moves[id].start.toString();
         msg += " to ";
@@ -112,9 +110,7 @@ namespace chess {
 
 # ifdef ROOT_LOG
         msg = "Evaluated ";
-        msg += colorToString(cb.at(moves[id].end).color());
-        msg += " ";
-        msg += cb.at(moves[id].end).name();
+        msg += cb.at(moves[id].end).fullName();
         msg += " from ";
         msg += moves[id].start.toString();
         msg += " to ";
@@ -131,7 +127,7 @@ namespace chess {
         alpha = std::max(alpha, moves[id].weight);
       }
 
-      log("Visited " + std::to_string(nodes) + " node(s) to analyze " + std::to_string(moves.size()) + " move(s)");
+      log("Visited " + std::to_string(nodes) + " node(s) to analyze " + std::to_string(moves.size()) + " move(s)", utils::Level::Verbose);
     }
 
     return moves;
@@ -187,13 +183,12 @@ namespace chess {
     // state of the board after making the move.
     for (unsigned id = 0u ; id < moves.size() ; ++id) {
       Board cb(b);
-      cb.move(moves[id].start, moves[id].end);
+      // Allow auto-promotion to queen.
+      cb.move(moves[id].start, moves[id].end, true, Type::Queen);
 
 # ifdef EXPLORE_LOG
       std::string msg = "Evaluating ";
-      msg += colorToString(cb.at(moves[id].end).color());
-      msg += " ";
-      msg += cb.at(moves[id].end).name();
+      msg += cb.at(moves[id].end).fullName();
       msg += " from ";
       msg += moves[id].start.toString();
       msg += " to ";
@@ -212,9 +207,7 @@ namespace chess {
 
 # ifdef EXPLORE_LOG
       msg = "Evaluated ";
-      msg += colorToString(cb.at(moves[id].end).color());
-      msg += " ";
-      msg += cb.at(moves[id].end).name();
+      msg += cb.at(moves[id].end).fullName();
       msg += " from ";
       msg += moves[id].start.toString();
       msg += " to ";

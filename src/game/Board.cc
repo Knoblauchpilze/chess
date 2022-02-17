@@ -320,7 +320,11 @@ namespace chess {
   }
 
   void
-  Board::move(const Coordinates& start, const Coordinates& end) {
+  Board::move(const Coordinates& start,
+              const Coordinates& end,
+              bool autoPromote,
+              const Type& promotion)
+  {
     // Fetch starting and ending position.
     PieceData sp = m_board[linear(start)];
     PieceData e = m_board[linear(end)];
@@ -356,26 +360,11 @@ namespace chess {
 
     m_last.captured = e;
     m_last.raw = PieceData{ Piece::generate(), false };
-  }
 
-  void
-  Board::undo() noexcept {
-    // In case the last move is assigned, let's revert it.
-    if (!validCoordinates(m_last.origin) || !validCoordinates(m_last.end)) {
-      warn("Failed to undo move", "No move registered");
-      return;
+    // Handle auto-promoting if required.
+    if (autoPromote && sp.item.pawn() && (end.y() == 0 || end.y() == h() - 1)) {
+      promote(end, promotion);
     }
-    // Revert the initial piece.
-    if (m_last.raw.item.valid()) {
-      log("Restoring promoted " + m_last.raw.item.fullName() + " at " + m_last.origin.toString() + " to " + m_last.raw.item.fullName());
-      m_board[linear(m_last.origin)] = m_last.raw;
-    }
-    else {
-      m_board[linear(m_last.origin)] = m_board[linear(m_last.end)];
-    }
-
-    // Revert the end piece to its value.
-    m_board[linear(m_last.end)] = m_last.captured;
   }
 
   void
@@ -396,7 +385,7 @@ namespace chess {
       );
     }
 
-    log("Promoting " + pi.fullName() + " to " + pieceToString(promote), utils::Level::Info);
+    log("Promoting " + pi.fullName() + " to " + pieceToString(promote), utils::Level::Verbose);
 
     if (m_last.end == p) {
       m_last.raw = m_board[linear(p)];
