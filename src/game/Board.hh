@@ -53,7 +53,7 @@ namespace chess {
       /**
        * @brief - Returns the piece at the specified position or none in
        *          case the cell is empty.
-       * @param x - the x coordinate.
+       * @param x - the x coordinates.
        * @param y - the y coordinates.
        * @return - the piece at this place.
        */
