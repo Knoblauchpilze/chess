@@ -79,7 +79,7 @@ namespace pge {
         true,  // disabled
         false, // terminated
         false, // resigned
-        false, // lost
+        false, // done
       }
     ),
 
