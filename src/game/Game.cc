@@ -207,7 +207,7 @@ namespace pge {
     m_menus.win.menu = generateMessageBoxMenu(
       olc::vi2d((width - 300.0f) / 2.0f, (height - 150.0f) / 2.0f),
       olc::vi2d(300, 150),
-      "Your checkmated your opponent !",
+      "You checkmated your opponent !",
       "win",
       false
     );
