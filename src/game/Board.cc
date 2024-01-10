@@ -219,13 +219,12 @@ namespace chess {
       CoordinatesSet::const_iterator it = s.cbegin();
       while (it != s.cend() && !canLeaveCheck) {
         if (!leadsToCheck(av[id].second, *it)) {
-          log(
+          verbose(
             "Move " + av[id].first.name() +
             " (" + colorToString(av[id].first.color()) + ", " + colorToString(c) +
             ") from " + av[id].second.toString() +
             " to " + it->toString() +
-            " prevents check",
-            utils::Level::Verbose
+            " prevents check"
           );
 
           canLeaveCheck = true;
@@ -385,7 +384,7 @@ namespace chess {
       );
     }
 
-    log("Promoting " + pi.fullName() + " to " + pieceToString(promote), utils::Level::Verbose);
+    verbose("Promoting " + pi.fullName() + " to " + pieceToString(promote));
 
     if (m_last.end == p) {
       m_last.raw = m_board[linear(p)];

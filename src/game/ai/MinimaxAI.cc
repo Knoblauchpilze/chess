@@ -87,7 +87,7 @@ namespace chess {
     // For each available position, evaluate the
     // state of the board after making the move.
     {
-      utils::Chrono<> clock("Evaluation of " + std::to_string(moves.size()) + " move(s)", "moves", utils::Level::Info);
+      utils::Chrono<> clock("Evaluation of " + std::to_string(moves.size()) + " move(s)", "moves");
 
       int alpha = -CHECKMATE_EVALUATION;
       int beta = CHECKMATE_EVALUATION;
@@ -105,7 +105,7 @@ namespace chess {
         msg += " to ";
         msg += moves[id].end.toString();
 
-        log("[0] " + colorToString(m_color) + " " + msg, utils::Level::Notice);
+        notice("[0] " + colorToString(m_color) + " " + msg);
 # endif
 
         // The idea of the alpha-beta pruning is described
@@ -134,13 +134,13 @@ namespace chess {
         msg += std::to_string(pruned);
         msg += ")";
 
-        log("[0] " + colorToString(m_color) + " " + msg, utils::Level::Notice);
+        notice("[0] " + colorToString(m_color) + " " + msg);
 # endif
         // Handle alpha-beta pruning.
         alpha = std::max(alpha, moves[id].weight);
       }
 
-      log("Visited " + std::to_string(nodes) + " node(s) (" + std::to_string(pruned) + " pruned) to analyze " + std::to_string(moves.size()) + " move(s)", utils::Level::Info);
+      info("Visited " + std::to_string(nodes) + " node(s) (" + std::to_string(pruned) + " pruned) to analyze " + std::to_string(moves.size()) + " move(s)");
     }
 
     return moves;
@@ -162,11 +162,10 @@ namespace chess {
       return std::string(2u * depth, ' ');
     };
 
-    auto print = [this, &depth, &indent, &c](const std::string msg, const utils::Level& level) {
-      log(
+    auto print = [this, &depth, &indent, &c](const std::string msg) {
+      notice(
         "[" + std::to_string(depth) + "] " + indent(depth) +
-        colorToString(c) + " " + msg,
-        level
+        colorToString(c) + " " + msg
       );
     };
 # endif
@@ -181,7 +180,7 @@ namespace chess {
       // call.
       float w = evaluateBoard(c, b);
 # ifdef EVALUATE_LOG
-      print("board: " + std::to_string(w), utils::Level::Notice);
+      print("board: " + std::to_string(w));
 # endif
 
       *nodes = 1u;
@@ -206,7 +205,7 @@ namespace chess {
       msg += moves[id].start.toString();
       msg += " to ";
       msg += moves[id].end.toString();
-      print(msg, utils::Level::Notice);
+      print(msg);
 # endif
 
       unsigned visited = 0u;
@@ -230,7 +229,7 @@ namespace chess {
       msg += " (nodes: ";
       msg += std::to_string(visited);
       msg += ")";
-      print(msg, utils::Level::Notice);
+      print(msg);
 # endif
 
       // Handle alpha-beta pruning.
@@ -290,7 +289,7 @@ namespace chess {
     msg += " (nodes: ";
     msg += std::to_string(*nodes);
     msg += ")";
-    print(msg, utils::Level::Notice);
+    print(msg);
 # endif
 
     return moves[0].weight;

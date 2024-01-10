@@ -278,13 +278,13 @@ namespace pge {
   Game::performAction(float x, float y) {
     // Only handle actions when the game is not disabled.
     if (m_state.disabled) {
-      log("Ignoring action while menu is disabled");
+      debug("Ignoring action while menu is disabled");
       return;
     }
 
     // Also prevent action in case the player resigned.
     if (m_state.resigned) {
-      log("Ignoring action while player resigned");
+      debug("Ignoring action while player resigned");
       return;
     }
 
@@ -301,7 +301,7 @@ namespace pge {
     // In case a promotion coordinates is available, disable
     // the selection of a new one.
     if (m_promote) {
-      log("Waiting for promoting");
+      debug("Waiting for promoting");
       return;
     }
 
@@ -403,7 +403,7 @@ namespace pge {
       return;
     }
 
-    log("Game is now resumed", utils::Level::Info);
+    info("Game is now resumed");
     m_state.paused = false;
 
     // Also, make the AI play: this will make sure that
@@ -416,7 +416,7 @@ namespace pge {
   Game::setPlayer(const chess::Color& color) noexcept {
     // Create the AI with the oppostie color as the player.
     m_ai = std::make_shared<chess::MinimaxAI>(oppositeColor(color), AI_TREE_DEPTH);
-    log("Player will be " + colorToString(color), utils::Level::Info);
+    info("Player will be " + colorToString(color));
 
     // Reset the board.
     m_board->initialize();
@@ -460,7 +460,7 @@ namespace pge {
   void
   Game::resign() noexcept {
     chess::Color p = chess::oppositeColor(m_ai->side());
-    log(colorToString(p) + " resigned", utils::Level::Info);
+    info(colorToString(p) + " resigned");
 
     m_state.resigned = true;
   }
@@ -470,10 +470,10 @@ namespace pge {
     m_state.disabled = !enable;
 
     if (m_state.disabled) {
-      log("Disabled game UI", utils::Level::Verbose);
+      verbose("Disabled game UI");
     }
     else {
-      log("Enabled game UI", utils::Level::Verbose);
+      verbose("Enabled game UI");
     }
   }
 

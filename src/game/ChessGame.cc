@@ -220,7 +220,7 @@ namespace chess {
       ++m_index;
       m_round = Round(m_index);
 
-      log("Adding round " + m_rounds.back().toString(), utils::Level::Info);
+      info("Adding round " + m_rounds.back().toString());
     }
 
     // Move to the next player if the other player

@@ -40,11 +40,11 @@ namespace chess {
     // Generate the best move using the interface method.
     std::vector<ai::Move> moves = generateMoves(b());
     if (moves.empty()) {
-      log("No legal moves for " + colorToString(m_color));
+      debug("No legal moves for " + colorToString(m_color));
       return false;
     }
 
-    log("Generated " + std::to_string(moves.size()) + " move(s) for " + colorToString(m_color));
+    debug("Generated " + std::to_string(moves.size()) + " move(s) for " + colorToString(m_color));
 
     // Sort moves based on how favourable they are.
     std::sort(
@@ -56,7 +56,7 @@ namespace chess {
     );
 
     ai::Move best = moves[0];
-    log("Picked move from " + best.start.toString() + " to " + best.end.toString() + " with weight " + std::to_string(best.weight), utils::Level::Info);
+    info("Picked move from " + best.start.toString() + " to " + best.end.toString() + " with weight " + std::to_string(best.weight));
 
     // Apply the move.
     if (!b.move(best.start, best.end)) {
